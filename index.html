@@ -4,380 +4,489 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>RatTara – Withdrawal Portal</title>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#080c14;
-  --surface:#0f1520;
-  --card:#141c2e;
-  --border:#1e2d4a;
-  --accent:#00d4ff;
-  --accent2:#7c3aed;
-  --gold:#f59e0b;
-  --green:#10b981;
-  --red:#ef4444;
-  --text:#e2e8f0;
-  --muted:#64748b;
-  --font:'Sora',sans-serif;
+  --bg:#f5f7fa;
+  --white:#ffffff;
+  --surface:#f0f2f5;
+  --border:#e2e6ea;
+  --border2:#d0d5dd;
+  --text:#1a1d23;
+  --text2:#4a5568;
+  --text3:#8a95a3;
+  --primary:#2563eb;
+  --primary-light:#eff6ff;
+  --primary-dark:#1d4ed8;
+  --green:#059669;
+  --green-light:#ecfdf5;
+  --red:#dc2626;
+  --red-light:#fef2f2;
+  --gold:#d97706;
+  --gold-light:#fffbeb;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 30px rgba(0,0,0,.1),0 4px 8px rgba(0,0,0,.06);
+  --radius:12px;
+  --radius-sm:8px;
+  --radius-lg:16px;
+  --font:'Plus Jakarta Sans','Noto Sans Bengali',sans-serif;
 }
-body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -20%,rgba(0,212,255,.08),transparent),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(124,58,237,.06),transparent);pointer-events:none;z-index:0}
 
-/* ---- LOADER ---- */
-#loader{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .5s}
-.loader-ring{width:60px;height:60px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;font-size:15px;line-height:1.6}
 
-/* ---- NAV ---- */
-nav{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:20px 32px;border-bottom:1px solid var(--border)}
-.logo{display:flex;align-items:center;gap:10px;font-size:1.4rem;font-weight:800;letter-spacing:-0.5px}
-.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
-.logo span{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.nav-right{display:flex;align-items:center;gap:12px}
-.badge{background:rgba(0,212,255,.1);color:var(--accent);border:1px solid rgba(0,212,255,.2);padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:600}
+/* LOADER */
+#loader{position:fixed;inset:0;background:var(--white);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .4s}
+#loader.hide{opacity:0;pointer-events:none}
+.loader-logo{font-size:2rem;font-weight:800;color:var(--primary);margin-bottom:20px;letter-spacing:-1px}
+.loader-bar{width:200px;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.loader-bar-fill{height:100%;background:var(--primary);border-radius:2px;animation:loading 1.5s ease infinite}
+@keyframes loading{0%{width:0;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0;margin-left:100%}}
 
-/* ---- PAGES ---- */
-.page{display:none;position:relative;z-index:1}
+/* NAV */
+nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:none;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:var(--shadow)}
+nav.show{display:flex}
+.nav-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.1rem;color:var(--text);letter-spacing:-.3px}
+.nav-icon{width:34px;height:34px;background:var(--primary);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-badge{background:var(--primary-light);color:var(--primary);padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:700;border:1px solid rgba(37,99,235,.15)}
+.btn-logout{background:var(--red-light);color:var(--red);border:1px solid rgba(220,38,38,.15);padding:7px 14px;border-radius:var(--radius-sm);font-family:var(--font);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-logout:hover{background:var(--red);color:#fff}
+
+/* PAGES */
+.page{display:none;min-height:calc(100vh - 60px)}
 .page.active{display:block}
+#loginPage.active,#adminLoginPage.active{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
 
-/* ---- LOGIN ---- */
-#loginPage{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-.login-card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:48px 40px;width:100%;max-width:420px;position:relative;overflow:hidden}
-.login-card::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(0,212,255,.12),transparent 70%);pointer-events:none}
-.login-title{font-size:1.8rem;font-weight:800;margin-bottom:6px}
-.login-sub{color:var(--muted);font-size:.9rem;margin-bottom:32px}
-.form-group{margin-bottom:20px}
-.form-group label{display:block;font-size:.8rem;font-weight:600;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px}
-.form-group input,.form-group select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;color:var(--text);font-family:var(--font);font-size:.95rem;transition:border-color .2s,box-shadow .2s;outline:none}
-.form-group input:focus,.form-group select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,212,255,.1)}
-.form-group select option{background:var(--surface)}
-.btn{width:100%;padding:14px;border:none;border-radius:12px;font-family:var(--font);font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.02em}
-.btn-primary{background:linear-gradient(135deg,var(--accent),#0099cc);color:#000}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,212,255,.3)}
+/* CARD */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow)}
+
+/* LOGIN */
+.auth-card{width:100%;max-width:420px;padding:40px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg)}
+.auth-logo{text-align:center;margin-bottom:28px}
+.auth-logo-icon{width:56px;height:56px;background:var(--primary);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 12px;box-shadow:0 4px 12px rgba(37,99,235,.3)}
+.auth-title{font-size:1.5rem;font-weight:800;color:var(--text);letter-spacing:-.4px}
+.auth-sub{color:var(--text3);font-size:.88rem;margin-top:4px}
+
+/* FORM */
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:.8rem;font-weight:700;color:var(--text2);margin-bottom:6px;letter-spacing:.03em;text-transform:uppercase}
+.form-input{width:100%;background:var(--white);border:1.5px solid var(--border2);border-radius:var(--radius-sm);padding:12px 14px;color:var(--text);font-family:var(--font);font-size:.95rem;transition:all .2s;outline:none}
+.form-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.form-input::placeholder{color:var(--text3)}
+.form-select{width:100%;background:var(--white);border:1.5px solid var(--border2);border-radius:var(--radius-sm);padding:12px 14px;color:var(--text);font-family:var(--font);font-size:.95rem;cursor:pointer;outline:none;transition:all .2s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a95a3' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.form-select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+
+/* BTN */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 20px;border-radius:var(--radius-sm);font-family:var(--font);font-size:.9rem;font-weight:700;cursor:pointer;border:none;transition:all .2s;text-decoration:none;white-space:nowrap}
+.btn-full{width:100%}
+.btn-primary{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.3)}
+.btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,.35)}
 .btn-primary:active{transform:translateY(0)}
-.btn-danger{background:linear-gradient(135deg,var(--red),#b91c1c);color:#fff;margin-top:8px}
-.btn-sm{width:auto;padding:8px 16px;font-size:.8rem;border-radius:8px}
-.error-msg{color:var(--red);font-size:.85rem;margin-top:8px;display:none}
-.admin-link{text-align:center;margin-top:20px;font-size:.85rem;color:var(--muted)}
-.admin-link a{color:var(--accent);text-decoration:none;font-weight:600}
+.btn-outline{background:var(--white);color:var(--text2);border:1.5px solid var(--border2)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+.btn-success{background:var(--green);color:#fff}
+.btn-success:hover{background:#047857}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{background:#b91c1c}
+.btn-sm{padding:7px 14px;font-size:.8rem;border-radius:var(--radius-sm)}
+.btn-xs{padding:5px 10px;font-size:.75rem;border-radius:6px}
 
-/* ---- DASHBOARD ---- */
-#dashPage{min-height:100vh;padding:24px 32px}
-.dash-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:gap}
-.greeting{font-size:1.5rem;font-weight:700}
-.greeting span{color:var(--accent)}
-.balance-card{background:linear-gradient(135deg,#0a1628,#0f2040);border:1px solid rgba(0,212,255,.2);border-radius:20px;padding:28px 32px;margin-bottom:24px;position:relative;overflow:hidden}
-.balance-card::after{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(0,212,255,.15),transparent 70%)}
-.balance-label{font-size:.8rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
-.balance-amount{font-size:2.8rem;font-weight:800;color:var(--accent);line-height:1}
-.balance-amount span{font-size:1.4rem;margin-right:4px}
-.balance-sub{color:var(--muted);font-size:.85rem;margin-top:6px}
+/* ERROR */
+.error-box{background:var(--red-light);color:var(--red);border:1px solid rgba(220,38,38,.2);border-radius:var(--radius-sm);padding:10px 14px;font-size:.85rem;font-weight:600;margin-top:8px;display:none}
 
-.section-title{font-size:1rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.section-title::before{content:'';width:3px;height:16px;background:var(--accent);border-radius:2px;display:inline-block}
+/* ADMIN TOGGLE */
+.auth-toggle{text-align:center;margin-top:20px;font-size:.85rem;color:var(--text3)}
+.auth-toggle a{color:var(--primary);text-decoration:none;font-weight:700}
+.auth-toggle a:hover{text-decoration:underline}
 
-.withdraw-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;margin-bottom:24px}
-.row-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.method-select{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
-.method-btn{background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .2s;font-size:.85rem;font-weight:600}
-.method-btn:hover{border-color:var(--accent);color:var(--accent)}
-.method-btn.active{border-color:var(--accent);background:rgba(0,212,255,.08);color:var(--accent)}
-.method-icon{font-size:1.4rem;display:block;margin-bottom:4px}
+/* DASHBOARD */
+#dashPage{padding:24px;max-width:760px;margin:0 auto}
+.page-header{margin-bottom:24px}
+.page-title{font-size:1.4rem;font-weight:800;letter-spacing:-.4px}
+.page-sub{color:var(--text3);font-size:.88rem;margin-top:3px}
 
-.requests-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px}
-.request-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.request-info{flex:1}
-.request-amount{font-size:1.1rem;font-weight:700;color:var(--text)}
-.request-meta{font-size:.8rem;color:var(--muted);margin-top:3px}
-.status-badge{padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:700;white-space:nowrap}
-.status-pending{background:rgba(245,158,11,.15);color:var(--gold);border:1px solid rgba(245,158,11,.3)}
-.status-approved{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3)}
-.status-rejected{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
-.empty-state{text-align:center;padding:32px;color:var(--muted);font-size:.9rem}
+/* BALANCE CARD */
+.balance-card{background:linear-gradient(135deg,#2563eb,#1e40af);color:#fff;border-radius:var(--radius-lg);padding:28px 32px;margin-bottom:20px;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(37,99,235,.3)}
+.balance-card::after{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:rgba(255,255,255,.06);border-radius:50%}
+.balance-card::before{content:'';position:absolute;bottom:-60px;left:-20px;width:200px;height:200px;background:rgba(255,255,255,.04);border-radius:50%}
+.balance-label{font-size:.78rem;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.balance-amount{font-size:3rem;font-weight:800;letter-spacing:-2px;line-height:1}
+.balance-amount .currency{font-size:1.5rem;font-weight:600;opacity:.8;margin-right:4px}
+.balance-min{opacity:.65;font-size:.82rem;margin-top:8px}
 
-/* ---- ADMIN ---- */
-#adminPage{min-height:100vh;padding:24px 32px}
-.admin-grid{display:grid;grid-template-columns:280px 1fr;gap:24px;min-height:calc(100vh - 120px)}
-.admin-sidebar{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:20px;height:fit-content;position:sticky;top:24px}
-.admin-menu-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;cursor:pointer;transition:all .2s;font-size:.9rem;font-weight:500;color:var(--muted);margin-bottom:4px}
-.admin-menu-item:hover{background:var(--surface);color:var(--text)}
-.admin-menu-item.active{background:rgba(0,212,255,.1);color:var(--accent);border:1px solid rgba(0,212,255,.15)}
-.admin-menu-item .menu-icon{font-size:1.1rem}
-.admin-content{display:flex;flex-direction:column;gap:20px}
-.admin-panel{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;display:none}
+/* SECTION */
+.section{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px;box-shadow:var(--shadow)}
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.section-icon{width:36px;height:36px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.section-icon.blue{background:var(--primary-light);color:var(--primary)}
+.section-icon.green{background:var(--green-light);color:var(--green)}
+.section-title-text{font-size:1rem;font-weight:700;color:var(--text)}
+.section-sub{font-size:.8rem;color:var(--text3);margin-top:1px}
+
+/* METHOD SELECT */
+.method-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.method-btn{background:var(--bg);border:2px solid var(--border);border-radius:var(--radius-sm);padding:14px 8px;text-align:center;cursor:pointer;transition:all .2s;font-size:.85rem;font-weight:700;color:var(--text2)}
+.method-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
+.method-btn.active{border-color:var(--primary);background:var(--primary-light);color:var(--primary)}
+.method-emoji{font-size:1.5rem;display:block;margin-bottom:5px}
+
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* REQUEST ITEM */
+.req-item{border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;background:var(--white);transition:box-shadow .2s}
+.req-item:hover{box-shadow:var(--shadow-md)}
+.req-amount{font-size:1rem;font-weight:700;color:var(--text)}
+.req-meta{font-size:.8rem;color:var(--text3);margin-top:2px}
+.badge{padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700;white-space:nowrap}
+.badge-pending{background:var(--gold-light);color:var(--gold);border:1px solid rgba(217,119,6,.2)}
+.badge-approved{background:var(--green-light);color:var(--green);border:1px solid rgba(5,150,105,.2)}
+.badge-rejected{background:var(--red-light);color:var(--red);border:1px solid rgba(220,38,38,.2)}
+.empty{text-align:center;padding:32px;color:var(--text3);font-size:.9rem}
+
+/* ADMIN */
+#adminPage{display:none;padding:24px;max-width:1100px;margin:0 auto}
+#adminPage.active{display:block}
+.admin-layout{display:grid;grid-template-columns:220px 1fr;gap:20px;align-items:start}
+.admin-nav{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;box-shadow:var(--shadow);position:sticky;top:80px}
+.admin-nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:.88rem;font-weight:600;color:var(--text2);margin-bottom:2px;transition:all .2s}
+.admin-nav-item:hover{background:var(--bg);color:var(--text)}
+.admin-nav-item.active{background:var(--primary-light);color:var(--primary)}
+.admin-nav-icon{font-size:1rem;width:20px;text-align:center}
+
+.admin-panel{display:none}
 .admin-panel.active{display:block}
 
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
-.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center}
-.stat-num{font-size:1.8rem;font-weight:800;color:var(--accent)}
-.stat-label{font-size:.78rem;color:var(--muted);margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px;text-align:center;box-shadow:var(--shadow)}
+.stat-num{font-size:1.8rem;font-weight:800;color:var(--primary);letter-spacing:-1px}
+.stat-label{font-size:.75rem;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
 
-table{width:100%;border-collapse:collapse}
-th{text-align:left;padding:12px 14px;font-size:.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)}
-td{padding:14px;font-size:.88rem;border-bottom:1px solid rgba(30,45,74,.5);vertical-align:middle}
+/* ADD USER */
+.add-user-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:20px}
+.add-user-grid{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+thead{background:var(--bg)}
+th{padding:11px 14px;text-align:left;font-size:.75rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)}
+td{padding:13px 14px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(255,255,255,.02)}
+tbody tr:hover{background:var(--bg)}
+.td-actions{display:flex;gap:6px;flex-wrap:wrap}
 
-.action-btn{background:transparent;border:1px solid;border-radius:8px;padding:5px 12px;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:var(--font)}
-.action-approve{border-color:var(--green);color:var(--green)}
-.action-approve:hover{background:var(--green);color:#000}
-.action-reject{border-color:var(--red);color:var(--red)}
-.action-reject:hover{background:var(--red);color:#fff}
-.action-edit{border-color:var(--accent);color:var(--accent)}
-.action-edit:hover{background:var(--accent);color:#000}
-.action-otp{border-color:var(--gold);color:var(--gold)}
-.action-otp:hover{background:var(--gold);color:#000}
+/* OTP */
+.otp-tag{font-family:monospace;font-size:.9rem;font-weight:700;color:var(--gold);background:var(--gold-light);padding:3px 10px;border-radius:6px;border:1px solid rgba(217,119,6,.2);letter-spacing:.05em}
 
-.filter-row{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
-.filter-btn{padding:7px 16px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:var(--font);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s}
-.filter-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,.08)}
+/* FILTER */
+.filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filter-btn{padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--white);color:var(--text3);font-family:var(--font);font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s}
+.filter-btn:hover{border-color:var(--primary);color:var(--primary)}
+.filter-btn.active{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
 
-.add-user-form{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end;margin-bottom:24px;background:var(--surface);padding:20px;border-radius:14px;border:1px solid var(--border)}
-.add-user-form .form-group{margin-bottom:0}
-.otp-display{font-family:'Courier New',monospace;font-size:1.1rem;font-weight:700;color:var(--gold);letter-spacing:.1em;background:rgba(245,158,11,.1);padding:4px 10px;border-radius:6px}
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:200;padding:20px}
+.modal-bg.open{display:flex}
+.modal{background:var(--white);border-radius:var(--radius-lg);padding:28px;width:100%;max-width:380px;box-shadow:var(--shadow-lg);border:1px solid var(--border)}
+.modal-title{font-size:1rem;font-weight:800;margin-bottom:18px;color:var(--text)}
+.modal-actions{display:flex;gap:10px;margin-top:18px}
+.modal-actions .btn{flex:1}
 
-/* ---- MODAL ---- */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:100;display:none}
-.modal-overlay.open{display:flex}
-.modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px;width:90%;max-width:400px}
-.modal-title{font-size:1.1rem;font-weight:700;margin-bottom:20px}
-.modal-actions{display:flex;gap:10px;margin-top:20px}
-.modal-actions .btn{width:auto;flex:1}
-.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
-.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
-
-/* ---- TOAST ---- */
-#toast{position:fixed;bottom:32px;right:32px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 20px;font-size:.9rem;font-weight:600;z-index:999;transform:translateY(80px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:10px;max-width:320px}
+/* TOAST */
+#toast{position:fixed;bottom:28px;right:28px;padding:12px 18px;border-radius:var(--radius);font-size:.88rem;font-weight:700;z-index:999;transform:translateY(60px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:8px;max-width:300px;box-shadow:var(--shadow-lg);border:1px solid var(--border)}
 #toast.show{transform:translateY(0);opacity:1}
-#toast.success{border-color:var(--green);color:var(--green)}
-#toast.error{border-color:var(--red);color:var(--red)}
-#toast.info{border-color:var(--accent);color:var(--accent)}
+#toast.success{background:#fff;color:var(--green);border-color:rgba(5,150,105,.25)}
+#toast.error{background:#fff;color:var(--red);border-color:rgba(220,38,38,.25)}
+#toast.info{background:#fff;color:var(--primary);border-color:rgba(37,99,235,.25)}
 
-/* ---- LOGOUT BTN ---- */
-.logout-btn{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:var(--red);padding:8px 16px;border-radius:10px;font-family:var(--font);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s}
-.logout-btn:hover{background:var(--red);color:#fff}
+/* SETTINGS */
+.settings-box{max-width:440px}
+.settings-box .form-group{margin-bottom:18px}
 
-/* ---- RESPONSIVE ---- */
+/* RESPONSIVE */
 @media(max-width:768px){
-  nav{padding:14px 18px}
-  #dashPage,#adminPage{padding:16px}
-  .admin-grid{grid-template-columns:1fr}
-  .admin-sidebar{position:static;display:flex;gap:6px;flex-wrap:wrap;padding:14px}
-  .admin-menu-item{padding:8px 12px;font-size:.82rem}
-  .stats-row{grid-template-columns:repeat(2,1fr)}
-  .row-2{grid-template-columns:1fr}
-  .add-user-form{grid-template-columns:1fr}
-  table{font-size:.8rem}
-  td,th{padding:10px 8px}
-  .balance-amount{font-size:2rem}
-  .method-select{grid-template-columns:repeat(3,1fr)}
-  .login-card{padding:32px 24px}
+  nav{padding:0 16px}
+  #dashPage{padding:16px}
+  #adminPage{padding:16px}
+  .admin-layout{grid-template-columns:1fr}
+  .admin-nav{position:static;display:flex;gap:4px;flex-wrap:wrap}
+  .admin-nav-item{padding:7px 12px;font-size:.8rem}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .grid-2{grid-template-columns:1fr}
+  .add-user-grid{grid-template-columns:1fr}
+  .balance-amount{font-size:2.2rem}
+  .auth-card{padding:28px 20px}
+  #toast{right:16px;bottom:16px;left:16px;max-width:none}
 }
 </style>
 </head>
 <body>
 
 <!-- LOADER -->
-<div id="loader"><div class="loader-ring"></div></div>
+<div id="loader">
+  <div class="loader-logo">⭐ RatTara</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
 
 <!-- NAV -->
-<nav id="mainNav" style="display:none">
-  <div class="logo">
-    <div class="logo-icon">⭐</div>
-    <span>RatTara</span>
+<nav id="mainNav">
+  <div class="nav-brand">
+    <div class="nav-icon">⭐</div>
+    RatTara
   </div>
   <div class="nav-right">
-    <span class="badge" id="navBadge">Portal</span>
-    <button class="logout-btn" onclick="logout()">Logout</button>
+    <span class="nav-badge" id="navBadge">Portal</span>
+    <button class="btn-logout" onclick="logout()">Sign Out</button>
   </div>
 </nav>
 
-<!-- ===== LOGIN PAGE ===== -->
+<!-- ===== USER LOGIN ===== -->
 <div id="loginPage" class="page active">
-  <div class="login-card">
-    <div class="login-title">⭐ RatTara</div>
-    <div class="login-sub">Withdrawal Portal — আপনার account এ login করুন</div>
-    <div class="form-group">
-      <label>Username</label>
-      <input type="text" id="loginUser" placeholder="আপনার username"/>
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="auth-logo-icon">⭐</div>
+      <div class="auth-title">RatTara Portal</div>
+      <div class="auth-sub">আপনার account এ login করুন</div>
     </div>
     <div class="form-group">
-      <label>OTP Code</label>
-      <input type="text" id="loginOtp" placeholder="Admin দেওয়া OTP"/>
+      <label class="form-label">Username</label>
+      <input class="form-input" type="text" id="loginUser" placeholder="আপনার username লিখুন"/>
     </div>
-    <div class="error-msg" id="loginErr">❌ Username বা OTP ভুল</div>
-    <button class="btn btn-primary" onclick="userLogin()">Login করুন →</button>
-    <div class="admin-link"><a href="#" onclick="showAdminLogin()">🔐 Admin Panel</a></div>
+    <div class="form-group">
+      <label class="form-label">Password / OTP</label>
+      <input class="form-input" type="password" id="loginPass" placeholder="Password বা OTP লিখুন" onkeydown="if(event.key==='Enter')userLogin()"/>
+    </div>
+    <div class="error-box" id="loginErr">❌ Username বা Password ভুল হয়েছে</div>
+    <button class="btn btn-primary btn-full" style="margin-top:8px" onclick="userLogin()">Login করুন →</button>
+    <div class="auth-toggle"><a href="#" onclick="showAdminLogin(event)">🔐 Admin Panel এ যান</a></div>
   </div>
 </div>
 
 <!-- ===== ADMIN LOGIN ===== -->
 <div id="adminLoginPage" class="page">
-  <div id="loginPage" style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px">
-  <div class="login-card">
-    <div class="login-title">🔐 Admin Login</div>
-    <div class="login-sub">RatTara Admin Panel</div>
-    <div class="form-group">
-      <label>Admin Password</label>
-      <input type="password" id="adminPass" placeholder="Password"/>
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="auth-logo-icon" style="background:#1e293b">🔐</div>
+      <div class="auth-title">Admin Login</div>
+      <div class="auth-sub">RatTara Admin Panel</div>
     </div>
-    <div class="error-msg" id="adminErr">❌ Password ভুল</div>
-    <button class="btn btn-primary" onclick="adminLogin()">Admin Login →</button>
-    <div class="admin-link"><a href="#" onclick="showUserLogin()">← User Login</a></div>
-  </div>
+    <div class="form-group">
+      <label class="form-label">Admin Username</label>
+      <input class="form-input" type="text" id="adminUser" placeholder="admin"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Admin Password</label>
+      <input class="form-input" type="password" id="adminPass" placeholder="Password" onkeydown="if(event.key==='Enter')adminLogin()"/>
+    </div>
+    <div class="error-box" id="adminErr">❌ Username বা Password ভুল</div>
+    <button class="btn btn-primary btn-full" style="margin-top:8px;background:#1e293b" onclick="adminLogin()">Admin Login →</button>
+    <div class="auth-toggle"><a href="#" onclick="showUserLogin(event)">← User Login এ ফিরে যান</a></div>
   </div>
 </div>
 
 <!-- ===== USER DASHBOARD ===== -->
 <div id="dashPage" class="page">
-  <div class="dash-header">
-    <div>
-      <div class="greeting">স্বাগতম, <span id="dashName">User</span>!</div>
-      <div style="color:var(--muted);font-size:.85rem;margin-top:4px">আপনার withdrawal portal</div>
-    </div>
+  <div class="page-header">
+    <div class="page-title">স্বাগতম, <span id="dashName" style="color:var(--primary)">User</span>! 👋</div>
+    <div class="page-sub">আপনার withdrawal portal</div>
   </div>
 
   <div class="balance-card">
     <div class="balance-label">Available Balance</div>
-    <div class="balance-amount"><span>৳</span><span id="dashBalance">0</span></div>
-    <div class="balance-sub">সর্বনিম্ন উত্তোলন ৳100</div>
+    <div class="balance-amount"><span class="currency">৳</span><span id="dashBalance">0</span></div>
+    <div class="balance-min">সর্বনিম্ন উত্তোলন ৳100</div>
   </div>
 
-  <div class="withdraw-card">
-    <div class="section-title">Withdrawal Request</div>
+  <!-- WITHDRAW FORM -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon blue">💸</div>
+      <div>
+        <div class="section-title-text">Withdrawal Request</div>
+        <div class="section-sub">আপনার payment method বেছে নিন</div>
+      </div>
+    </div>
+
     <div class="form-group">
-      <label>Payment Method বেছে নিন</label>
-      <div class="method-select">
-        <div class="method-btn active" onclick="selectMethod(this,'bKash')"><span class="method-icon">💜</span>bKash</div>
-        <div class="method-btn" onclick="selectMethod(this,'Nagad')"><span class="method-icon">🧡</span>Nagad</div>
-        <div class="method-btn" onclick="selectMethod(this,'Binance')"><span class="method-icon">🟡</span>Binance</div>
+      <label class="form-label">Payment Method</label>
+      <div class="method-grid">
+        <div class="method-btn active" onclick="selectMethod(this,'bKash')">
+          <span class="method-emoji">💜</span>bKash
+        </div>
+        <div class="method-btn" onclick="selectMethod(this,'Nagad')">
+          <span class="method-emoji">🧡</span>Nagad
+        </div>
+        <div class="method-btn" onclick="selectMethod(this,'Binance')">
+          <span class="method-emoji">🟡</span>Binance
+        </div>
       </div>
     </div>
-    <div class="row-2">
+
+    <div class="grid-2">
       <div class="form-group">
-        <label>আপনার পূর্ণ নাম</label>
-        <input type="text" id="wdName" placeholder="Full name"/>
+        <label class="form-label">পূর্ণ নাম</label>
+        <input class="form-input" type="text" id="wdName" placeholder="আপনার পূর্ণ নাম"/>
       </div>
       <div class="form-group">
-        <label id="wdNumLabel">bKash নম্বর</label>
-        <input type="text" id="wdNumber" placeholder="01XXXXXXXXX"/>
+        <label class="form-label" id="wdNumLabel">bKash নম্বর</label>
+        <input class="form-input" type="text" id="wdNumber" placeholder="01XXXXXXXXX"/>
       </div>
     </div>
-    <div class="row-2">
+    <div class="grid-2">
       <div class="form-group">
-        <label id="wdAccLabel">Account Type</label>
-        <select id="wdAccType">
-          <option value="Personal">Personal</option>
-          <option value="Agent">Agent</option>
-          <option value="Merchant">Merchant</option>
+        <label class="form-label" id="wdAccLabel">Account Type</label>
+        <select class="form-select" id="wdAccType">
+          <option>Personal</option>
+          <option>Agent</option>
+          <option>Merchant</option>
         </select>
       </div>
       <div class="form-group">
-        <label>Amount (৳)</label>
-        <input type="number" id="wdAmount" placeholder="সর্বনিম্ন ৳100" min="100"/>
+        <label class="form-label">Amount (৳)</label>
+        <input class="form-input" type="number" id="wdAmount" placeholder="সর্বনিম্ন ৳100" min="100"/>
       </div>
     </div>
-    <div class="error-msg" id="wdErr">Error</div>
-    <button class="btn btn-primary" onclick="submitWithdraw()">Request Submit করুন →</button>
+    <div class="error-box" id="wdErr">Error</div>
+    <button class="btn btn-primary btn-full" style="margin-top:4px" onclick="submitWithdraw()">Request Submit করুন →</button>
   </div>
 
-  <div class="requests-card">
-    <div class="section-title">আমার Requests</div>
-    <div id="myRequests"><div class="empty-state">কোনো request নেই</div></div>
+  <!-- MY REQUESTS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon green">📋</div>
+      <div>
+        <div class="section-title-text">আমার Requests</div>
+        <div class="section-sub">সব withdrawal request এর status</div>
+      </div>
+    </div>
+    <div id="myRequests"><div class="empty">কোনো request নেই</div></div>
   </div>
 </div>
 
 <!-- ===== ADMIN PAGE ===== -->
 <div id="adminPage" class="page">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
-    <div style="font-size:1.5rem;font-weight:800">🔐 Admin Panel</div>
+  <div class="page-header">
+    <div class="page-title">🔐 Admin Panel</div>
+    <div class="page-sub">RatTara Withdrawal Management</div>
   </div>
 
-  <div class="admin-grid">
-    <div class="admin-sidebar">
-      <div class="admin-menu-item active" onclick="showAdminTab('overview',this)"><span class="menu-icon">📊</span> Overview</div>
-      <div class="admin-menu-item" onclick="showAdminTab('users',this)"><span class="menu-icon">👥</span> Users</div>
-      <div class="admin-menu-item" onclick="showAdminTab('requests',this)"><span class="menu-icon">💸</span> Withdrawals</div>
-      <div class="admin-menu-item" onclick="showAdminTab('settings',this)"><span class="menu-icon">⚙️</span> Settings</div>
+  <div class="admin-layout">
+    <div class="admin-nav">
+      <div class="admin-nav-item active" onclick="showTab('overview',this)"><span class="admin-nav-icon">📊</span>Overview</div>
+      <div class="admin-nav-item" onclick="showTab('users',this)"><span class="admin-nav-icon">👥</span>Users</div>
+      <div class="admin-nav-item" onclick="showTab('withdrawals',this)"><span class="admin-nav-icon">💸</span>Withdrawals</div>
+      <div class="admin-nav-item" onclick="showTab('settings',this)"><span class="admin-nav-icon">⚙️</span>Settings</div>
     </div>
 
-    <div class="admin-content">
-
+    <div>
       <!-- OVERVIEW -->
       <div class="admin-panel active" id="tab-overview">
-        <div class="stats-row">
-          <div class="stat-box"><div class="stat-num" id="st-users">0</div><div class="stat-label">Total Users</div></div>
-          <div class="stat-box"><div class="stat-num" id="st-pending">0</div><div class="stat-label">Pending</div></div>
-          <div class="stat-box"><div class="stat-num" id="st-approved">0</div><div class="stat-label">Approved</div></div>
-          <div class="stat-box"><div class="stat-num" id="st-total">৳0</div><div class="stat-label">Total Paid</div></div>
+        <div class="stats-grid">
+          <div class="stat"><div class="stat-num" id="st-users">0</div><div class="stat-label">Total Users</div></div>
+          <div class="stat"><div class="stat-num" id="st-pending" style="color:var(--gold)">0</div><div class="stat-label">Pending</div></div>
+          <div class="stat"><div class="stat-num" id="st-approved" style="color:var(--green)">0</div><div class="stat-label">Approved</div></div>
+          <div class="stat"><div class="stat-num" id="st-paid" style="color:var(--primary)">৳0</div><div class="stat-label">Total Paid</div></div>
         </div>
-        <div class="section-title">Recent Requests</div>
-        <div id="recentRequests"><div class="empty-state">No requests yet</div></div>
+        <div class="section">
+          <div class="section-header">
+            <div class="section-icon blue">🕐</div>
+            <div><div class="section-title-text">Recent Requests</div></div>
+          </div>
+          <div id="recentList"><div class="empty">No requests yet</div></div>
+        </div>
       </div>
 
       <!-- USERS -->
       <div class="admin-panel" id="tab-users">
-        <div class="section-title">New User Add করুন</div>
-        <div class="add-user-form">
-          <div class="form-group">
-            <label>Username</label>
-            <input type="text" id="newUsername" placeholder="username"/>
+        <div class="section">
+          <div class="section-header">
+            <div class="section-icon blue">➕</div>
+            <div><div class="section-title-text">New User Add করুন</div></div>
           </div>
-          <div class="form-group">
-            <label>Balance (৳)</label>
-            <input type="number" id="newBalance" placeholder="0"/>
+          <div class="add-user-box">
+            <div class="add-user-grid">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Username</label>
+                <input class="form-input" type="text" id="newUser" placeholder="username"/>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Balance (৳)</label>
+                <input class="form-input" type="number" id="newBal" placeholder="0"/>
+              </div>
+              <button class="btn btn-primary" style="height:46px;margin-top:22px" onclick="addUser()">Add User</button>
+            </div>
           </div>
-          <button class="btn btn-primary btn-sm" onclick="addUser()" style="height:50px;margin-top:22px">Add User</button>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Username</th><th>Balance</th><th>OTP / Password</th><th>Actions</th></tr></thead>
+              <tbody id="usersTable"><tr><td colspan="4" class="empty">No users</td></tr></tbody>
+            </table>
+          </div>
         </div>
-        <div class="section-title">সব Users</div>
-        <table>
-          <thead><tr><th>Username</th><th>Balance</th><th>OTP</th><th>Actions</th></tr></thead>
-          <tbody id="usersTable"></tbody>
-        </table>
       </div>
 
       <!-- WITHDRAWALS -->
-      <div class="admin-panel" id="tab-requests">
-        <div class="filter-row">
-          <button class="filter-btn active" onclick="filterReq('all',this)">সব</button>
-          <button class="filter-btn" onclick="filterReq('pending',this)">Pending</button>
-          <button class="filter-btn" onclick="filterReq('approved',this)">Approved</button>
-          <button class="filter-btn" onclick="filterReq('rejected',this)">Rejected</button>
+      <div class="admin-panel" id="tab-withdrawals">
+        <div class="section">
+          <div class="section-header">
+            <div class="section-icon blue">💸</div>
+            <div><div class="section-title-text">Withdrawal Requests</div></div>
+          </div>
+          <div class="filter-bar">
+            <button class="filter-btn active" onclick="filterReq('all',this)">সব</button>
+            <button class="filter-btn" onclick="filterReq('pending',this)">⏳ Pending</button>
+            <button class="filter-btn" onclick="filterReq('approved',this)">✅ Approved</button>
+            <button class="filter-btn" onclick="filterReq('rejected',this)">❌ Rejected</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>User</th><th>Method</th><th>Number</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="reqTable"><tr><td colspan="6" class="empty">No requests</td></tr></tbody>
+            </table>
+          </div>
         </div>
-        <table>
-          <thead><tr><th>User</th><th>Method</th><th>Number</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
-          <tbody id="reqTable"></tbody>
-        </table>
       </div>
 
       <!-- SETTINGS -->
       <div class="admin-panel" id="tab-settings">
-        <div class="section-title">Settings</div>
-        <div style="max-width:400px">
-          <div class="form-group">
-            <label>Minimum Withdrawal (৳)</label>
-            <input type="number" id="setMinWd" value="100"/>
+        <div class="section">
+          <div class="section-header">
+            <div class="section-icon blue">⚙️</div>
+            <div><div class="section-title-text">Settings</div></div>
           </div>
-          <div class="form-group">
-            <label>New Admin Password</label>
-            <input type="password" id="setAdminPass" placeholder="নতুন password"/>
+          <div class="settings-box">
+            <div class="form-group">
+              <label class="form-label">Minimum Withdrawal (৳)</label>
+              <input class="form-input" type="number" id="setMin" value="100"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Admin Username</label>
+              <input class="form-input" type="text" id="setAdminUser" placeholder="admin"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">New Admin Password</label>
+              <input class="form-input" type="password" id="setAdminPass" placeholder="নতুন password"/>
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()">Save Settings ✓</button>
           </div>
-          <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- MODAL (Edit Balance / OTP) -->
-<div class="modal-overlay" id="modal">
+<!-- MODAL -->
+<div class="modal-bg" id="modal">
   <div class="modal">
     <div class="modal-title" id="modalTitle">Edit</div>
     <div id="modalBody"></div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" id="modalConfirm">Confirm</button>
+      <button class="btn btn-primary" id="modalOk">Confirm</button>
     </div>
   </div>
 </div>
@@ -385,13 +494,11 @@ tr:hover td{background:rgba(255,255,255,.02)}
 <!-- TOAST -->
 <div id="toast"></div>
 
-<!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs, updateDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// ===================== FIREBASE CONFIG =====================
-// 🔴 REPLACE WITH YOUR FIREBASE CONFIG BELOW
+// ===== FIREBASE CONFIG =====
 const firebaseConfig = {
   apiKey: "AIzaSyB6DT5aVGDDW7IAPUMVAmQY8u5PMd1ZLe8",
   authDomain: "rattara-c6c23.firebaseapp.com",
@@ -401,94 +508,126 @@ const firebaseConfig = {
   appId: "1:542423756114:web:42b7cee066b284fe011e8b",
   measurementId: "G-PRR976LDTW"
 };
-// ===========================================================
+// ===========================
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ===================== STATE =====================
+// ===== STATE =====
 let currentUser = null;
 let isAdmin = false;
 let selectedMethod = 'bKash';
 let reqFilter = 'all';
-let settings = { minWithdraw: 100, adminPass: 'Tania-Rakib-5687' };
+let allReqs = [];
+let settings = { minWithdraw: 100, adminUser: 'admin', adminPass: 'Tania-Rakib-5687' };
 
-// ===================== INIT =====================
+// ===== INIT =====
 window.addEventListener('load', async () => {
   await loadSettings();
-  document.getElementById('loader').style.opacity = '0';
-  setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('hide');
+  }, 800);
 });
 
 async function loadSettings() {
   try {
     const snap = await getDoc(doc(db, 'config', 'settings'));
-    if (snap.exists()) settings = snap.data();
+    if (snap.exists()) settings = { ...settings, ...snap.data() };
     else await setDoc(doc(db, 'config', 'settings'), settings);
-  } catch(e) {}
+  } catch(e) { console.log('Settings load error:', e); }
 }
 
-// ===================== AUTH =====================
-window.showAdminLogin = () => { switchPage('adminLoginPage'); };
-window.showUserLogin = () => { switchPage('loginPage'); };
+// ===== NAVIGATION =====
+function switchPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
 
-window.userLogin = async () => {
-  const username = document.getElementById('loginUser').value.trim();
-  const otp = document.getElementById('loginOtp').value.trim();
-  if (!username || !otp) return;
-  try {
-    const snap = await getDoc(doc(db, 'users', username.toLowerCase()));
-    if (!snap.exists() || snap.data().otp !== otp) {
-      document.getElementById('loginErr').style.display = 'block'; return;
-    }
-    currentUser = { id: username.toLowerCase(), ...snap.data() };
-    isAdmin = false;
-    document.getElementById('loginErr').style.display = 'none';
-    showDashboard();
-  } catch(e) { showToast('Connection error!', 'error'); }
-};
-
-window.adminLogin = () => {
-  const pass = document.getElementById('adminPass').value;
-  if (pass !== settings.adminPass) {
-    document.getElementById('adminErr').style.display = 'block'; return;
-  }
-  isAdmin = true;
-  switchPage('adminPage');
-  document.getElementById('mainNav').style.display = 'flex';
-  document.getElementById('navBadge').textContent = '🔐 Admin';
-  loadAdminData();
-};
+window.showAdminLogin = (e) => { e?.preventDefault(); switchPage('adminLoginPage'); };
+window.showUserLogin = (e) => { e?.preventDefault(); switchPage('loginPage'); };
 
 window.logout = () => {
   currentUser = null; isAdmin = false;
-  document.getElementById('mainNav').style.display = 'none';
+  document.getElementById('mainNav').classList.remove('show');
   switchPage('loginPage');
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
 };
 
-// ===================== DASHBOARD =====================
-async function showDashboard() {
-  switchPage('dashPage');
-  document.getElementById('mainNav').style.display = 'flex';
-  document.getElementById('navBadge').textContent = '👤 User';
-  document.getElementById('dashName').textContent = currentUser.username || currentUser.id;
-  document.getElementById('dashBalance').textContent = currentUser.balance || 0;
-  loadMyRequests();
-}
+// ===== USER LOGIN =====
+window.userLogin = async () => {
+  const username = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value.trim();
+  const errEl = document.getElementById('loginErr');
+  errEl.style.display = 'none';
 
+  if (!username || !pass) { errEl.textContent = '❌ Username এবং Password দিন'; errEl.style.display = 'block'; return; }
+
+  // Check if admin credentials
+  if (username === settings.adminUser && pass === settings.adminPass) {
+    isAdmin = true;
+    document.getElementById('mainNav').classList.add('show');
+    document.getElementById('navBadge').textContent = '🔐 Admin';
+    switchPage('adminPage');
+    loadAdminData();
+    return;
+  }
+
+  // User login
+  try {
+    const snap = await getDoc(doc(db, 'users', username.toLowerCase()));
+    if (!snap.exists() || snap.data().otp !== pass) {
+      errEl.textContent = '❌ Username বা OTP ভুল হয়েছে';
+      errEl.style.display = 'block'; return;
+    }
+    currentUser = { id: username.toLowerCase(), ...snap.data() };
+    isAdmin = false;
+    errEl.style.display = 'none';
+    document.getElementById('mainNav').classList.add('show');
+    document.getElementById('navBadge').textContent = '👤 ' + (currentUser.username || currentUser.id);
+    document.getElementById('dashName').textContent = currentUser.username || currentUser.id;
+    document.getElementById('dashBalance').textContent = currentUser.balance || 0;
+    switchPage('dashPage');
+    loadMyRequests();
+  } catch(e) { errEl.textContent = '❌ Connection error! Try again.'; errEl.style.display = 'block'; }
+};
+
+// ===== ADMIN LOGIN =====
+window.adminLogin = () => {
+  const u = document.getElementById('adminUser').value.trim();
+  const p = document.getElementById('adminPass').value.trim();
+  const errEl = document.getElementById('adminErr');
+  errEl.style.display = 'none';
+
+  if (u === settings.adminUser && p === settings.adminPass) {
+    isAdmin = true;
+    document.getElementById('mainNav').classList.add('show');
+    document.getElementById('navBadge').textContent = '🔐 Admin';
+    switchPage('adminPage');
+    loadAdminData();
+  } else {
+    errEl.textContent = '❌ Username বা Password ভুল';
+    errEl.style.display = 'block';
+  }
+};
+
+// ===== USER DASHBOARD =====
 async function loadMyRequests() {
   const snap = await getDocs(query(collection(db, 'withdrawals'), orderBy('createdAt', 'desc')));
   const mine = snap.docs.filter(d => d.data().userId === currentUser.id);
-  const container = document.getElementById('myRequests');
-  if (!mine.length) { container.innerHTML = '<div class="empty-state">কোনো request নেই</div>'; return; }
-  container.innerHTML = mine.map(d => {
+  const el = document.getElementById('myRequests');
+  if (!mine.length) { el.innerHTML = '<div class="empty">কোনো request নেই এখনো</div>'; return; }
+  el.innerHTML = mine.map(d => {
     const r = d.data();
-    return `<div class="request-item">
-      <div class="request-info">
-        <div class="request-amount">৳${r.amount} — ${r.method}</div>
-        <div class="request-meta">${r.number} • ${r.accountType} • ${r.fullName}</div>
+    const badge = r.status === 'pending' ? 'badge-pending' : r.status === 'approved' ? 'badge-approved' : 'badge-rejected';
+    const label = r.status === 'pending' ? '⏳ Pending' : r.status === 'approved' ? '✅ Approved' : '❌ Rejected';
+    return `<div class="req-item">
+      <div>
+        <div class="req-amount">৳${r.amount} — ${r.method}</div>
+        <div class="req-meta">${r.number} • ${r.accountType} • ${r.fullName}</div>
       </div>
-      <span class="status-badge status-${r.status}">${r.status === 'pending' ? '⏳ Pending' : r.status === 'approved' ? '✅ Approved' : '❌ Rejected'}</span>
+      <span class="badge ${badge}">${label}</span>
     </div>`;
   }).join('');
 }
@@ -497,14 +636,16 @@ window.selectMethod = (el, method) => {
   document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   selectedMethod = method;
-  const label = method === 'Binance' ? 'Binance UID/Email' : `${method} নম্বর`;
-  document.getElementById('wdNumLabel').textContent = label;
   if (method === 'Binance') {
-    document.getElementById('wdAccLabel').textContent = 'Account Type';
+    document.getElementById('wdNumLabel').textContent = 'Binance UID / Email';
+    document.getElementById('wdAccLabel').textContent = 'Wallet Type';
     document.getElementById('wdAccType').innerHTML = '<option>Spot</option><option>Funding</option>';
+    document.getElementById('wdNumber').placeholder = 'UID বা Email';
   } else {
+    document.getElementById('wdNumLabel').textContent = method + ' নম্বর';
     document.getElementById('wdAccLabel').textContent = 'Account Type';
     document.getElementById('wdAccType').innerHTML = '<option>Personal</option><option>Agent</option><option>Merchant</option>';
+    document.getElementById('wdNumber').placeholder = '01XXXXXXXXX';
   }
 };
 
@@ -514,116 +655,112 @@ window.submitWithdraw = async () => {
   const accountType = document.getElementById('wdAccType').value;
   const amount = parseInt(document.getElementById('wdAmount').value);
   const errEl = document.getElementById('wdErr');
+  errEl.style.display = 'none';
 
-  // Validation
-  if (!fullName || !number || !amount) { errEl.textContent = '❌ সব field পূরণ করুন'; errEl.style.display = 'block'; return; }
-  if (selectedMethod !== 'Binance' && !/^01[3-9]\d{8}$/.test(number)) { errEl.textContent = '❌ Valid Bangladesh mobile number দিন (01XXXXXXXXX)'; errEl.style.display = 'block'; return; }
-  if (amount < settings.minWithdraw) { errEl.textContent = `❌ সর্বনিম্ন ৳${settings.minWithdraw} withdraw করতে হবে`; errEl.style.display = 'block'; return; }
-  if (amount > (currentUser.balance || 0)) { errEl.textContent = '❌ Balance কম'; errEl.style.display = 'block'; return; }
+  if (!fullName) { errEl.textContent = '❌ পূর্ণ নাম দিন'; errEl.style.display = 'block'; return; }
+  if (!number) { errEl.textContent = '❌ ' + selectedMethod + ' নম্বর/UID দিন'; errEl.style.display = 'block'; return; }
+  if (selectedMethod !== 'Binance' && !/^01[3-9]\d{8}$/.test(number)) { errEl.textContent = '❌ Valid Bangladesh নম্বর দিন (01XXXXXXXXX)'; errEl.style.display = 'block'; return; }
+  if (!amount || amount < settings.minWithdraw) { errEl.textContent = `❌ সর্বনিম্ন ৳${settings.minWithdraw} withdraw করতে হবে`; errEl.style.display = 'block'; return; }
+  if (amount > (currentUser.balance || 0)) { errEl.textContent = '❌ পর্যাপ্ত balance নেই'; errEl.style.display = 'block'; return; }
 
-  // Check pending
   const snap = await getDocs(collection(db, 'withdrawals'));
   const hasPending = snap.docs.some(d => d.data().userId === currentUser.id && d.data().status === 'pending');
-  if (hasPending) { errEl.textContent = '❌ একটি pending request আছে, অপেক্ষা করুন'; errEl.style.display = 'block'; return; }
+  if (hasPending) { errEl.textContent = '❌ একটি pending request আছে। Approved হওয়ার পর নতুন request করুন'; errEl.style.display = 'block'; return; }
 
-  errEl.style.display = 'none';
-  await addDoc(collection(db, 'withdrawals'), {
-    userId: currentUser.id,
-    username: currentUser.username || currentUser.id,
-    fullName, number, accountType, amount,
-    method: selectedMethod,
-    status: 'pending',
-    createdAt: serverTimestamp()
-  });
-  showToast('✅ Request submit হয়েছে!', 'success');
-  loadMyRequests();
-  document.getElementById('wdName').value = '';
-  document.getElementById('wdNumber').value = '';
-  document.getElementById('wdAmount').value = '';
+  try {
+    await addDoc(collection(db, 'withdrawals'), {
+      userId: currentUser.id, username: currentUser.username || currentUser.id,
+      fullName, number, accountType, amount, method: selectedMethod,
+      status: 'pending', createdAt: serverTimestamp()
+    });
+    showToast('✅ Request submit হয়েছে!', 'success');
+    loadMyRequests();
+    document.getElementById('wdName').value = '';
+    document.getElementById('wdNumber').value = '';
+    document.getElementById('wdAmount').value = '';
+  } catch(e) { errEl.textContent = '❌ Submit failed. Try again.'; errEl.style.display = 'block'; }
 };
 
-// ===================== ADMIN =====================
+// ===== ADMIN =====
 async function loadAdminData() {
-  const [usersSnap, reqSnap] = await Promise.all([
-    getDocs(collection(db, 'users')),
-    getDocs(query(collection(db, 'withdrawals'), orderBy('createdAt', 'desc')))
-  ]);
+  try {
+    const [uSnap, rSnap] = await Promise.all([
+      getDocs(collection(db, 'users')),
+      getDocs(query(collection(db, 'withdrawals'), orderBy('createdAt', 'desc')))
+    ]);
+    const users = uSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    allReqs = rSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-  const users = usersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-  const reqs = reqSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const pending = allReqs.filter(r => r.status === 'pending');
+    const approved = allReqs.filter(r => r.status === 'approved');
+    const totalPaid = approved.reduce((s, r) => s + (r.amount || 0), 0);
 
-  const pending = reqs.filter(r => r.status === 'pending').length;
-  const approved = reqs.filter(r => r.status === 'approved');
-  const totalPaid = approved.reduce((s, r) => s + r.amount, 0);
+    document.getElementById('st-users').textContent = users.length;
+    document.getElementById('st-pending').textContent = pending.length;
+    document.getElementById('st-approved').textContent = approved.length;
+    document.getElementById('st-paid').textContent = '৳' + totalPaid;
 
-  document.getElementById('st-users').textContent = users.length;
-  document.getElementById('st-pending').textContent = pending;
-  document.getElementById('st-approved').textContent = approved.length;
-  document.getElementById('st-total').textContent = '৳' + totalPaid;
+    // Users table
+    document.getElementById('usersTable').innerHTML = users.length ? users.map(u => `
+      <tr>
+        <td><strong>${u.username || u.id}</strong></td>
+        <td><strong style="color:var(--primary)">৳${u.balance || 0}</strong></td>
+        <td><span class="otp-tag">${u.otp || '—'}</span></td>
+        <td><div class="td-actions">
+          <button class="btn btn-outline btn-xs" onclick="editBalance('${u.id}',${u.balance||0})">✏️ Balance</button>
+          <button class="btn btn-xs" style="background:var(--gold-light);color:var(--gold);border:1px solid rgba(217,119,6,.2)" onclick="newOtp('${u.id}')">🔑 New OTP</button>
+          <button class="btn btn-xs" style="background:var(--red-light);color:var(--red);border:1px solid rgba(220,38,38,.2)" onclick="delUser('${u.id}')">🗑️</button>
+        </div></td>
+      </tr>`).join('') : '<tr><td colspan="4" class="empty">No users yet</td></tr>';
 
-  // Users table
-  document.getElementById('usersTable').innerHTML = users.map(u => `
-    <tr>
-      <td><strong>${u.username || u.id}</strong></td>
-      <td>৳${u.balance || 0}</td>
-      <td><span class="otp-display">${u.otp}</span></td>
-      <td style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="action-btn action-edit" onclick="editBalance('${u.id}',${u.balance||0})">Edit Balance</button>
-        <button class="action-btn action-otp" onclick="newOtp('${u.id}')">New OTP</button>
-        <button class="action-btn action-reject" onclick="deleteUser('${u.id}')">Delete</button>
-      </td>
-    </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--muted)">No users yet</td></tr>';
+    // Recent
+    document.getElementById('recentList').innerHTML = allReqs.slice(0, 5).map(r => {
+      const badge = r.status === 'pending' ? 'badge-pending' : r.status === 'approved' ? 'badge-approved' : 'badge-rejected';
+      return `<div class="req-item">
+        <div>
+          <div class="req-amount">${r.username} — ৳${r.amount} (${r.method})</div>
+          <div class="req-meta">${r.number} • ${r.accountType} • ${r.fullName}</div>
+        </div>
+        <span class="badge ${badge}">${r.status}</span>
+      </div>`;
+    }).join('') || '<div class="empty">No requests yet</div>';
 
-  // Recent requests (overview)
-  document.getElementById('recentRequests').innerHTML = reqs.slice(0,5).map(r => reqRow(r)).join('') || '<div class="empty-state">No requests</div>';
-
-  // Requests table
-  renderReqTable(reqs);
-  window._allReqs = reqs;
+    renderReqTable();
+  } catch(e) { showToast('Data load error!', 'error'); }
 }
 
-function reqRow(r) {
-  return `<div class="request-item">
-    <div class="request-info">
-      <div class="request-amount">${r.username} — ৳${r.amount} (${r.method})</div>
-      <div class="request-meta">${r.number} • ${r.accountType} • ${r.fullName}</div>
-    </div>
-    <span class="status-badge status-${r.status}">${r.status}</span>
-  </div>`;
-}
-
-function renderReqTable(reqs) {
-  const filtered = reqFilter === 'all' ? reqs : reqs.filter(r => r.status === reqFilter);
-  document.getElementById('reqTable').innerHTML = filtered.map(r => `
+function renderReqTable() {
+  const list = reqFilter === 'all' ? allReqs : allReqs.filter(r => r.status === reqFilter);
+  document.getElementById('reqTable').innerHTML = list.length ? list.map(r => `
     <tr>
       <td><strong>${r.username}</strong></td>
       <td>${r.method}</td>
-      <td>${r.number}<br><small style="color:var(--muted)">${r.accountType}</small></td>
-      <td>৳${r.amount}</td>
-      <td><span class="status-badge status-${r.status}">${r.status}</span></td>
-      <td style="display:flex;gap:6px;flex-wrap:wrap">
-        ${r.status === 'pending' ? `
-          <button class="action-btn action-approve" onclick="approveReq('${r.id}','${r.userId}',${r.amount})">✓ Approve</button>
-          <button class="action-btn action-reject" onclick="rejectReq('${r.id}')">✗ Reject</button>` : '—'}
-      </td>
-    </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--muted)">No requests</td></tr>';
+      <td>${r.number}<br><small style="color:var(--text3)">${r.accountType}</small></td>
+      <td><strong style="color:var(--primary)">৳${r.amount}</strong></td>
+      <td><span class="badge ${r.status==='pending'?'badge-pending':r.status==='approved'?'badge-approved':'badge-rejected'}">${r.status}</span></td>
+      <td><div class="td-actions">${r.status === 'pending' ? `
+        <button class="btn btn-xs btn-success" onclick="approveReq('${r.id}','${r.userId}',${r.amount})">✓ Approve</button>
+        <button class="btn btn-xs btn-danger" onclick="rejectReq('${r.id}')">✗ Reject</button>` : '—'}</div></td>
+    </tr>`).join('') : '<tr><td colspan="6" class="empty">No requests</td></tr>';
 }
 
 window.filterReq = (f, el) => {
   reqFilter = f;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
-  renderReqTable(window._allReqs || []);
+  renderReqTable();
 };
 
 window.approveReq = async (reqId, userId, amount) => {
-  const userSnap = await getDoc(doc(db, 'users', userId));
-  if (!userSnap.exists()) return;
-  const newBal = (userSnap.data().balance || 0) - amount;
-  await updateDoc(doc(db, 'withdrawals', reqId), { status: 'approved' });
-  await updateDoc(doc(db, 'users', userId), { balance: Math.max(0, newBal) });
-  showToast('✅ Approved!', 'success');
-  loadAdminData();
+  try {
+    const uSnap = await getDoc(doc(db, 'users', userId));
+    if (!uSnap.exists()) return;
+    const newBal = Math.max(0, (uSnap.data().balance || 0) - amount);
+    await updateDoc(doc(db, 'withdrawals', reqId), { status: 'approved' });
+    await updateDoc(doc(db, 'users', userId), { balance: newBal });
+    showToast('✅ Approved!', 'success');
+    loadAdminData();
+  } catch(e) { showToast('Error!', 'error'); }
 };
 
 window.rejectReq = async (reqId) => {
@@ -633,26 +770,26 @@ window.rejectReq = async (reqId) => {
 };
 
 window.addUser = async () => {
-  const username = document.getElementById('newUsername').value.trim();
-  const balance = parseInt(document.getElementById('newBalance').value) || 0;
-  if (!username) return;
-  const otp = generateOTP();
-  await setDoc(doc(db, 'users', username.toLowerCase()), { username, balance, otp, createdAt: serverTimestamp() });
-  showToast(`✅ User added! OTP: ${otp}`, 'info');
-  document.getElementById('newUsername').value = '';
-  document.getElementById('newBalance').value = '';
-  loadAdminData();
+  const username = document.getElementById('newUser').value.trim();
+  const balance = parseInt(document.getElementById('newBal').value) || 0;
+  if (!username) { showToast('Username দিন!', 'error'); return; }
+  const otp = Math.random().toString(36).substring(2, 10).toUpperCase();
+  try {
+    await setDoc(doc(db, 'users', username.toLowerCase()), { username, balance, otp, createdAt: serverTimestamp() });
+    showToast(`✅ User added! OTP: ${otp}`, 'info');
+    document.getElementById('newUser').value = '';
+    document.getElementById('newBal').value = '';
+    loadAdminData();
+  } catch(e) { showToast('Error adding user!', 'error'); }
 };
 
-window.editBalance = (userId, currentBal) => {
+window.editBalance = (userId, cur) => {
   document.getElementById('modalTitle').textContent = 'Balance Edit করুন';
   document.getElementById('modalBody').innerHTML = `
-    <div class="form-group">
-      <label>New Balance (৳)</label>
-      <input type="number" id="modalInput" value="${currentBal}" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;color:var(--text);font-family:var(--font);font-size:.95rem;outline:none"/>
-    </div>`;
-  document.getElementById('modalConfirm').onclick = async () => {
-    const val = parseInt(document.getElementById('modalInput').value);
+    <div class="form-group"><label class="form-label">New Balance (৳)</label>
+    <input class="form-input" type="number" id="modalInput" value="${cur}"/></div>`;
+  document.getElementById('modalOk').onclick = async () => {
+    const val = parseInt(document.getElementById('modalInput').value) || 0;
     await updateDoc(doc(db, 'users', userId), { balance: val });
     closeModal(); showToast('✅ Balance updated!', 'success'); loadAdminData();
   };
@@ -660,42 +797,33 @@ window.editBalance = (userId, currentBal) => {
 };
 
 window.newOtp = async (userId) => {
-  const otp = generateOTP();
+  const otp = Math.random().toString(36).substring(2, 10).toUpperCase();
   await updateDoc(doc(db, 'users', userId), { otp });
   showToast(`🔑 New OTP: ${otp}`, 'info');
   loadAdminData();
 };
 
-window.deleteUser = async (userId) => {
+window.delUser = async (userId) => {
   if (!confirm('এই user delete করবেন?')) return;
-  const { deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
   await deleteDoc(doc(db, 'users', userId));
   showToast('🗑️ User deleted', 'error');
   loadAdminData();
 };
 
 window.saveSettings = async () => {
-  const minWd = parseInt(document.getElementById('setMinWd').value);
-  const newPass = document.getElementById('setAdminPass').value;
-  if (minWd) settings.minWithdraw = minWd;
-  if (newPass) settings.adminPass = newPass;
+  const min = parseInt(document.getElementById('setMin').value) || 100;
+  const adminU = document.getElementById('setAdminUser').value.trim();
+  const adminP = document.getElementById('setAdminPass').value.trim();
+  if (min) settings.minWithdraw = min;
+  if (adminU) settings.adminUser = adminU;
+  if (adminP) settings.adminPass = adminP;
   await setDoc(doc(db, 'config', 'settings'), settings);
   showToast('✅ Settings saved!', 'success');
 };
 
-// ===================== HELPERS =====================
-function generateOTP() {
-  return Math.random().toString(36).substring(2, 10).toUpperCase();
-}
-
-function switchPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(id)?.classList.add('active');
-}
-
-window.showAdminTab = (tab, el) => {
+window.showTab = (tab, el) => {
   document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.admin-menu-item').forEach(m => m.classList.remove('active'));
+  document.querySelectorAll('.admin-nav-item').forEach(m => m.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
   el.classList.add('active');
 };
@@ -708,6 +836,11 @@ function showToast(msg, type = 'info') {
   t.className = `show ${type}`;
   setTimeout(() => t.className = '', 3500);
 }
+
+// Close modal on bg click
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
 </script>
 </body>
 </html>
