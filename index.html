@@ -4,514 +4,578 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>RatTara – Withdrawal Portal</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#f5f7fa;
-  --white:#ffffff;
-  --surface:#f0f2f5;
-  --border:#e2e6ea;
-  --border2:#d0d5dd;
-  --text:#1a1d23;
-  --text2:#4a5568;
-  --text3:#8a95a3;
-  --primary:#2563eb;
-  --primary-light:#eff6ff;
-  --primary-dark:#1d4ed8;
-  --green:#059669;
-  --green-light:#ecfdf5;
-  --red:#dc2626;
-  --red-light:#fef2f2;
-  --gold:#d97706;
-  --gold-light:#fffbeb;
-  --purple:#7c3aed;
-  --purple-light:#f5f3ff;
-  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
-  --shadow-md:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);
-  --shadow-lg:0 10px 30px rgba(0,0,0,.1),0 4px 8px rgba(0,0,0,.06);
-  --radius:12px;
-  --radius-sm:8px;
-  --radius-lg:16px;
-  --font:'Plus Jakarta Sans','Noto Sans Bengali',sans-serif;
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
+<style type="text/tailwindcss">
+@import "tailwindcss";
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-card: var(--card);
+  --color-border: var(--border);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-tertiary: var(--tertiary);
+  --color-destructive: var(--destructive);
+  --font-family-sans: 'Plus Jakarta Sans', sans-serif;
+}
+:root {
+  --secondary: #F1F5F9;
+  --card: #FFFFFF;
+  --foreground: #0F172A;
+  --primary: #2563EB;
+  --tertiary: #10B981;
+  --destructive: #EF4444;
+  --border: #E2E8F0;
+  --primary-foreground: #FFFFFF;
+  --background: #F8FAFC;
+  --muted-foreground: #94A3B8;
+}
+* { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+/* Page switching */
+.page { display: none; }
+.page.active { display: block; }
+#loginPage.active, #adminLoginPage.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
 }
 
-body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;font-size:15px;line-height:1.6}
-
-/* LOADER */
-#loader{position:fixed;inset:0;background:var(--white);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .4s}
-#loader.hide{opacity:0;pointer-events:none}
-.loader-logo{font-size:2rem;font-weight:800;color:var(--primary);margin-bottom:20px;letter-spacing:-1px}
-.loader-bar{width:200px;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
-.loader-bar-fill{height:100%;background:var(--primary);border-radius:2px;animation:loading 1.5s ease infinite}
-@keyframes loading{0%{width:0;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0;margin-left:100%}}
-
-/* NAV */
-nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:none;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:var(--shadow)}
-nav.show{display:flex}
-.nav-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.1rem;color:var(--text);letter-spacing:-.3px}
-.nav-icon{width:34px;height:34px;background:var(--primary);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem}
-.nav-right{display:flex;align-items:center;gap:10px}
-.nav-badge{background:var(--primary-light);color:var(--primary);padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:700;border:1px solid rgba(37,99,235,.15)}
-.btn-logout{background:var(--red-light);color:var(--red);border:1px solid rgba(220,38,38,.15);padding:7px 14px;border-radius:var(--radius-sm);font-family:var(--font);font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s}
-.btn-logout:hover{background:var(--red);color:#fff}
-
-/* PAGES */
-.page{display:none;min-height:calc(100vh - 60px)}
-.page.active{display:block}
-#loginPage.active,#adminLoginPage.active{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
-
-/* CARD */
-.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow)}
-
-/* LOGIN */
-.auth-card{width:100%;max-width:420px;padding:40px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg)}
-.auth-logo{text-align:center;margin-bottom:28px}
-.auth-logo-icon{width:56px;height:56px;background:var(--primary);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 12px;box-shadow:0 4px 12px rgba(37,99,235,.3)}
-.auth-title{font-size:1.5rem;font-weight:800;color:var(--text);letter-spacing:-.4px}
-.auth-sub{color:var(--text3);font-size:.88rem;margin-top:4px}
-
-/* FORM */
-.form-group{margin-bottom:16px}
-.form-label{display:block;font-size:.8rem;font-weight:700;color:var(--text2);margin-bottom:6px;letter-spacing:.03em;text-transform:uppercase}
-.form-input{width:100%;background:var(--white);border:1.5px solid var(--border2);border-radius:var(--radius-sm);padding:12px 14px;color:var(--text);font-family:var(--font);font-size:.95rem;transition:all .2s;outline:none}
-.form-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
-.form-input::placeholder{color:var(--text3)}
-.form-select{width:100%;background:var(--white);border:1.5px solid var(--border2);border-radius:var(--radius-sm);padding:12px 14px;color:var(--text);font-family:var(--font);font-size:.95rem;cursor:pointer;outline:none;transition:all .2s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a95a3' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
-.form-select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
-textarea.form-input{resize:vertical;min-height:140px;font-family:monospace;font-size:.88rem}
-
-/* BTN */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 20px;border-radius:var(--radius-sm);font-family:var(--font);font-size:.9rem;font-weight:700;cursor:pointer;border:none;transition:all .2s;text-decoration:none;white-space:nowrap}
-.btn-full{width:100%}
-.btn-primary{background:var(--primary);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.3)}
-.btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,.35)}
-.btn-primary:active{transform:translateY(0)}
-.btn-outline{background:var(--white);color:var(--text2);border:1.5px solid var(--border2)}
-.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
-.btn-success{background:var(--green);color:#fff}
-.btn-success:hover{background:#047857}
-.btn-danger{background:var(--red);color:#fff}
-.btn-danger:hover{background:#b91c1c}
-.btn-purple{background:var(--purple);color:#fff}
-.btn-purple:hover{background:#6d28d9}
-.btn-sm{padding:7px 14px;font-size:.8rem;border-radius:var(--radius-sm)}
-.btn-xs{padding:5px 10px;font-size:.75rem;border-radius:6px}
-
-/* ERROR */
-.error-box{background:var(--red-light);color:var(--red);border:1px solid rgba(220,38,38,.2);border-radius:var(--radius-sm);padding:10px 14px;font-size:.85rem;font-weight:600;margin-top:8px;display:none}
-
-/* ADMIN TOGGLE */
-.auth-toggle{text-align:center;margin-top:20px;font-size:.85rem;color:var(--text3)}
-.auth-toggle a{color:var(--primary);text-decoration:none;font-weight:700}
-.auth-toggle a:hover{text-decoration:underline}
-
-/* DASHBOARD */
-#dashPage{padding:24px;max-width:760px;margin:0 auto}
-.page-header{margin-bottom:24px}
-.page-title{font-size:1.4rem;font-weight:800;letter-spacing:-.4px}
-.page-sub{color:var(--text3);font-size:.88rem;margin-top:3px}
-
-/* BALANCE CARD */
-.balance-card{background:linear-gradient(135deg,#2563eb,#1e40af);color:#fff;border-radius:var(--radius-lg);padding:28px 32px;margin-bottom:20px;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(37,99,235,.3)}
-.balance-card::after{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;background:rgba(255,255,255,.06);border-radius:50%}
-.balance-card::before{content:'';position:absolute;bottom:-60px;left:-20px;width:200px;height:200px;background:rgba(255,255,255,.04);border-radius:50%}
-.balance-label{font-size:.78rem;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
-.balance-amount{font-size:3rem;font-weight:800;letter-spacing:-2px;line-height:1}
-.balance-amount .currency{font-size:1.5rem;font-weight:600;opacity:.8;margin-right:4px}
-.balance-min{opacity:.65;font-size:.82rem;margin-top:8px}
-
-/* OTP STATS GRID */
-.otp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
-.otp-stat{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;box-shadow:var(--shadow)}
-.otp-stat-num{font-size:1.6rem;font-weight:800;letter-spacing:-1px}
-.otp-stat-label{font-size:.72rem;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
-
-/* SECTION */
-.section{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px;box-shadow:var(--shadow)}
-.section-header{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
-.section-icon{width:36px;height:36px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
-.section-icon.blue{background:var(--primary-light);color:var(--primary)}
-.section-icon.green{background:var(--green-light);color:var(--green)}
-.section-icon.purple{background:var(--purple-light);color:var(--purple)}
-.section-title-text{font-size:1rem;font-weight:700;color:var(--text)}
-.section-sub{font-size:.8rem;color:var(--text3);margin-top:1px}
-
-/* METHOD SELECT */
-.method-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
-.method-btn{background:var(--bg);border:2px solid var(--border);border-radius:var(--radius-sm);padding:14px 8px;text-align:center;cursor:pointer;transition:all .2s;font-size:.85rem;font-weight:700;color:var(--text2)}
-.method-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
-.method-btn.active{border-color:var(--primary);background:var(--primary-light);color:var(--primary)}
-.method-emoji{font-size:1.5rem;display:block;margin-bottom:5px}
-
-/* GRID */
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-
-/* REQUEST ITEM */
-.req-item{border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;background:var(--white);transition:box-shadow .2s}
-.req-item:hover{box-shadow:var(--shadow-md)}
-.req-amount{font-size:1rem;font-weight:700;color:var(--text)}
-.req-meta{font-size:.8rem;color:var(--text3);margin-top:2px}
-.badge{padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700;white-space:nowrap}
-.badge-pending{background:var(--gold-light);color:var(--gold);border:1px solid rgba(217,119,6,.2)}
-.badge-approved{background:var(--green-light);color:var(--green);border:1px solid rgba(5,150,105,.2)}
-.badge-rejected{background:var(--red-light);color:var(--red);border:1px solid rgba(220,38,38,.2)}
-.empty{text-align:center;padding:32px;color:var(--text3);font-size:.9rem}
-
-/* ADMIN */
-#adminPage{display:none;padding:24px;max-width:1100px;margin:0 auto}
-#adminPage.active{display:block}
-.admin-layout{display:grid;grid-template-columns:220px 1fr;gap:20px;align-items:start}
-.admin-nav{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;box-shadow:var(--shadow);position:sticky;top:80px}
-.admin-nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:.88rem;font-weight:600;color:var(--text2);margin-bottom:2px;transition:all .2s}
-.admin-nav-item:hover{background:var(--bg);color:var(--text)}
-.admin-nav-item.active{background:var(--primary-light);color:var(--primary)}
-.admin-nav-icon{font-size:1rem;width:20px;text-align:center}
-
-.admin-panel{display:none}
-.admin-panel.active{display:block}
-
-/* STATS */
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
-.stat{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px;text-align:center;box-shadow:var(--shadow)}
-.stat-num{font-size:1.8rem;font-weight:800;color:var(--primary);letter-spacing:-1px}
-.stat-label{font-size:.75rem;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:3px}
-
-/* ADD USER */
-.add-user-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:20px}
-.add-user-grid{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end}
-
-/* TABLE */
-.table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border)}
-table{width:100%;border-collapse:collapse;font-size:.85rem}
-thead{background:var(--bg)}
-th{padding:11px 14px;text-align:left;font-size:.75rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)}
-td{padding:13px 14px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tbody tr:hover{background:var(--bg)}
-.td-actions{display:flex;gap:6px;flex-wrap:wrap}
-
-/* OTP */
-.otp-tag{font-family:monospace;font-size:.9rem;font-weight:700;color:var(--gold);background:var(--gold-light);padding:3px 10px;border-radius:6px;border:1px solid rgba(217,119,6,.2);letter-spacing:.05em}
-
-/* FILTER */
-.filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.filter-btn{padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--white);color:var(--text3);font-family:var(--font);font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s}
-.filter-btn:hover{border-color:var(--primary);color:var(--primary)}
-.filter-btn.active{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
-
-/* MODAL */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:200;padding:20px}
-.modal-bg.open{display:flex}
-.modal{background:var(--white);border-radius:var(--radius-lg);padding:28px;width:100%;max-width:420px;box-shadow:var(--shadow-lg);border:1px solid var(--border)}
-.modal-title{font-size:1rem;font-weight:800;margin-bottom:18px;color:var(--text)}
-.modal-actions{display:flex;gap:10px;margin-top:18px}
-.modal-actions .btn{flex:1}
-
-/* TOAST */
-#toast{position:fixed;bottom:28px;right:28px;padding:12px 18px;border-radius:var(--radius);font-size:.88rem;font-weight:700;z-index:999;transform:translateY(60px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:8px;max-width:320px;box-shadow:var(--shadow-lg);border:1px solid var(--border)}
-#toast.show{transform:translateY(0);opacity:1}
-#toast.success{background:#fff;color:var(--green);border-color:rgba(5,150,105,.25)}
-#toast.error{background:#fff;color:var(--red);border-color:rgba(220,38,38,.25)}
-#toast.info{background:#fff;color:var(--primary);border-color:rgba(37,99,235,.25)}
-
-/* SETTINGS */
-.settings-box{max-width:440px}
-.settings-box .form-group{margin-bottom:18px}
-
-/* BULK OTP */
-.bulk-box{background:var(--bg);border:2px dashed var(--border2);border-radius:var(--radius);padding:20px;margin-bottom:16px}
-.bulk-preview{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-top:12px;max-height:200px;overflow-y:auto;font-size:.82rem;display:none}
-.bulk-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)}
-.bulk-row:last-child{border-bottom:none}
-.bulk-found{color:var(--green);font-weight:700}
-.bulk-notfound{color:var(--text3)}
-
-/* OTP RATE BOX */
-.rate-info{background:var(--primary-light);border:1px solid rgba(37,99,235,.2);border-radius:var(--radius-sm);padding:10px 14px;font-size:.83rem;color:var(--primary);font-weight:600;margin-bottom:14px}
-
-/* RESPONSIVE */
-@media(max-width:768px){
-  nav{padding:0 16px}
-  #dashPage{padding:16px}
-  #adminPage{padding:16px}
-  .admin-layout{grid-template-columns:1fr}
-  .admin-nav{position:static;display:flex;gap:4px;flex-wrap:wrap}
-  .admin-nav-item{padding:7px 12px;font-size:.8rem}
-  .stats-grid{grid-template-columns:repeat(2,1fr)}
-  .grid-2{grid-template-columns:1fr}
-  .add-user-grid{grid-template-columns:1fr}
-  .balance-amount{font-size:2.2rem}
-  .auth-card{padding:28px 20px}
-  #toast{right:16px;bottom:16px;left:16px;max-width:none}
-  .otp-stats{grid-template-columns:1fr 1fr}
-  .method-grid{grid-template-columns:1fr 1fr}
+/* Admin desktop layout */
+@media (min-width: 900px) {
+  #adminPage .admin-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  #adminPage .admin-nav-sidebar {
+    position: sticky;
+    top: 80px;
+  }
 }
+
+/* Toast */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  left: 24px;
+  max-width: 360px;
+  margin: 0 auto;
+  padding: 14px 18px;
+  border-radius: 16px;
+  font-size: .88rem;
+  font-weight: 700;
+  z-index: 9999;
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all .3s;
+  box-shadow: 0 10px 30px rgba(0,0,0,.15);
+  background: white;
+  border: 1px solid #E2E8F0;
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+#toast.success { color: #059669; border-color: rgba(5,150,105,.25); }
+#toast.error { color: #EF4444; border-color: rgba(239,68,68,.25); }
+#toast.info { color: #2563EB; border-color: rgba(37,99,235,.25); }
+
+/* Loader */
+#loader {
+  position: fixed; inset: 0;
+  background: white;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 9999; transition: opacity .4s;
+}
+#loader.hide { opacity: 0; pointer-events: none; }
+.loader-bar { width: 160px; height: 3px; background: #E2E8F0; border-radius: 2px; overflow: hidden; margin-top: 20px; }
+.loader-bar-fill { height: 100%; background: #2563EB; border-radius: 2px; animation: loading 1.5s ease infinite; }
+@keyframes loading { 0%{width:0;margin-left:0} 50%{width:60%;margin-left:20%} 100%{width:0;margin-left:100%} }
+
+/* Error box */
+.error-box {
+  background: #FEF2F2; color: #EF4444;
+  border: 1px solid rgba(239,68,68,.2);
+  border-radius: 12px; padding: 10px 14px;
+  font-size: .85rem; font-weight: 600;
+  margin-top: 8px; display: none;
+}
+
+/* Modal */
+.modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.4); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 200; padding: 20px; }
+.modal-bg.open { display: flex; }
+
+/* Admin panel tabs */
+.admin-panel { display: none; }
+.admin-panel.active { display: block; }
+
+/* Req items */
+.req-item { border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; background: white; }
+.badge { padding: 4px 10px; border-radius: 20px; font-size: .72rem; font-weight: 700; white-space: nowrap; }
+.badge-pending { background: #FFFBEB; color: #D97706; border: 1px solid rgba(217,119,6,.2); }
+.badge-approved { background: #ECFDF5; color: #059669; border: 1px solid rgba(5,150,105,.2); }
+.badge-rejected { background: #FEF2F2; color: #EF4444; border: 1px solid rgba(239,68,68,.2); }
+
+/* Table */
+.table-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid #E2E8F0; }
+table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+thead { background: #F8FAFC; }
+th { padding: 11px 14px; text-align: left; font-size: .72rem; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid #E2E8F0; }
+td { padding: 13px 14px; border-bottom: 1px solid #E2E8F0; color: #0F172A; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: #F8FAFC; }
+
+/* Filter btns */
+.filter-btn { padding: 6px 14px; border-radius: 20px; border: 1.5px solid #E2E8F0; background: white; color: #94A3B8; font-family: inherit; font-size: .8rem; font-weight: 700; cursor: pointer; transition: all .2s; }
+.filter-btn.active { border-color: #2563EB; color: #2563EB; background: #EFF6FF; }
+
+/* OTP tag */
+.otp-tag { font-family: monospace; font-size: .9rem; font-weight: 700; color: #D97706; background: #FFFBEB; padding: 3px 10px; border-radius: 6px; border: 1px solid rgba(217,119,6,.2); letter-spacing: .05em; }
+
+/* Bulk preview */
+.bulk-preview { background: white; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px; margin-top: 12px; max-height: 200px; overflow-y: auto; font-size: .82rem; display: none; }
+.bulk-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid #E2E8F0; }
+.bulk-row:last-child { border-bottom: none; }
+.bulk-found { color: #059669; font-weight: 700; }
+.bulk-notfound { color: #94A3B8; }
+
+/* Small buttons */
+.btn-xs { padding: 5px 10px; font-size: .75rem; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; font-family: inherit; display: inline-flex; align-items: center; gap: 4px; }
+.btn-success-xs { background: #ECFDF5; color: #059669; border: 1px solid rgba(5,150,105,.2); }
+.btn-danger-xs { background: #FEF2F2; color: #EF4444; border: 1px solid rgba(239,68,68,.2); }
+.btn-gold-xs { background: #FFFBEB; color: #D97706; border: 1px solid rgba(217,119,6,.2); }
+
+/* Admin bottom nav mobile */
+@media (max-width: 899px) {
+  .admin-nav-sidebar { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 16px; }
+  .admin-nav-item { padding: 7px 12px !important; font-size: .8rem !important; }
+}
+
+/* Method btn */
+.method-btn { border: 2px solid #E2E8F0; border-radius: 16px; padding: 14px 8px; text-align: center; cursor: pointer; transition: all .2s; font-size: .85rem; font-weight: 700; color: #64748B; background: #F8FAFC; }
+.method-btn:hover { border-color: #2563EB; color: #2563EB; background: #EFF6FF; }
+.method-btn.active { border-color: #2563EB; background: #EFF6FF; color: #2563EB; }
 </style>
 </head>
-<body>
+<body class="bg-background text-foreground min-h-screen">
 
 <!-- LOADER -->
 <div id="loader">
-  <div class="loader-logo">⭐ RatTara</div>
+  <div class="w-16 h-16 bg-primary rounded-3xl flex items-center justify-center shadow-xl shadow-blue-200 mb-4">
+    <iconify-icon icon="lucide:zap" class="text-3xl text-white"></iconify-icon>
+  </div>
+  <div class="text-2xl font-extrabold tracking-tight text-foreground">RatTara</div>
   <div class="loader-bar"><div class="loader-bar-fill"></div></div>
 </div>
 
-<!-- NAV -->
-<nav id="mainNav">
-  <div class="nav-brand">
-    <div class="nav-icon">⭐</div>
-    RatTara
-  </div>
-  <div class="nav-right">
-    <span class="nav-badge" id="navBadge">Portal</span>
-    <button class="btn-logout" onclick="logout()">Sign Out</button>
+<!-- NAV (shown after login) -->
+<nav id="mainNav" class="hidden bg-card border-b border-border px-5 py-3 sticky top-0 z-50 shadow-sm">
+  <div class="max-w-6xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 bg-primary rounded-xl flex items-center justify-center">
+        <iconify-icon icon="lucide:zap" class="text-lg text-white"></iconify-icon>
+      </div>
+      <span class="font-extrabold text-lg tracking-tight">RatTara</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="hidden sm:flex bg-secondary text-foreground border border-border px-3 py-1 rounded-full text-xs font-bold" id="navBadge">Portal</span>
+      <button onclick="logout()" class="flex items-center gap-2 bg-red-50 text-red-500 border border-red-100 px-3 py-2 rounded-xl text-xs font-bold hover:bg-red-500 hover:text-white transition-all">
+        <iconify-icon icon="lucide:log-out"></iconify-icon>
+        <span class="hidden sm:inline">Sign Out</span>
+      </button>
+    </div>
   </div>
 </nav>
 
 <!-- ===== USER LOGIN ===== -->
-<div id="loginPage" class="page active">
-  <div class="auth-card">
-    <div class="auth-logo">
-      <div class="auth-logo-icon">⭐</div>
-      <div class="auth-title">RatTara Portal</div>
-      <div class="auth-sub">আপনার account এ login করুন</div>
+<div id="loginPage" class="page active relative overflow-hidden bg-background w-full min-h-screen">
+  <div class="absolute -top-24 -left-24 w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-60"></div>
+  <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-emerald-100 rounded-full blur-3xl opacity-60"></div>
+  <div class="w-full max-w-sm mx-auto px-6 z-10 relative">
+    <div class="text-center mb-10">
+      <div class="w-20 h-20 bg-primary rounded-3xl shadow-2xl shadow-blue-200 flex items-center justify-center mx-auto mb-6">
+        <iconify-icon icon="lucide:zap" class="text-4xl text-white"></iconify-icon>
+      </div>
+      <h1 class="text-3xl font-extrabold tracking-tight">RatTara</h1>
+      <p class="text-muted-foreground mt-2 font-medium text-sm">আপনার account এ login করুন</p>
     </div>
-    <div class="form-group">
-      <label class="form-label">Username</label>
-      <input class="form-input" type="text" id="loginUser" placeholder="আপনার username লিখুন"/>
+    <div class="bg-card border border-border rounded-[2rem] p-8 shadow-xl shadow-slate-100">
+      <div class="space-y-5">
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Username</label>
+          <div class="relative">
+            <iconify-icon icon="lucide:user" class="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-lg"></iconify-icon>
+            <input type="text" id="loginUser" class="w-full bg-secondary border-none rounded-2xl py-4 pl-12 pr-4 text-foreground focus:ring-2 focus:ring-primary transition-all outline-none text-sm font-medium" placeholder="আপনার username লিখুন"/>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Password / OTP</label>
+          <div class="relative">
+            <iconify-icon icon="lucide:lock" class="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-lg"></iconify-icon>
+            <input type="password" id="loginPass" class="w-full bg-secondary border-none rounded-2xl py-4 pl-12 pr-4 text-foreground focus:ring-2 focus:ring-primary transition-all outline-none text-sm font-medium" placeholder="Password বা OTP লিখুন" onkeydown="if(event.key==='Enter')userLogin()"/>
+          </div>
+        </div>
+        <div class="error-box" id="loginErr">❌ Username বা Password ভুল হয়েছে</div>
+        <button onclick="userLogin()" class="w-full bg-primary text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-2">
+          Login করুন
+          <iconify-icon icon="lucide:arrow-right" class="text-xl"></iconify-icon>
+        </button>
+      </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Password / OTP</label>
-      <input class="form-input" type="password" id="loginPass" placeholder="Password বা OTP লিখুন" onkeydown="if(event.key==='Enter')userLogin()"/>
+    <div class="mt-8 text-center">
+      <a href="#" onclick="showAdminLogin(event)" class="text-sm font-semibold text-primary hover:underline flex items-center justify-center gap-2">
+        <iconify-icon icon="lucide:shield-check"></iconify-icon>
+        Admin Panel এ যান
+      </a>
     </div>
-    <div class="error-box" id="loginErr">❌ Username বা Password ভুল হয়েছে</div>
-    <button class="btn btn-primary btn-full" style="margin-top:8px" onclick="userLogin()">Login করুন →</button>
-    <div class="auth-toggle"><a href="#" onclick="showAdminLogin(event)">🔐 Admin Panel এ যান</a></div>
   </div>
 </div>
 
 <!-- ===== ADMIN LOGIN ===== -->
-<div id="adminLoginPage" class="page">
-  <div class="auth-card">
-    <div class="auth-logo">
-      <div class="auth-logo-icon" style="background:#1e293b">🔐</div>
-      <div class="auth-title">Admin Login</div>
-      <div class="auth-sub">RatTara Admin Panel</div>
+<div id="adminLoginPage" class="page relative overflow-hidden bg-background w-full min-h-screen">
+  <div class="absolute -top-24 -right-24 w-64 h-64 bg-slate-200 rounded-full blur-3xl opacity-60"></div>
+  <div class="w-full max-w-sm mx-auto px-6 z-10 relative">
+    <div class="text-center mb-10">
+      <div class="w-20 h-20 bg-slate-900 rounded-3xl shadow-2xl shadow-slate-300 flex items-center justify-center mx-auto mb-6">
+        <iconify-icon icon="lucide:shield" class="text-4xl text-white"></iconify-icon>
+      </div>
+      <h1 class="text-3xl font-extrabold tracking-tight">Admin Login</h1>
+      <p class="text-muted-foreground mt-2 font-medium text-sm">RatTara Admin Panel</p>
     </div>
-    <div class="form-group">
-      <label class="form-label">Admin Username</label>
-      <input class="form-input" type="text" id="adminUser" placeholder="admin"/>
+    <div class="bg-card border border-border rounded-[2rem] p-8 shadow-xl shadow-slate-100">
+      <div class="space-y-5">
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Admin Username</label>
+          <div class="relative">
+            <iconify-icon icon="lucide:user" class="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-lg"></iconify-icon>
+            <input type="text" id="adminUser" class="w-full bg-secondary border-none rounded-2xl py-4 pl-12 pr-4 text-foreground focus:ring-2 focus:ring-primary transition-all outline-none text-sm font-medium" placeholder="admin"/>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Admin Password</label>
+          <div class="relative">
+            <iconify-icon icon="lucide:lock" class="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-lg"></iconify-icon>
+            <input type="password" id="adminPass" class="w-full bg-secondary border-none rounded-2xl py-4 pl-12 pr-4 text-foreground focus:ring-2 focus:ring-primary transition-all outline-none text-sm font-medium" placeholder="Password" onkeydown="if(event.key==='Enter')adminLogin()"/>
+          </div>
+        </div>
+        <div class="error-box" id="adminErr">❌ Username বা Password ভুল</div>
+        <button onclick="adminLogin()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl shadow-lg shadow-slate-200 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-2">
+          Admin Login
+          <iconify-icon icon="lucide:arrow-right" class="text-xl"></iconify-icon>
+        </button>
+      </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Admin Password</label>
-      <input class="form-input" type="password" id="adminPass" placeholder="Password" onkeydown="if(event.key==='Enter')adminLogin()"/>
+    <div class="mt-8 text-center">
+      <a href="#" onclick="showUserLogin(event)" class="text-sm font-semibold text-muted-foreground hover:text-foreground flex items-center justify-center gap-2">
+        <iconify-icon icon="lucide:arrow-left"></iconify-icon>
+        User Login এ ফিরে যান
+      </a>
     </div>
-    <div class="error-box" id="adminErr">❌ Username বা Password ভুল</div>
-    <button class="btn btn-primary btn-full" style="margin-top:8px;background:#1e293b" onclick="adminLogin()">Admin Login →</button>
-    <div class="auth-toggle"><a href="#" onclick="showUserLogin(event)">← User Login এ ফিরে যান</a></div>
   </div>
 </div>
 
 <!-- ===== USER DASHBOARD ===== -->
-<div id="dashPage" class="page">
-  <div style="padding:24px;max-width:760px;margin:0 auto">
-    <div class="page-header">
-      <div class="page-title">স্বাগতম, <span id="dashName" style="color:var(--primary)">User</span>! 👋</div>
-      <div class="page-sub">আপনার withdrawal portal</div>
-    </div>
-
-    <!-- OTP STATS -->
-    <div class="otp-stats">
-      <div class="otp-stat">
-        <div class="otp-stat-num" id="dashTotalOtp" style="color:var(--purple)">0</div>
-        <div class="otp-stat-label">⭐ Total OTP</div>
+<div id="dashPage" class="page bg-background min-h-screen pb-8">
+  <div class="max-w-lg mx-auto px-5 py-6 space-y-5">
+    <!-- Welcome -->
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-extrabold tracking-tight">স্বাগতম, <span id="dashName" class="text-primary">User</span>! 👋</h2>
+        <p class="text-xs text-muted-foreground font-medium mt-1">আপনার withdrawal portal</p>
       </div>
-      <div class="otp-stat">
-        <div class="otp-stat-num" id="dashOtpBalance" style="color:var(--primary)">৳0</div>
-        <div class="otp-stat-label">💰 OTP Balance</div>
-      </div>
-      <div class="otp-stat">
-        <div class="otp-stat-num" id="dashWithdrawn" style="color:var(--red)">৳0</div>
-        <div class="otp-stat-label">💸 Withdrawn</div>
+      <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center">
+        <iconify-icon icon="lucide:user" class="text-2xl text-primary"></iconify-icon>
       </div>
     </div>
 
-    <div class="balance-card">
-      <div class="balance-label">Available Balance</div>
-      <div class="balance-amount"><span class="currency">৳</span><span id="dashBalance">0</span></div>
-      <div class="balance-min" id="dashBalanceMin">সর্বনিম্ন উত্তোলন ৳100</div>
+    <!-- Stats -->
+    <div class="grid grid-cols-3 gap-3">
+      <div class="bg-card border border-border rounded-3xl p-4 shadow-sm">
+        <div class="w-8 h-8 bg-purple-100 rounded-xl flex items-center justify-center mb-3">
+          <iconify-icon icon="lucide:star" class="text-purple-600"></iconify-icon>
+        </div>
+        <div class="text-xl font-extrabold tracking-tight" id="dashTotalOtp">0</div>
+        <div class="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mt-0.5">Total OTP</div>
+      </div>
+      <div class="bg-card border border-border rounded-3xl p-4 shadow-sm">
+        <div class="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center mb-3">
+          <iconify-icon icon="lucide:coins" class="text-blue-600"></iconify-icon>
+        </div>
+        <div class="text-xl font-extrabold tracking-tight" id="dashOtpBalance">৳0</div>
+        <div class="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mt-0.5">OTP Balance</div>
+      </div>
+      <div class="bg-card border border-border rounded-3xl p-4 shadow-sm">
+        <div class="w-8 h-8 bg-red-100 rounded-xl flex items-center justify-center mb-3">
+          <iconify-icon icon="lucide:arrow-down-right" class="text-red-500"></iconify-icon>
+        </div>
+        <div class="text-xl font-extrabold tracking-tight" id="dashWithdrawn">৳0</div>
+        <div class="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mt-0.5">Withdrawn</div>
+      </div>
     </div>
 
-    <!-- WITHDRAW FORM -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-icon blue">💸</div>
+    <!-- Balance Card -->
+    <div class="bg-primary rounded-[2rem] p-7 text-white relative overflow-hidden shadow-2xl shadow-blue-200">
+      <div class="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20 blur-2xl"></div>
+      <div class="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full -ml-16 -mb-16 blur-xl"></div>
+      <div class="relative z-10">
+        <p class="text-[10px] font-bold uppercase tracking-widest opacity-70 mb-2">Available Balance</p>
+        <div class="flex items-baseline gap-1">
+          <span class="text-2xl font-semibold opacity-80">৳</span>
+          <span class="text-5xl font-extrabold tracking-tighter" id="dashBalance">0</span>
+        </div>
+        <div class="mt-5 inline-flex items-center gap-2 bg-white/20 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase">
+          <iconify-icon icon="lucide:info" class="text-sm"></iconify-icon>
+          <span id="dashBalanceMin">সর্বনিম্ন উত্তোলন ৳100</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Withdraw Form -->
+    <div class="bg-card border border-border rounded-[2rem] p-6 shadow-sm">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center">
+          <iconify-icon icon="lucide:send" class="text-primary text-lg"></iconify-icon>
+        </div>
         <div>
-          <div class="section-title-text">Withdrawal Request</div>
-          <div class="section-sub">আপনার payment method বেছে নিন</div>
+          <h3 class="font-extrabold text-base">Withdrawal Request</h3>
+          <p class="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">আপনার payment method বেছে নিন</p>
         </div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Payment Method</label>
-        <div class="method-grid">
-          <div class="method-btn active" onclick="selectMethod(this,'bKash')">
-            <span class="method-emoji">💜</span>bKash
-          </div>
-          <div class="method-btn" onclick="selectMethod(this,'Nagad')">
-            <span class="method-emoji">🧡</span>Nagad
-          </div>
+      <!-- Method -->
+      <div class="grid grid-cols-2 gap-3 mb-5">
+        <div class="method-btn active" onclick="selectMethod(this,'bKash')">
+          <div class="text-2xl mb-1">💜</div>
+          <div class="text-xs">bKash</div>
+        </div>
+        <div class="method-btn" onclick="selectMethod(this,'Nagad')">
+          <div class="text-2xl mb-1">🧡</div>
+          <div class="text-xs">Nagad</div>
         </div>
       </div>
 
-      <div class="grid-2">
-        <div class="form-group">
-          <label class="form-label">পূর্ণ নাম</label>
-          <input class="form-input" type="text" id="wdName" placeholder="আপনার পূর্ণ নাম"/>
+      <div class="space-y-4">
+        <div class="space-y-1.5">
+          <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">পূর্ণ নাম</label>
+          <input type="text" id="wdName" class="w-full bg-secondary border-none rounded-2xl py-3.5 px-4 text-foreground focus:ring-2 focus:ring-primary transition-all outline-none text-sm font-medium" placeholder="আপনার পূর্ণ নাম"/>
         </div>
-        <div class="form-group">
-          <label class="form-label" id="wdNumLabel">bKash নম্বর</label>
-          <input class="form-input" type="text" id="wdNumber" placeholder="01XXXXXXXXX"/>
+        <div class="space-y-1.5">
+          <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1" id="wdNumLabel">bKash নম্বর</label>
+          <input type="text" id="wdNumber" class="w-full bg-secondary border-none rounded-2xl py-3.5 px-4 text-foreground focus:ring-2 focus:ring-primary transition-all outline-none text-sm font-medium" placeholder="01XXXXXXXXX"/>
         </div>
+        <div class="space-y-1.5">
+          <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Account Type</label>
+          <select id="wdAccType" class="w-full bg-secondary border-none rounded-2xl py-3.5 px-4 text-foreground focus:ring-2 focus:ring-primary transition-all outline-none text-sm font-medium appearance-none">
+            <option>Personal</option>
+          </select>
+        </div>
+        <div class="space-y-1.5">
+          <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Amount (৳)</label>
+          <input type="number" id="wdAmount" class="w-full bg-secondary border-none rounded-2xl py-3.5 px-4 text-foreground focus:ring-2 focus:ring-primary transition-all outline-none text-sm font-medium" placeholder="সর্বনিম্ন ৳100" min="100"/>
+        </div>
+        <div class="error-box" id="wdErr">Error</div>
+        <button onclick="submitWithdraw()" class="w-full bg-primary text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200 flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-all">
+          Request Submit করুন
+          <iconify-icon icon="lucide:send" class="text-lg"></iconify-icon>
+        </button>
       </div>
-      <div class="form-group">
-        <label class="form-label">Account Type</label>
-        <select class="form-select" id="wdAccType">
-          <option>Personal</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Amount (৳)</label>
-        <input class="form-input" type="number" id="wdAmount" placeholder="সর্বনিম্ন ৳100" min="100"/>
-      </div>
-      <div class="error-box" id="wdErr">Error</div>
-      <button class="btn btn-primary btn-full" style="margin-top:4px" onclick="submitWithdraw()">Request Submit করুন →</button>
     </div>
 
-    <!-- MY REQUESTS -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-icon green">📋</div>
+    <!-- My Requests -->
+    <div class="bg-card border border-border rounded-[2rem] p-6 shadow-sm">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="w-10 h-10 bg-emerald-50 rounded-2xl flex items-center justify-center">
+          <iconify-icon icon="lucide:list" class="text-tertiary text-lg"></iconify-icon>
+        </div>
         <div>
-          <div class="section-title-text">আমার Requests</div>
-          <div class="section-sub">সব withdrawal request এর status</div>
+          <h3 class="font-extrabold text-base">আমার Requests</h3>
+          <p class="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">সব withdrawal request এর status</p>
         </div>
       </div>
-      <div id="myRequests"><div class="empty">কোনো request নেই এখনো</div></div>
+      <div id="myRequests"><div class="text-center py-8 text-muted-foreground text-sm">কোনো request নেই এখনো</div></div>
     </div>
   </div>
 </div>
 
 <!-- ===== ADMIN PAGE ===== -->
-<div id="adminPage" class="page">
-  <div style="padding:24px;max-width:1100px;margin:0 auto">
-    <div class="page-header">
-      <div class="page-title">🔐 Admin Panel</div>
-      <div class="page-sub">RatTara Withdrawal Management</div>
+<div id="adminPage" class="page bg-background min-h-screen pb-8">
+  <div class="max-w-6xl mx-auto px-5 py-6">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center">
+        <iconify-icon icon="lucide:shield" class="text-white text-lg"></iconify-icon>
+      </div>
+      <div>
+        <h2 class="text-xl font-extrabold tracking-tight">Admin Panel</h2>
+        <p class="text-xs text-muted-foreground font-medium">RatTara Withdrawal Management</p>
+      </div>
     </div>
 
     <div class="admin-layout">
-      <div class="admin-nav">
-        <div class="admin-nav-item active" onclick="showTab('overview',this)"><span class="admin-nav-icon">📊</span>Overview</div>
-        <div class="admin-nav-item" onclick="showTab('users',this)"><span class="admin-nav-icon">👥</span>Users</div>
-        <div class="admin-nav-item" onclick="showTab('otp',this)"><span class="admin-nav-icon">⭐</span>OTP Update</div>
-        <div class="admin-nav-item" onclick="showTab('withdrawals',this)"><span class="admin-nav-icon">💸</span>Withdrawals</div>
-        <div class="admin-nav-item" onclick="showTab('settings',this)"><span class="admin-nav-icon">⚙️</span>Settings</div>
+      <!-- Sidebar Nav -->
+      <div class="admin-nav-sidebar">
+        <div class="bg-slate-900 rounded-[1.5rem] p-3 space-y-1">
+          <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white bg-white/10 transition-all" onclick="showTab('overview',this)">
+            <iconify-icon icon="lucide:pie-chart" class="text-lg"></iconify-icon>Overview
+          </div>
+          <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10 hover:text-white transition-all" onclick="showTab('users',this)">
+            <iconify-icon icon="lucide:users" class="text-lg"></iconify-icon>Users
+          </div>
+          <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10 hover:text-white transition-all" onclick="showTab('otp',this)">
+            <iconify-icon icon="lucide:zap" class="text-lg"></iconify-icon>OTP Update
+          </div>
+          <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10 hover:text-white transition-all" onclick="showTab('withdrawals',this)">
+            <iconify-icon icon="lucide:banknote" class="text-lg"></iconify-icon>Withdrawals
+          </div>
+          <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10 hover:text-white transition-all" onclick="showTab('settings',this)">
+            <iconify-icon icon="lucide:settings" class="text-lg"></iconify-icon>Settings
+          </div>
+        </div>
       </div>
 
-      <div>
+      <!-- Content -->
+      <div class="space-y-5">
+
         <!-- OVERVIEW -->
         <div class="admin-panel active" id="tab-overview">
-          <div class="stats-grid">
-            <div class="stat"><div class="stat-num" id="st-users">0</div><div class="stat-label">Total Users</div></div>
-            <div class="stat"><div class="stat-num" id="st-pending" style="color:var(--gold)">0</div><div class="stat-label">Pending</div></div>
-            <div class="stat"><div class="stat-num" id="st-approved" style="color:var(--green)">0</div><div class="stat-label">Approved</div></div>
-            <div class="stat"><div class="stat-num" id="st-paid" style="color:var(--primary)">৳0</div><div class="stat-label">Total Paid</div></div>
-          </div>
-          <div class="section">
-            <div class="section-header">
-              <div class="section-icon blue">🕐</div>
-              <div><div class="section-title-text">Recent Requests</div></div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-5">
+            <div class="bg-card border border-border rounded-[1.5rem] p-5 shadow-sm">
+              <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center mb-3">
+                <iconify-icon icon="lucide:users" class="text-primary text-xl"></iconify-icon>
+              </div>
+              <div class="text-2xl font-extrabold" id="st-users">0</div>
+              <div class="text-xs text-muted-foreground font-bold uppercase tracking-wider mt-1">Total Users</div>
             </div>
-            <div id="recentList"><div class="empty">No requests yet</div></div>
+            <div class="bg-card border border-border rounded-[1.5rem] p-5 shadow-sm">
+              <div class="w-10 h-10 bg-amber-50 rounded-2xl flex items-center justify-center mb-3">
+                <iconify-icon icon="lucide:clock" class="text-amber-500 text-xl"></iconify-icon>
+              </div>
+              <div class="text-2xl font-extrabold text-amber-500" id="st-pending">0</div>
+              <div class="text-xs text-muted-foreground font-bold uppercase tracking-wider mt-1">Pending</div>
+            </div>
+            <div class="bg-card border border-border rounded-[1.5rem] p-5 shadow-sm">
+              <div class="w-10 h-10 bg-emerald-50 rounded-2xl flex items-center justify-center mb-3">
+                <iconify-icon icon="lucide:check-circle" class="text-tertiary text-xl"></iconify-icon>
+              </div>
+              <div class="text-2xl font-extrabold text-tertiary" id="st-approved">0</div>
+              <div class="text-xs text-muted-foreground font-bold uppercase tracking-wider mt-1">Approved</div>
+            </div>
+            <div class="bg-card border border-border rounded-[1.5rem] p-5 shadow-sm">
+              <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center mb-3">
+                <iconify-icon icon="lucide:wallet" class="text-primary text-xl"></iconify-icon>
+              </div>
+              <div class="text-2xl font-extrabold text-primary" id="st-paid">৳0</div>
+              <div class="text-xs text-muted-foreground font-bold uppercase tracking-wider mt-1">Total Paid</div>
+            </div>
+          </div>
+          <div class="bg-card border border-border rounded-[1.5rem] p-6 shadow-sm">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center">
+                <iconify-icon icon="lucide:clock" class="text-primary text-lg"></iconify-icon>
+              </div>
+              <h3 class="font-extrabold text-base">Recent Requests</h3>
+            </div>
+            <div id="recentList"><div class="text-center py-8 text-muted-foreground text-sm">No requests yet</div></div>
           </div>
         </div>
 
         <!-- USERS -->
         <div class="admin-panel" id="tab-users">
-          <div class="section">
-            <div class="section-header">
-              <div class="section-icon blue">➕</div>
-              <div><div class="section-title-text">New User Add করুন</div></div>
+          <div class="bg-card border border-border rounded-[1.5rem] p-6 shadow-sm">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center">
+                <iconify-icon icon="lucide:user-plus" class="text-primary text-lg"></iconify-icon>
+              </div>
+              <h3 class="font-extrabold text-base">New User Add করুন</h3>
             </div>
-            <div class="add-user-box">
-              <div class="add-user-grid">
-                <div class="form-group" style="margin:0">
-                  <label class="form-label">Username</label>
-                  <input class="form-input" type="text" id="newUser" placeholder="username (e.g. RT_Rakib)"/>
+            <div class="bg-secondary rounded-2xl p-4 mb-5">
+              <div class="flex gap-3 items-end">
+                <div class="flex-1 space-y-1.5">
+                  <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Username</label>
+                  <input type="text" id="newUser" class="w-full bg-card border border-border rounded-xl py-3 px-4 text-foreground focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="username (e.g. RT_Rakib)"/>
                 </div>
-                <button class="btn btn-primary" style="height:46px;margin-top:22px" onclick="addUser()">➕ Add User</button>
+                <button onclick="addUser()" class="bg-primary text-white px-5 py-3 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-blue-700 transition-all shrink-0">
+                  <iconify-icon icon="lucide:plus"></iconify-icon>Add
+                </button>
               </div>
             </div>
             <div class="table-wrap">
               <table>
-                <thead><tr><th>Username</th><th>Total OTP</th><th>OTP Rate</th><th>OTP Balance</th><th>Withdrawn</th><th>Available</th><th>Login OTP</th><th>Actions</th></tr></thead>
-                <tbody id="usersTable"><tr><td colspan="8" class="empty">No users</td></tr></tbody>
+                <thead><tr><th>Username</th><th>Total OTP</th><th>Rate</th><th>OTP Balance</th><th>Withdrawn</th><th>Available</th><th>Login OTP</th><th>Actions</th></tr></thead>
+                <tbody id="usersTable"><tr><td colspan="8" class="text-center py-8 text-muted-foreground text-sm">No users</td></tr></tbody>
               </table>
             </div>
           </div>
         </div>
 
-        <!-- OTP UPDATE TAB -->
+        <!-- OTP UPDATE -->
         <div class="admin-panel" id="tab-otp">
-          <div class="section">
-            <div class="section-header">
-              <div class="section-icon purple">⭐</div>
+          <div class="bg-card border border-border rounded-[1.5rem] p-6 shadow-sm mb-5">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-10 h-10 bg-purple-100 rounded-2xl flex items-center justify-center">
+                <iconify-icon icon="lucide:zap" class="text-purple-600 text-lg"></iconify-icon>
+              </div>
               <div>
-                <div class="section-title-text">Bulk OTP Update</div>
-                <div class="section-sub">প্রতিদিনের OTP data paste করুন — automatically সব user update হবে</div>
+                <h3 class="font-extrabold text-base">Bulk OTP Update</h3>
+                <p class="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">প্রতিদিনের OTP data paste করুন</p>
               </div>
             </div>
 
-            <div class="rate-info">
-              💡 Current OTP Rate: <strong>৳<span id="currentRateDisplay">1</span> per OTP</strong> — Settings থেকে পরিবর্তন করতে পারবেন
+            <div class="bg-blue-50 border border-blue-100 rounded-2xl px-4 py-3 mb-5 text-sm text-primary font-semibold flex items-center gap-2">
+              <iconify-icon icon="lucide:info" class="text-lg shrink-0"></iconify-icon>
+              Current OTP Rate: <strong>৳<span id="currentRateDisplay">1</span> per OTP</strong>
             </div>
 
-            <div class="bulk-box">
-              <label class="form-label" style="margin-bottom:10px">OTP Data Paste করুন</label>
-              <p style="font-size:.82rem;color:var(--text3);margin-bottom:10px">Format: <code style="background:var(--bg);padding:2px 6px;border-radius:4px">Username&nbsp;&nbsp;&nbsp;OTPCount</code> (প্রতি লাইনে একটি user, tab বা space দিয়ে আলাদা)</p>
-              <textarea class="form-input" id="bulkOtpInput" placeholder="RT_Rakib    1880&#10;RT_Ashik    3123&#10;RT_Faruk    1300&#10;..." oninput="previewBulk()"></textarea>
+            <div class="bg-secondary border-2 border-dashed border-border rounded-2xl p-4 mb-4">
+              <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 block">OTP Data Paste করুন</label>
+              <p class="text-xs text-muted-foreground mb-3">Format: <code class="bg-white px-2 py-0.5 rounded-lg text-xs">Username&nbsp;&nbsp;&nbsp;OTPCount</code></p>
+              <textarea class="w-full bg-transparent border-none resize-none text-sm font-mono focus:ring-0 outline-none min-h-[120px]" id="bulkOtpInput" placeholder="RT_Rakib    1880&#10;RT_Ashik    3123&#10;RT_Faruk    1300&#10;..." oninput="previewBulk()"></textarea>
             </div>
 
             <div class="bulk-preview" id="bulkPreview"></div>
 
-            <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap">
-              <button class="btn btn-purple" onclick="applyBulkOtp()">⭐ Apply OTP Update</button>
-              <button class="btn btn-outline" onclick="document.getElementById('bulkOtpInput').value='';document.getElementById('bulkPreview').style.display='none'">🗑️ Clear</button>
+            <div class="flex gap-3 mt-4 flex-wrap">
+              <button onclick="applyBulkOtp()" class="bg-slate-900 text-white font-bold py-3 px-6 rounded-2xl shadow-lg flex items-center gap-2 hover:bg-slate-800 transition-all">
+                <iconify-icon icon="lucide:refresh-cw"></iconify-icon>
+                Apply Updates
+              </button>
+              <button onclick="document.getElementById('bulkOtpInput').value='';document.getElementById('bulkPreview').style.display='none'" class="bg-secondary border border-border text-foreground font-bold py-3 px-6 rounded-2xl flex items-center gap-2 hover:bg-border transition-all">
+                <iconify-icon icon="lucide:trash-2"></iconify-icon>
+                Clear
+              </button>
             </div>
           </div>
 
-          <!-- INDIVIDUAL OTP ADD -->
-          <div class="section">
-            <div class="section-header">
-              <div class="section-icon blue">➕</div>
+          <!-- Individual OTP -->
+          <div class="bg-card border border-border rounded-[1.5rem] p-6 shadow-sm">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center">
+                <iconify-icon icon="lucide:plus-circle" class="text-primary text-lg"></iconify-icon>
+              </div>
               <div>
-                <div class="section-title-text">Individual OTP Add</div>
-                <div class="section-sub">একজন user এর OTP আলাদাভাবে add করুন</div>
+                <h3 class="font-extrabold text-base">Individual OTP Add</h3>
+                <p class="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">একজন user এর OTP আলাদাভাবে add করুন</p>
               </div>
             </div>
-            <div class="add-user-box">
-              <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end">
-                <div class="form-group" style="margin:0">
-                  <label class="form-label">Username</label>
-                  <input class="form-input" type="text" id="singleOtpUser" placeholder="username"/>
+            <div class="bg-secondary rounded-2xl p-4">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+                <div class="space-y-1.5">
+                  <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Username</label>
+                  <input type="text" id="singleOtpUser" class="w-full bg-card border border-border rounded-xl py-3 px-4 text-foreground focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="username"/>
                 </div>
-                <div class="form-group" style="margin:0">
-                  <label class="form-label">OTP Count</label>
-                  <input class="form-input" type="number" id="singleOtpCount" placeholder="e.g. 50"/>
+                <div class="space-y-1.5">
+                  <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">OTP Count</label>
+                  <input type="number" id="singleOtpCount" class="w-full bg-card border border-border rounded-xl py-3 px-4 text-foreground focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="e.g. 50"/>
                 </div>
-                <button class="btn btn-primary" style="height:46px;margin-top:22px" onclick="addSingleOtp()">Add OTP</button>
+                <button onclick="addSingleOtp()" class="bg-primary text-white px-5 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-blue-700 transition-all">
+                  <iconify-icon icon="lucide:plus"></iconify-icon>Add OTP
+                </button>
               </div>
             </div>
           </div>
@@ -519,12 +583,14 @@ tbody tr:hover{background:var(--bg)}
 
         <!-- WITHDRAWALS -->
         <div class="admin-panel" id="tab-withdrawals">
-          <div class="section">
-            <div class="section-header">
-              <div class="section-icon blue">💸</div>
-              <div><div class="section-title-text">Withdrawal Requests</div></div>
+          <div class="bg-card border border-border rounded-[1.5rem] p-6 shadow-sm">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center">
+                <iconify-icon icon="lucide:banknote" class="text-primary text-lg"></iconify-icon>
+              </div>
+              <h3 class="font-extrabold text-base">Withdrawal Requests</h3>
             </div>
-            <div class="filter-bar">
+            <div class="flex gap-2 flex-wrap mb-5">
               <button class="filter-btn active" onclick="filterReq('all',this)">সব</button>
               <button class="filter-btn" onclick="filterReq('pending',this)">⏳ Pending</button>
               <button class="filter-btn" onclick="filterReq('approved',this)">✅ Approved</button>
@@ -533,7 +599,7 @@ tbody tr:hover{background:var(--bg)}
             <div class="table-wrap">
               <table>
                 <thead><tr><th>User</th><th>Method</th><th>Number</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
-                <tbody id="reqTable"><tr><td colspan="6" class="empty">No requests</td></tr></tbody>
+                <tbody id="reqTable"><tr><td colspan="6" class="text-center py-8 text-muted-foreground text-sm">No requests</td></tr></tbody>
               </table>
             </div>
           </div>
@@ -541,33 +607,39 @@ tbody tr:hover{background:var(--bg)}
 
         <!-- SETTINGS -->
         <div class="admin-panel" id="tab-settings">
-          <div class="section">
-            <div class="section-header">
-              <div class="section-icon blue">⚙️</div>
-              <div><div class="section-title-text">Settings</div></div>
+          <div class="bg-card border border-border rounded-[1.5rem] p-6 shadow-sm">
+            <div class="flex items-center gap-3 mb-6">
+              <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center">
+                <iconify-icon icon="lucide:settings" class="text-primary text-lg"></iconify-icon>
+              </div>
+              <h3 class="font-extrabold text-base">Settings</h3>
             </div>
-            <div class="settings-box">
-              <div class="form-group">
-                <label class="form-label">Minimum Withdrawal (৳)</label>
-                <input class="form-input" type="number" id="setMin" value="100"/>
+            <div class="max-w-md space-y-4">
+              <div class="space-y-1.5">
+                <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Minimum Withdrawal (৳)</label>
+                <input type="number" id="setMin" value="100" class="w-full bg-secondary border-none rounded-2xl py-3.5 px-4 text-foreground focus:ring-2 focus:ring-primary outline-none text-sm font-medium"/>
               </div>
-              <div class="form-group">
-                <label class="form-label">OTP Rate (৳ per OTP)</label>
-                <input class="form-input" type="number" id="setOtpRate" value="1" step="0.5"/>
-                <small style="color:var(--text3);font-size:.78rem;margin-top:4px;display:block">প্রতিটি OTP এর মূল্য কত টাকা</small>
+              <div class="space-y-1.5">
+                <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">OTP Rate (৳ per OTP)</label>
+                <input type="number" id="setOtpRate" value="1" step="0.5" class="w-full bg-secondary border-none rounded-2xl py-3.5 px-4 text-foreground focus:ring-2 focus:ring-primary outline-none text-sm font-medium"/>
+                <p class="text-xs text-muted-foreground ml-1">প্রতিটি OTP এর মূল্য কত টাকা</p>
               </div>
-              <div class="form-group">
-                <label class="form-label">Admin Username</label>
-                <input class="form-input" type="text" id="setAdminUser" placeholder="admin"/>
+              <div class="space-y-1.5">
+                <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Admin Username</label>
+                <input type="text" id="setAdminUser" placeholder="admin" class="w-full bg-secondary border-none rounded-2xl py-3.5 px-4 text-foreground focus:ring-2 focus:ring-primary outline-none text-sm font-medium"/>
               </div>
-              <div class="form-group">
-                <label class="form-label">New Admin Password</label>
-                <input class="form-input" type="password" id="setAdminPass" placeholder="নতুন password"/>
+              <div class="space-y-1.5">
+                <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">New Admin Password</label>
+                <input type="password" id="setAdminPass" placeholder="নতুন password" class="w-full bg-secondary border-none rounded-2xl py-3.5 px-4 text-foreground focus:ring-2 focus:ring-primary outline-none text-sm font-medium"/>
               </div>
-              <button class="btn btn-primary" onclick="saveSettings()">Save Settings ✓</button>
+              <button onclick="saveSettings()" class="bg-primary text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-blue-100 flex items-center gap-2 hover:bg-blue-700 transition-all">
+                <iconify-icon icon="lucide:save"></iconify-icon>
+                Save Settings
+              </button>
             </div>
           </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -575,12 +647,12 @@ tbody tr:hover{background:var(--bg)}
 
 <!-- MODAL -->
 <div class="modal-bg" id="modal">
-  <div class="modal">
-    <div class="modal-title" id="modalTitle">Edit</div>
+  <div class="bg-card rounded-[1.5rem] p-7 w-full max-w-sm shadow-2xl border border-border mx-4">
+    <div class="font-extrabold text-lg mb-5" id="modalTitle">Edit</div>
     <div id="modalBody"></div>
-    <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" id="modalOk">Confirm</button>
+    <div class="flex gap-3 mt-6">
+      <button onclick="closeModal()" class="flex-1 bg-secondary border border-border text-foreground font-bold py-3 rounded-2xl hover:bg-border transition-all text-sm">Cancel</button>
+      <button class="flex-1 bg-primary text-white font-bold py-3 rounded-2xl hover:bg-blue-700 transition-all text-sm" id="modalOk">Confirm</button>
     </div>
   </div>
 </div>
@@ -588,11 +660,17 @@ tbody tr:hover{background:var(--bg)}
 <!-- TOAST -->
 <div id="toast"></div>
 
+<script>
+// Helper to toggle admin nav item active state
+document.querySelectorAll('.admin-nav-item').forEach(item => {
+  // handled via showTab
+});
+</script>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// ===== FIREBASE CONFIG =====
 const firebaseConfig = {
   apiKey: "AIzaSyB6DT5aVGDDW7IAPUMVAmQY8u5PMd1ZLe8",
   authDomain: "rattara-c6c23.firebaseapp.com",
@@ -602,12 +680,10 @@ const firebaseConfig = {
   appId: "1:542423756114:web:42b7cee066b284fe011e8b",
   measurementId: "G-PRR976LDTW"
 };
-// ===========================
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ===== STATE =====
 let currentUser = null;
 let isAdmin = false;
 let selectedMethod = 'bKash';
@@ -619,13 +695,11 @@ let unsubAdmin = null;
 let unsubUser = null;
 let unsubReqs = null;
 const SESSION_KEY = 'rt_session';
-const SESSION_DURATION = 30 * 60 * 1000; // 30 minutes
+const SESSION_DURATION = 30 * 60 * 1000;
 
-// ===== SESSION =====
 function saveSession(data) {
   sessionStorage.setItem(SESSION_KEY, JSON.stringify({ ...data, ts: Date.now() }));
 }
-
 function loadSession() {
   try {
     const s = JSON.parse(sessionStorage.getItem(SESSION_KEY));
@@ -634,9 +708,7 @@ function loadSession() {
     return s;
   } catch { return null; }
 }
-
 function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
-
 function startSessionTimer() {
   clearTimeout(window._sessionTimer);
   window._sessionTimer = setTimeout(() => {
@@ -645,28 +717,25 @@ function startSessionTimer() {
   }, SESSION_DURATION);
 }
 
-// ===== INIT =====
 window.addEventListener('load', async () => {
   await loadSettings();
   setTimeout(async () => {
     document.getElementById('loader').classList.add('hide');
-    // Restore session
     const sess = loadSession();
     if (sess) {
       if (sess.isAdmin) {
         isAdmin = true;
-        document.getElementById('mainNav').classList.add('show');
+        document.getElementById('mainNav').classList.remove('hidden');
         document.getElementById('navBadge').textContent = '🔐 Admin';
         switchPage('adminPage');
         startAdminLiveListeners();
         startSessionTimer();
       } else if (sess.userId) {
-        // restore user
         try {
           const snap = await getDoc(doc(db, 'users', sess.userId));
           if (snap.exists()) {
             currentUser = { id: sess.userId, ...snap.data() };
-            document.getElementById('mainNav').classList.add('show');
+            document.getElementById('mainNav').classList.remove('hidden');
             document.getElementById('navBadge').textContent = '👤 ' + (currentUser.username || currentUser.id);
             document.getElementById('dashName').textContent = currentUser.username || currentUser.id;
             switchPage('dashPage');
@@ -691,7 +760,6 @@ async function loadSettings() {
   } catch(e) { console.log('Settings load error:', e); }
 }
 
-// ===== NAVIGATION =====
 function switchPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const el = document.getElementById(id);
@@ -708,32 +776,28 @@ window.logout = () => {
   if (unsubReqs) { unsubReqs(); unsubReqs = null; }
   clearTimeout(window._sessionTimer);
   currentUser = null; isAdmin = false;
-  document.getElementById('mainNav').classList.remove('show');
+  document.getElementById('mainNav').classList.add('hidden');
   switchPage('loginPage');
   document.getElementById('loginUser').value = '';
   document.getElementById('loginPass').value = '';
 };
 
-// ===== USER LOGIN =====
 window.userLogin = async () => {
   const username = document.getElementById('loginUser').value.trim();
   const pass = document.getElementById('loginPass').value.trim();
   const errEl = document.getElementById('loginErr');
   errEl.style.display = 'none';
-
   if (!username || !pass) { errEl.textContent = '❌ Username এবং Password দিন'; errEl.style.display = 'block'; return; }
-
   if (username === settings.adminUser && pass === settings.adminPass) {
     isAdmin = true;
     saveSession({ isAdmin: true });
-    document.getElementById('mainNav').classList.add('show');
+    document.getElementById('mainNav').classList.remove('hidden');
     document.getElementById('navBadge').textContent = '🔐 Admin';
     switchPage('adminPage');
     startAdminLiveListeners();
     startSessionTimer();
     return;
   }
-
   try {
     const snap = await getDoc(doc(db, 'users', username.toLowerCase()));
     if (!snap.exists() || snap.data().otp !== pass) {
@@ -744,7 +808,7 @@ window.userLogin = async () => {
     isAdmin = false;
     saveSession({ userId: currentUser.id });
     errEl.style.display = 'none';
-    document.getElementById('mainNav').classList.add('show');
+    document.getElementById('mainNav').classList.remove('hidden');
     document.getElementById('navBadge').textContent = '👤 ' + (currentUser.username || currentUser.id);
     document.getElementById('dashName').textContent = currentUser.username || currentUser.id;
     switchPage('dashPage');
@@ -754,17 +818,15 @@ window.userLogin = async () => {
   } catch(e) { errEl.textContent = '❌ Connection error! Try again.'; errEl.style.display = 'block'; }
 };
 
-// ===== ADMIN LOGIN =====
 window.adminLogin = () => {
   const u = document.getElementById('adminUser').value.trim();
   const p = document.getElementById('adminPass').value.trim();
   const errEl = document.getElementById('adminErr');
   errEl.style.display = 'none';
-
   if (u === settings.adminUser && p === settings.adminPass) {
     isAdmin = true;
     saveSession({ isAdmin: true });
-    document.getElementById('mainNav').classList.add('show');
+    document.getElementById('mainNav').classList.remove('hidden');
     document.getElementById('navBadge').textContent = '🔐 Admin';
     switchPage('adminPage');
     startAdminLiveListeners();
@@ -775,7 +837,6 @@ window.adminLogin = () => {
   }
 };
 
-// ===== USER DASHBOARD =====
 function updateDashStats() {
   if (!currentUser) return;
   const totalOtp = currentUser.totalOtp || 0;
@@ -783,7 +844,6 @@ function updateDashStats() {
   const otpBalance = totalOtp * rate;
   const withdrawn = currentUser.totalWithdrawn || 0;
   const available = Math.max(0, otpBalance - withdrawn);
-
   document.getElementById('dashTotalOtp').textContent = totalOtp;
   document.getElementById('dashOtpBalance').textContent = '৳' + otpBalance;
   document.getElementById('dashWithdrawn').textContent = '৳' + withdrawn;
@@ -793,7 +853,6 @@ function updateDashStats() {
 
 function startUserLiveListeners() {
   if (!currentUser) return;
-  // Live user data
   if (unsubUser) unsubUser();
   unsubUser = onSnapshot(doc(db, 'users', currentUser.id), (snap) => {
     if (snap.exists()) {
@@ -801,23 +860,21 @@ function startUserLiveListeners() {
       updateDashStats();
     }
   });
-
-  // Live withdrawal requests for this user
   if (unsubReqs) unsubReqs();
   unsubReqs = onSnapshot(
     query(collection(db, 'withdrawals'), orderBy('createdAt', 'desc')),
     (snap) => {
       const mine = snap.docs.filter(d => d.data().userId === currentUser.id);
       const el = document.getElementById('myRequests');
-      if (!mine.length) { el.innerHTML = '<div class="empty">কোনো request নেই এখনো</div>'; return; }
+      if (!mine.length) { el.innerHTML = '<div class="text-center py-8 text-muted-foreground text-sm">কোনো request নেই এখনো</div>'; return; }
       el.innerHTML = mine.map(d => {
         const r = d.data();
         const badge = r.status === 'pending' ? 'badge-pending' : r.status === 'approved' ? 'badge-approved' : 'badge-rejected';
         const label = r.status === 'pending' ? '⏳ Pending' : r.status === 'approved' ? '✅ Approved' : '❌ Rejected';
         return `<div class="req-item">
           <div>
-            <div class="req-amount">৳${r.amount} — ${r.method}</div>
-            <div class="req-meta">${r.number} • ${r.accountType} • ${r.fullName}</div>
+            <div class="font-bold text-sm">৳${r.amount} — ${r.method}</div>
+            <div class="text-xs text-muted-foreground mt-1">${r.number} • ${r.accountType} • ${r.fullName}</div>
           </div>
           <span class="badge ${badge}">${label}</span>
         </div>`;
@@ -841,23 +898,19 @@ window.submitWithdraw = async () => {
   const amount = parseInt(document.getElementById('wdAmount').value);
   const errEl = document.getElementById('wdErr');
   errEl.style.display = 'none';
-
   const totalOtp = currentUser.totalOtp || 0;
   const rate = settings.otpRate || 1;
   const otpBalance = totalOtp * rate;
   const withdrawn = currentUser.totalWithdrawn || 0;
   const available = Math.max(0, otpBalance - withdrawn);
-
   if (!fullName) { errEl.textContent = '❌ পূর্ণ নাম দিন'; errEl.style.display = 'block'; return; }
   if (!number) { errEl.textContent = '❌ ' + selectedMethod + ' নম্বর দিন'; errEl.style.display = 'block'; return; }
   if (!/^01[3-9]\d{8}$/.test(number)) { errEl.textContent = '❌ Valid Bangladesh নম্বর দিন (01XXXXXXXXX)'; errEl.style.display = 'block'; return; }
   if (!amount || amount < settings.minWithdraw) { errEl.textContent = `❌ সর্বনিম্ন ৳${settings.minWithdraw} withdraw করতে হবে`; errEl.style.display = 'block'; return; }
   if (amount > available) { errEl.textContent = '❌ পর্যাপ্ত balance নেই'; errEl.style.display = 'block'; return; }
-
   const snap = await getDocs(collection(db, 'withdrawals'));
   const hasPending = snap.docs.some(d => d.data().userId === currentUser.id && d.data().status === 'pending');
   if (hasPending) { errEl.textContent = '❌ একটি pending request আছে। Approved হওয়ার পর নতুন request করুন'; errEl.style.display = 'block'; return; }
-
   try {
     await addDoc(collection(db, 'withdrawals'), {
       userId: currentUser.id, username: currentUser.username || currentUser.id,
@@ -871,9 +924,7 @@ window.submitWithdraw = async () => {
   } catch(e) { errEl.textContent = '❌ Submit failed. Try again.'; errEl.style.display = 'block'; }
 };
 
-// ===== ADMIN LIVE LISTENERS =====
 function startAdminLiveListeners() {
-  // Users live
   if (unsubUser) unsubUser();
   unsubUser = onSnapshot(collection(db, 'users'), (snap) => {
     allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -886,8 +937,6 @@ function startAdminLiveListeners() {
     document.getElementById('st-approved').textContent = approved.length;
     document.getElementById('st-paid').textContent = '৳' + totalPaid;
   });
-
-  // Requests live
   if (unsubReqs) unsubReqs();
   unsubReqs = onSnapshot(
     query(collection(db, 'withdrawals'), orderBy('createdAt', 'desc')),
@@ -901,17 +950,16 @@ function startAdminLiveListeners() {
       document.getElementById('st-approved').textContent = approved.length;
       document.getElementById('st-paid').textContent = '৳' + totalPaid;
       renderReqTable();
-      // Recent
       document.getElementById('recentList').innerHTML = allReqs.slice(0, 5).map(r => {
         const badge = r.status === 'pending' ? 'badge-pending' : r.status === 'approved' ? 'badge-approved' : 'badge-rejected';
         return `<div class="req-item">
           <div>
-            <div class="req-amount">${r.username} — ৳${r.amount} (${r.method})</div>
-            <div class="req-meta">${r.number} • ${r.accountType} • ${r.fullName}</div>
+            <div class="font-bold text-sm">${r.username} — ৳${r.amount} (${r.method})</div>
+            <div class="text-xs text-muted-foreground mt-1">${r.number} • ${r.accountType} • ${r.fullName}</div>
           </div>
           <span class="badge ${badge}">${r.status}</span>
         </div>`;
-      }).join('') || '<div class="empty">No requests yet</div>';
+      }).join('') || '<div class="text-center py-8 text-muted-foreground text-sm">No requests yet</div>';
     }
   );
 }
@@ -925,18 +973,18 @@ function renderUsersTable() {
     const available = Math.max(0, otpBalance - withdrawn);
     return `<tr>
       <td><strong>${u.username || u.id}</strong></td>
-      <td><strong style="color:var(--purple)">${totalOtp}</strong></td>
-      <td><span style="color:var(--text3)">৳${rate}/OTP</span></td>
-      <td><strong style="color:var(--primary)">৳${otpBalance}</strong></td>
-      <td><strong style="color:var(--red)">৳${withdrawn}</strong></td>
-      <td><strong style="color:var(--green)">৳${available}</strong></td>
+      <td><strong class="text-purple-600">${totalOtp}</strong></td>
+      <td><span class="text-muted-foreground text-xs">৳${rate}/OTP</span></td>
+      <td><strong class="text-primary">৳${otpBalance}</strong></td>
+      <td><strong class="text-red-500">৳${withdrawn}</strong></td>
+      <td><strong class="text-emerald-600">৳${available}</strong></td>
       <td><span class="otp-tag">${u.otp || '—'}</span></td>
-      <td><div class="td-actions">
-        <button class="btn btn-xs" style="background:var(--gold-light);color:var(--gold);border:1px solid rgba(217,119,6,.2)" onclick="newOtp('${u.id}')">🔑 New OTP</button>
-        <button class="btn btn-xs btn-danger" onclick="delUser('${u.id}')">🗑️</button>
+      <td><div class="flex gap-2 flex-wrap">
+        <button class="btn-xs btn-gold-xs" onclick="newOtp('${u.id}')">🔑 New OTP</button>
+        <button class="btn-xs btn-danger-xs" onclick="delUser('${u.id}')">🗑️</button>
       </div></td>
     </tr>`;
-  }).join('') : '<tr><td colspan="8" class="empty">No users yet</td></tr>';
+  }).join('') : '<tr><td colspan="8" class="text-center py-8 text-muted-foreground text-sm">No users yet</td></tr>';
 }
 
 function renderReqTable() {
@@ -945,13 +993,13 @@ function renderReqTable() {
     <tr>
       <td><strong>${r.username}</strong></td>
       <td>${r.method}</td>
-      <td>${r.number}<br><small style="color:var(--text3)">${r.accountType}</small></td>
-      <td><strong style="color:var(--primary)">৳${r.amount}</strong></td>
+      <td>${r.number}<br><small class="text-muted-foreground">${r.accountType}</small></td>
+      <td><strong class="text-primary">৳${r.amount}</strong></td>
       <td><span class="badge ${r.status==='pending'?'badge-pending':r.status==='approved'?'badge-approved':'badge-rejected'}">${r.status}</span></td>
-      <td><div class="td-actions">${r.status === 'pending' ? `
-        <button class="btn btn-xs btn-success" onclick="approveReq('${r.id}','${r.userId}',${r.amount})">✓ Approve</button>
-        <button class="btn btn-xs btn-danger" onclick="rejectReq('${r.id}')">✗ Reject</button>` : '—'}</div></td>
-    </tr>`).join('') : '<tr><td colspan="6" class="empty">No requests</td></tr>';
+      <td><div class="flex gap-2">${r.status === 'pending' ? `
+        <button class="btn-xs btn-success-xs" onclick="approveReq('${r.id}','${r.userId}',${r.amount})">✓ Approve</button>
+        <button class="btn-xs btn-danger-xs" onclick="rejectReq('${r.id}')">✗ Reject</button>` : '—'}</div></td>
+    </tr>`).join('') : '<tr><td colspan="6" class="text-center py-8 text-muted-foreground text-sm">No requests</td></tr>';
 }
 
 window.filterReq = (f, el) => {
@@ -991,17 +1039,14 @@ window.addUser = async () => {
   } catch(e) { showToast('Error adding user!', 'error'); }
 };
 
-// ===== BULK OTP =====
 window.previewBulk = () => {
   const raw = document.getElementById('bulkOtpInput').value.trim();
   const preview = document.getElementById('bulkPreview');
   if (!raw) { preview.style.display = 'none'; return; }
-  
   const lines = parseBulkData(raw);
   if (!lines.length) { preview.style.display = 'none'; return; }
-
   preview.style.display = 'block';
-  preview.innerHTML = `<strong style="font-size:.82rem;color:var(--text2);margin-bottom:8px;display:block">📋 Preview — ${lines.length} entries</strong>` +
+  preview.innerHTML = `<strong style="font-size:.82rem;color:#64748B;margin-bottom:8px;display:block">📋 Preview — ${lines.length} entries</strong>` +
     lines.map(({ username, count }) => {
       const found = allUsers.find(u => u.id === username.toLowerCase() || (u.username || '').toLowerCase() === username.toLowerCase());
       const curOtp = found ? (found.totalOtp || 0) : 0;
@@ -1032,10 +1077,8 @@ window.applyBulkOtp = async () => {
   if (!raw) { showToast('Data paste করুন!', 'error'); return; }
   const lines = parseBulkData(raw);
   if (!lines.length) { showToast('Valid data নেই!', 'error'); return; }
-
   let updated = 0, notFound = 0;
   showToast('⏳ Updating...', 'info');
-
   for (const { username, count } of lines) {
     const found = allUsers.find(u => u.id === username.toLowerCase() || (u.username || '').toLowerCase() === username.toLowerCase());
     if (!found) { notFound++; continue; }
@@ -1054,10 +1097,8 @@ window.addSingleOtp = async () => {
   const username = document.getElementById('singleOtpUser').value.trim();
   const count = parseInt(document.getElementById('singleOtpCount').value);
   if (!username || isNaN(count) || count <= 0) { showToast('Username ও OTP count দিন!', 'error'); return; }
-
   const found = allUsers.find(u => u.id === username.toLowerCase() || (u.username || '').toLowerCase() === username.toLowerCase());
   if (!found) { showToast('❌ User not found!', 'error'); return; }
-  
   const curOtp = found.totalOtp || 0;
   await updateDoc(doc(db, 'users', found.id), { totalOtp: curOtp + count });
   showToast(`✅ ${found.username}: ${curOtp} → ${curOtp + count} OTP`, 'success');
@@ -1088,15 +1129,19 @@ window.saveSettings = async () => {
   if (adminP) settings.adminPass = adminP;
   await setDoc(doc(db, 'config', 'settings'), settings);
   document.getElementById('currentRateDisplay').textContent = rate;
-  renderUsersTable(); // refresh with new rate
+  renderUsersTable();
   showToast('✅ Settings saved!', 'success');
 };
 
 window.showTab = (tab, el) => {
   document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.admin-nav-item').forEach(m => m.classList.remove('active'));
+  document.querySelectorAll('.admin-nav-item').forEach(m => {
+    m.classList.remove('bg-white/10', 'text-white');
+    m.classList.add('text-white/50');
+  });
   document.getElementById('tab-' + tab).classList.add('active');
-  el.classList.add('active');
+  el.classList.remove('text-white/50');
+  el.classList.add('bg-white/10', 'text-white');
 };
 
 window.closeModal = () => document.getElementById('modal').classList.remove('open');
