@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>RatTara – Withdrawal Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes"/>
+<title>RatTara – Withdrawal Portal | Bulk User & OTP</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
 <style type="text/tailwindcss">
@@ -38,7 +38,6 @@
 }
 * { font-family: 'Plus Jakarta Sans', sans-serif; }
 
-/* Page switching */
 .page { display: none; }
 .page.active { display: block; }
 #loginPage.active, #adminLoginPage.active {
@@ -48,7 +47,6 @@
   min-height: 100vh;
 }
 
-/* Admin desktop layout */
 @media (min-width: 900px) {
   #adminPage .admin-layout {
     display: grid;
@@ -62,7 +60,6 @@
   }
 }
 
-/* Toast */
 #toast {
   position: fixed;
   bottom: 24px;
@@ -83,11 +80,10 @@
   border: 1px solid #E2E8F0;
 }
 #toast.show { transform: translateY(0); opacity: 1; }
-#toast.success { color: #059669; border-color: rgba(5,150,105,.25); }
-#toast.error { color: #EF4444; border-color: rgba(239,68,68,.25); }
-#toast.info { color: #2563EB; border-color: rgba(37,99,235,.25); }
+#toast.success { color: #059669; border-color: rgba(5,150,105,.25); background:#ECFDF5; }
+#toast.error { color: #EF4444; border-color: rgba(239,68,68,.25); background:#FEF2F2;}
+#toast.info { color: #2563EB; border-color: rgba(37,99,235,.25); background:#EFF6FF;}
 
-/* Loader */
 #loader {
   position: fixed; inset: 0;
   background: white;
@@ -99,7 +95,6 @@
 .loader-bar-fill { height: 100%; background: #2563EB; border-radius: 2px; animation: loading 1.5s ease infinite; }
 @keyframes loading { 0%{width:0;margin-left:0} 50%{width:60%;margin-left:20%} 100%{width:0;margin-left:100%} }
 
-/* Error box */
 .error-box {
   background: #FEF2F2; color: #EF4444;
   border: 1px solid rgba(239,68,68,.2);
@@ -108,65 +103,51 @@
   margin-top: 8px; display: none;
 }
 
-/* Modal */
 .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.4); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 200; padding: 20px; }
 .modal-bg.open { display: flex; }
 
-/* Admin panel tabs */
 .admin-panel { display: none; }
 .admin-panel.active { display: block; }
 
-/* Req items */
 .req-item { border: 1px solid #E2E8F0; border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; background: white; }
 .badge { padding: 4px 10px; border-radius: 20px; font-size: .72rem; font-weight: 700; white-space: nowrap; }
 .badge-pending { background: #FFFBEB; color: #D97706; border: 1px solid rgba(217,119,6,.2); }
 .badge-approved { background: #ECFDF5; color: #059669; border: 1px solid rgba(5,150,105,.2); }
 .badge-rejected { background: #FEF2F2; color: #EF4444; border: 1px solid rgba(239,68,68,.2); }
 
-/* Table */
-.table-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid #E2E8F0; }
-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.table-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid #E2E8F0; background: white;}
+table { width: 100%; border-collapse: collapse; font-size: .82rem; }
 thead { background: #F8FAFC; }
-th { padding: 11px 14px; text-align: left; font-size: .72rem; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid #E2E8F0; }
-td { padding: 13px 14px; border-bottom: 1px solid #E2E8F0; color: #0F172A; vertical-align: middle; }
+th { padding: 11px 12px; text-align: left; font-size: .7rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid #E2E8F0; }
+td { padding: 12px 12px; border-bottom: 1px solid #E2E8F0; color: #0F172A; vertical-align: middle; }
 tr:last-child td { border-bottom: none; }
 tbody tr:hover { background: #F8FAFC; }
 
-/* Filter btns */
-.filter-btn { padding: 6px 14px; border-radius: 20px; border: 1.5px solid #E2E8F0; background: white; color: #94A3B8; font-family: inherit; font-size: .8rem; font-weight: 700; cursor: pointer; transition: all .2s; }
+.filter-btn { padding: 6px 14px; border-radius: 20px; border: 1.5px solid #E2E8F0; background: white; color: #64748B; font-family: inherit; font-size: .75rem; font-weight: 700; cursor: pointer; transition: all .2s; }
 .filter-btn.active { border-color: #2563EB; color: #2563EB; background: #EFF6FF; }
 
-/* OTP tag */
-.otp-tag { font-family: monospace; font-size: .9rem; font-weight: 700; color: #D97706; background: #FFFBEB; padding: 3px 10px; border-radius: 6px; border: 1px solid rgba(217,119,6,.2); letter-spacing: .05em; }
+.otp-tag { font-family: monospace; font-size: .85rem; font-weight: 700; color: #D97706; background: #FFFBEB; padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(217,119,6,.2); letter-spacing: .03em;}
 
-/* Bulk preview */
 .bulk-preview { background: white; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px; margin-top: 12px; max-height: 200px; overflow-y: auto; font-size: .82rem; display: none; }
 .bulk-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid #E2E8F0; }
-.bulk-row:last-child { border-bottom: none; }
 .bulk-found { color: #059669; font-weight: 700; }
 .bulk-notfound { color: #94A3B8; }
 
-/* Small buttons */
-.btn-xs { padding: 5px 10px; font-size: .75rem; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; font-family: inherit; display: inline-flex; align-items: center; gap: 4px; }
+.btn-xs { padding: 5px 10px; font-size: .7rem; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; font-family: inherit; display: inline-flex; align-items: center; gap: 4px; }
 .btn-success-xs { background: #ECFDF5; color: #059669; border: 1px solid rgba(5,150,105,.2); }
 .btn-danger-xs { background: #FEF2F2; color: #EF4444; border: 1px solid rgba(239,68,68,.2); }
 .btn-gold-xs { background: #FFFBEB; color: #D97706; border: 1px solid rgba(217,119,6,.2); }
 
-/* Admin bottom nav mobile */
 @media (max-width: 899px) {
   .admin-nav-sidebar { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 16px; }
-  .admin-nav-item { padding: 7px 12px !important; font-size: .8rem !important; }
+  .admin-nav-item { padding: 7px 12px !important; font-size: .75rem !important; }
 }
-
-/* Method btn */
-.method-btn { border: 2px solid #E2E8F0; border-radius: 16px; padding: 14px 8px; text-align: center; cursor: pointer; transition: all .2s; font-size: .85rem; font-weight: 700; color: #64748B; background: #F8FAFC; }
-.method-btn:hover { border-color: #2563EB; color: #2563EB; background: #EFF6FF; }
+.method-btn { border: 2px solid #E2E8F0; border-radius: 18px; padding: 12px 5px; text-align: center; cursor: pointer; transition: all .2s; font-size: .8rem; font-weight: 700; color: #64748B; background: #F8FAFC; }
 .method-btn.active { border-color: #2563EB; background: #EFF6FF; color: #2563EB; }
 </style>
 </head>
 <body class="bg-background text-foreground min-h-screen">
 
-<!-- LOADER -->
 <div id="loader">
   <div class="w-16 h-16 bg-primary rounded-3xl flex items-center justify-center shadow-xl shadow-blue-200 mb-4">
     <iconify-icon icon="lucide:zap" class="text-3xl text-white"></iconify-icon>
@@ -175,996 +156,139 @@ tbody tr:hover { background: #F8FAFC; }
   <div class="loader-bar"><div class="loader-bar-fill"></div></div>
 </div>
 
-<!-- NAV (shown after login) -->
 <nav id="mainNav" class="hidden bg-card border-b border-border px-5 py-3 sticky top-0 z-50 shadow-sm">
   <div class="max-w-6xl mx-auto flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <div class="w-9 h-9 bg-primary rounded-xl flex items-center justify-center">
-        <iconify-icon icon="lucide:zap" class="text-lg text-white"></iconify-icon>
-      </div>
+      <div class="w-9 h-9 bg-primary rounded-xl flex items-center justify-center"><iconify-icon icon="lucide:zap" class="text-lg text-white"></iconify-icon></div>
       <span class="font-extrabold text-lg tracking-tight">RatTara</span>
     </div>
     <div class="flex items-center gap-3">
-      <span class="hidden sm:flex bg-secondary text-foreground border border-border px-3 py-1 rounded-full text-xs font-bold" id="navBadge">Portal</span>
-      <button onclick="logout()" class="flex items-center gap-2 bg-red-50 text-red-500 border border-red-100 px-3 py-2 rounded-xl text-xs font-bold hover:bg-red-500 hover:text-white transition-all">
-        <iconify-icon icon="lucide:log-out"></iconify-icon>
-        <span class="hidden sm:inline">Sign Out</span>
+      <span class="hidden sm:flex bg-secondary text-foreground border border-border px-3 py-1.5 rounded-full text-xs font-bold" id="navBadge">Portal</span>
+      <button onclick="window.logout()" class="flex items-center gap-2 bg-red-50 text-red-600 border border-red-100 px-3 py-2 rounded-xl text-xs font-bold hover:bg-red-600 hover:text-white transition-all">
+        <iconify-icon icon="lucide:log-out"></iconify-icon><span class="hidden sm:inline">Exit</span>
       </button>
     </div>
   </div>
 </nav>
 
-<!-- ===== USER LOGIN ===== -->
-<div id="loginPage" class="page active relative overflow-hidden bg-background w-full min-h-screen">
-  <div class="absolute -top-24 -left-24 w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-60"></div>
-  <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-emerald-100 rounded-full blur-3xl opacity-60"></div>
-  <div class="w-full max-w-sm mx-auto px-6 z-10 relative">
-    <div class="text-center mb-10">
-      <div class="w-20 h-20 bg-primary rounded-3xl shadow-2xl shadow-blue-200 flex items-center justify-center mx-auto mb-6">
-        <iconify-icon icon="lucide:zap" class="text-4xl text-white"></iconify-icon>
-      </div>
-      <h1 class="text-3xl font-extrabold tracking-tight">RatTara</h1>
-      <p class="text-muted-foreground mt-2 font-medium text-sm">আপনার account এ login করুন</p>
-    </div>
-    <div class="bg-card border border-border rounded-[2rem] p-8 shadow-xl shadow-slate-100">
+<!-- USER LOGIN -->
+<div id="loginPage" class="page active relative min-h-screen flex items-center justify-center">
+  <div class="absolute -top-24 -left-24 w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-60"></div><div class="absolute -bottom-24 -right-24 w-64 h-64 bg-emerald-100 rounded-full blur-3xl opacity-60"></div>
+  <div class="w-full max-w-sm mx-auto px-6 relative z-10">
+    <div class="text-center mb-10"><div class="w-20 h-20 bg-primary rounded-3xl shadow-2xl shadow-blue-200 flex items-center justify-center mx-auto mb-6"><iconify-icon icon="lucide:zap" class="text-4xl text-white"></iconify-icon></div><h1 class="text-3xl font-extrabold">RatTara</h1><p class="text-muted-foreground mt-2 font-medium text-sm">Enter your credentials</p></div>
+    <div class="bg-card border border-border rounded-[2rem] p-8 shadow-xl">
       <div class="space-y-5">
-        <div class="space-y-2">
-          <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Username</label>
-          <div class="relative">
-            <iconify-icon icon="lucide:user" class="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-lg"></iconify-icon>
-            <input type="text" id="loginUser" class="w-full bg-secondary border-none rounded-2xl py-4 pl-12 pr-4 text-foreground focus:ring-2 focus:ring-primary transition-all outline-none text-sm font-medium" placeholder="আপনার username লিখুন"/>
-          </div>
-        </div>
-        <div class="space-y-2">
-          <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Password / OTP</label>
-          <div class="relative">
-            <iconify-icon icon="lucide:lock" class="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-lg"></iconify-icon>
-            <input type="password" id="loginPass" class="w-full bg-secondary border-none rounded-2xl py-4 pl-12 pr-4 text-foreground focus:ring-2 focus:ring-primary transition-all outline-none text-sm font-medium" placeholder="Password বা OTP লিখুন" onkeydown="if(event.key==='Enter')userLogin()"/>
-          </div>
-        </div>
-        <div class="error-box" id="loginErr">❌ Username বা Password ভুল হয়েছে</div>
-        <button onclick="userLogin()" class="w-full bg-primary text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-2">
-          Login করুন
-          <iconify-icon icon="lucide:arrow-right" class="text-xl"></iconify-icon>
-        </button>
+        <div><label class="text-[10px] font-bold uppercase tracking-wider ml-1 text-muted-foreground">Username</label><input type="text" id="loginUser" class="w-full bg-secondary border-none rounded-2xl py-4 pl-5 pr-4 focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="আপনার username"/></div>
+        <div><label class="text-[10px] font-bold uppercase tracking-wider ml-1 text-muted-foreground">Password / OTP</label><input type="password" id="loginPass" class="w-full bg-secondary border-none rounded-2xl py-4 pl-5 pr-4 focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="OTP code" onkeydown="if(event.key==='Enter')window.userLogin()"/></div>
+        <div class="error-box" id="loginErr"></div>
+        <button onclick="window.userLogin()" class="w-full bg-primary text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200 hover:scale-[1.01] transition-all flex items-center justify-center gap-2">Login <iconify-icon icon="lucide:arrow-right"></iconify-icon></button>
       </div>
     </div>
-    <div class="mt-8 text-center">
-      <a href="#" onclick="showAdminLogin(event)" class="text-sm font-semibold text-primary hover:underline flex items-center justify-center gap-2">
-        <iconify-icon icon="lucide:shield-check"></iconify-icon>
-        Admin Panel এ যান
-      </a>
-    </div>
+    <div class="mt-8 text-center"><a href="#" onclick="window.showAdminLogin(event)" class="text-sm font-bold text-primary flex items-center justify-center gap-2"><iconify-icon icon="lucide:shield-check"></iconify-icon> Admin Panel</a></div>
   </div>
 </div>
 
-<!-- ===== ADMIN LOGIN ===== -->
-<div id="adminLoginPage" class="page relative overflow-hidden bg-background w-full min-h-screen">
-  <div class="absolute -top-24 -right-24 w-64 h-64 bg-slate-200 rounded-full blur-3xl opacity-60"></div>
-  <div class="w-full max-w-sm mx-auto px-6 z-10 relative">
-    <div class="text-center mb-10">
-      <div class="w-20 h-20 bg-slate-900 rounded-3xl shadow-2xl shadow-slate-300 flex items-center justify-center mx-auto mb-6">
-        <iconify-icon icon="lucide:shield" class="text-4xl text-white"></iconify-icon>
-      </div>
-      <h1 class="text-3xl font-extrabold tracking-tight">Admin Login</h1>
-      <p class="text-muted-foreground mt-2 font-medium text-sm">RatTara Admin Panel</p>
-    </div>
-    <div class="bg-card border border-border rounded-[2rem] p-8 shadow-xl shadow-slate-100">
-      <div class="space-y-5">
-        <div class="space-y-2">
-          <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Admin Username</label>
-          <div class="relative">
-            <iconify-icon icon="lucide:user" class="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-lg"></iconify-icon>
-            <input type="text" id="adminUser" class="w-full bg-secondary border-none rounded-2xl py-4 pl-12 pr-4 text-foreground focus:ring-2 focus:ring-primary transition-all outline-none text-sm font-medium" placeholder="admin"/>
-          </div>
-        </div>
-        <div class="space-y-2">
-          <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Admin Password</label>
-          <div class="relative">
-            <iconify-icon icon="lucide:lock" class="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-lg"></iconify-icon>
-            <input type="password" id="adminPass" class="w-full bg-secondary border-none rounded-2xl py-4 pl-12 pr-4 text-foreground focus:ring-2 focus:ring-primary transition-all outline-none text-sm font-medium" placeholder="Password" onkeydown="if(event.key==='Enter')adminLogin()"/>
-          </div>
-        </div>
-        <div class="error-box" id="adminErr">❌ Username বা Password ভুল</div>
-        <button onclick="adminLogin()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl shadow-lg shadow-slate-200 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-2">
-          Admin Login
-          <iconify-icon icon="lucide:arrow-right" class="text-xl"></iconify-icon>
-        </button>
-      </div>
-    </div>
-    <div class="mt-8 text-center">
-      <a href="#" onclick="showUserLogin(event)" class="text-sm font-semibold text-muted-foreground hover:text-foreground flex items-center justify-center gap-2">
-        <iconify-icon icon="lucide:arrow-left"></iconify-icon>
-        User Login এ ফিরে যান
-      </a>
-    </div>
+<!-- ADMIN LOGIN -->
+<div id="adminLoginPage" class="page relative min-h-screen flex items-center justify-center">
+  <div class="w-full max-w-sm mx-auto px-6"><div class="text-center mb-10"><div class="w-20 h-20 bg-slate-900 rounded-3xl shadow-2xl flex items-center justify-center mx-auto mb-6"><iconify-icon icon="lucide:shield" class="text-4xl text-white"></iconify-icon></div><h1 class="text-3xl font-extrabold">Admin Login</h1></div>
+    <div class="bg-card border border-border rounded-[2rem] p-8 shadow-xl"><div class="space-y-5"><div><label class="text-[10px] font-bold uppercase">Username</label><input type="text" id="adminUser" class="w-full bg-secondary rounded-2xl py-4 px-4 focus:ring-2 focus:ring-primary outline-none"/></div><div><label class="text-[10px] font-bold uppercase">Password</label><input type="password" id="adminPass" class="w-full bg-secondary rounded-2xl py-4 px-4 focus:ring-2 focus:ring-primary outline-none" onkeydown="if(event.key==='Enter')window.adminLogin()"/></div><div class="error-box" id="adminErr"></div><button onclick="window.adminLogin()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl">Admin Access</button></div></div>
+    <div class="mt-8 text-center"><a href="#" onclick="window.showUserLogin(event)" class="text-sm text-muted-foreground flex items-center justify-center gap-2"><iconify-icon icon="lucide:arrow-left"></iconify-icon> User Login</a></div>
   </div>
 </div>
 
-<!-- ===== USER DASHBOARD ===== -->
+<!-- USER DASHBOARD -->
 <div id="dashPage" class="page bg-background min-h-screen pb-8">
   <div class="max-w-lg mx-auto px-5 py-6 space-y-5">
-    <!-- Welcome -->
-    <div class="flex items-center justify-between">
-      <div>
-        <h2 class="text-2xl font-extrabold tracking-tight">স্বাগতম, <span id="dashName" class="text-primary">User</span>! 👋</h2>
-        <p class="text-xs text-muted-foreground font-medium mt-1">আপনার withdrawal portal</p>
-      </div>
-      <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center">
-        <iconify-icon icon="lucide:user" class="text-2xl text-primary"></iconify-icon>
-      </div>
+    <div class="flex justify-between items-center"><div><h2 class="text-2xl font-extrabold tracking-tight">স্বাগতম, <span id="dashName" class="text-primary">User</span>!</h2><p class="text-xs text-muted-foreground">Withdrawal Portal</p></div><div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center"><iconify-icon icon="lucide:user" class="text-2xl text-primary"></iconify-icon></div></div>
+    <div class="grid grid-cols-3 gap-3"><div class="bg-card border rounded-3xl p-4"><div class="w-8 h-8 bg-purple-100 rounded-xl flex items-center justify-center mb-2"><iconify-icon icon="lucide:star" class="text-purple-600"></iconify-icon></div><div class="text-xl font-extrabold" id="dashTotalOtp">0</div><div class="text-[9px] font-bold text-muted-foreground uppercase">Total OTP</div></div><div class="bg-card border rounded-3xl p-4"><div class="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center mb-2"><iconify-icon icon="lucide:coins" class="text-blue-600"></iconify-icon></div><div class="text-xl font-extrabold" id="dashOtpBalance">৳0</div><div class="text-[9px] font-bold text-muted-foreground uppercase">OTP Value</div></div><div class="bg-card border rounded-3xl p-4"><div class="w-8 h-8 bg-red-100 rounded-xl flex items-center justify-center mb-2"><iconify-icon icon="lucide:arrow-down-right" class="text-red-500"></iconify-icon></div><div class="text-xl font-extrabold" id="dashWithdrawn">৳0</div><div class="text-[9px] font-bold text-muted-foreground uppercase">Withdrawn</div></div></div>
+    <div class="bg-primary rounded-[2rem] p-7 text-white relative overflow-hidden shadow-xl"><div class="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20 blur-2xl"></div><div class="relative"><p class="text-[10px] font-bold uppercase tracking-widest opacity-80">Available Balance</p><div class="flex items-baseline gap-1"><span class="text-2xl font-semibold">৳</span><span class="text-5xl font-extrabold" id="dashBalance">0</span></div><div class="mt-4 inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold"><iconify-icon icon="lucide:info"></iconify-icon><span id="dashBalanceMin">Min withdrawal ৳100</span></div></div></div>
+    <div class="bg-card border rounded-[2rem] p-6 shadow-sm"><div class="flex items-center gap-3 mb-5"><div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center"><iconify-icon icon="lucide:send" class="text-primary text-lg"></iconify-icon></div><div><h3 class="font-extrabold">New Withdrawal</h3><p class="text-[10px] text-muted-foreground font-bold uppercase">Select method</p></div></div>
+      <div class="grid grid-cols-3 gap-3 mb-5"><div class="method-btn active" onclick="window.selectMethod(this,'bKash')"><div class="text-2xl">💜</div><div>bKash</div></div><div class="method-btn" onclick="window.selectMethod(this,'Nagad')"><div class="text-2xl">🧡</div><div>Nagad</div></div><div class="method-btn" onclick="window.selectMethod(this,'Binance')"><div class="text-2xl">🟡</div><div>Binance</div></div></div>
+      <div class="space-y-4"><input type="text" id="wdName" class="w-full bg-secondary rounded-2xl py-3.5 px-4 outline-none focus:ring-2 focus:ring-primary" placeholder="পূর্ণ নাম"/><input type="text" id="wdNumber" class="w-full bg-secondary rounded-2xl py-3.5 px-4 outline-none" placeholder="01XXXXXXXXX"/><select id="wdAccType" class="w-full bg-secondary rounded-2xl py-3.5 px-4 outline-none"><option>Personal</option></select><input type="number" id="wdAmount" class="w-full bg-secondary rounded-2xl py-3.5 px-4 outline-none" placeholder="Amount (৳)" min="100"/><div class="error-box" id="wdErr"></div><button onclick="window.submitWithdraw()" class="w-full bg-primary text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2">Request Submit <iconify-icon icon="lucide:send"></iconify-icon></button></div>
     </div>
-
-    <!-- Stats -->
-    <div class="grid grid-cols-3 gap-3">
-      <div class="bg-card border border-border rounded-3xl p-4 shadow-sm">
-        <div class="w-8 h-8 bg-purple-100 rounded-xl flex items-center justify-center mb-3">
-          <iconify-icon icon="lucide:star" class="text-purple-600"></iconify-icon>
-        </div>
-        <div class="text-xl font-extrabold tracking-tight" id="dashTotalOtp">0</div>
-        <div class="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mt-0.5">Total OTP</div>
-      </div>
-      <div class="bg-card border border-border rounded-3xl p-4 shadow-sm">
-        <div class="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center mb-3">
-          <iconify-icon icon="lucide:coins" class="text-blue-600"></iconify-icon>
-        </div>
-        <div class="text-xl font-extrabold tracking-tight" id="dashOtpBalance">৳0</div>
-        <div class="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mt-0.5">OTP Balance</div>
-      </div>
-      <div class="bg-card border border-border rounded-3xl p-4 shadow-sm">
-        <div class="w-8 h-8 bg-red-100 rounded-xl flex items-center justify-center mb-3">
-          <iconify-icon icon="lucide:arrow-down-right" class="text-red-500"></iconify-icon>
-        </div>
-        <div class="text-xl font-extrabold tracking-tight" id="dashWithdrawn">৳0</div>
-        <div class="text-[9px] uppercase font-bold text-muted-foreground tracking-widest mt-0.5">Withdrawn</div>
-      </div>
-    </div>
-
-    <!-- Balance Card -->
-    <div class="bg-primary rounded-[2rem] p-7 text-white relative overflow-hidden shadow-2xl shadow-blue-200">
-      <div class="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20 blur-2xl"></div>
-      <div class="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full -ml-16 -mb-16 blur-xl"></div>
-      <div class="relative z-10">
-        <p class="text-[10px] font-bold uppercase tracking-widest opacity-70 mb-2">Available Balance</p>
-        <div class="flex items-baseline gap-1">
-          <span class="text-2xl font-semibold opacity-80">৳</span>
-          <span class="text-5xl font-extrabold tracking-tighter" id="dashBalance">0</span>
-        </div>
-        <div class="mt-5 inline-flex items-center gap-2 bg-white/20 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase">
-          <iconify-icon icon="lucide:info" class="text-sm"></iconify-icon>
-          <span id="dashBalanceMin">সর্বনিম্ন উত্তোলন ৳100</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Withdraw Form -->
-    <div class="bg-card border border-border rounded-[2rem] p-6 shadow-sm">
-      <div class="flex items-center gap-3 mb-6">
-        <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center">
-          <iconify-icon icon="lucide:send" class="text-primary text-lg"></iconify-icon>
-        </div>
-        <div>
-          <h3 class="font-extrabold text-base">Withdrawal Request</h3>
-          <p class="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">আপনার payment method বেছে নিন</p>
-        </div>
-      </div>
-
-      <!-- Method -->
-      <div class="grid grid-cols-3 gap-3 mb-5">
-        <div class="method-btn active" onclick="selectMethod(this,'bKash')">
-          <div class="text-2xl mb-1">💜</div>
-          <div class="text-xs">bKash</div>
-        </div>
-        <div class="method-btn" onclick="selectMethod(this,'Nagad')">
-          <div class="text-2xl mb-1">🧡</div>
-          <div class="text-xs">Nagad</div>
-        </div>
-        <div class="method-btn" onclick="selectMethod(this,'Binance')">
-          <div class="text-2xl mb-1">🟡</div>
-          <div class="text-xs">Binance</div>
-        </div>
-      </div>
-
-      <div class="space-y-4">
-        <div class="space-y-1.5">
-          <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">পূর্ণ নাম</label>
-          <input type="text" id="wdName" class="w-full bg-secondary border-none rounded-2xl py-3.5 px-4 text-foreground focus:ring-2 focus:ring-primary transition-all outline-none text-sm font-medium" placeholder="আপনার পূর্ণ নাম"/>
-        </div>
-        <div class="space-y-1.5">
-          <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1" id="wdNumLabel">bKash নম্বর</label>
-          <input type="text" id="wdNumber" class="w-full bg-secondary border-none rounded-2xl py-3.5 px-4 text-foreground focus:ring-2 focus:ring-primary transition-all outline-none text-sm font-medium" placeholder="01XXXXXXXXX"/>
-        </div>
-        <div class="space-y-1.5">
-          <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Account Type</label>
-          <select id="wdAccType" class="w-full bg-secondary border-none rounded-2xl py-3.5 px-4 text-foreground focus:ring-2 focus:ring-primary transition-all outline-none text-sm font-medium appearance-none">
-            <option>Personal</option>
-          </select>
-        </div>
-        <div class="space-y-1.5">
-          <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Amount (৳)</label>
-          <input type="number" id="wdAmount" class="w-full bg-secondary border-none rounded-2xl py-3.5 px-4 text-foreground focus:ring-2 focus:ring-primary transition-all outline-none text-sm font-medium" placeholder="সর্বনিম্ন ৳100" min="100"/>
-        </div>
-        <div class="error-box" id="wdErr">Error</div>
-        <button onclick="submitWithdraw()" class="w-full bg-primary text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200 flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99] transition-all">
-          Request Submit করুন
-          <iconify-icon icon="lucide:send" class="text-lg"></iconify-icon>
-        </button>
-      </div>
-    </div>
-
-    <!-- My Requests -->
-    <div class="bg-card border border-border rounded-[2rem] p-6 shadow-sm">
-      <div class="flex items-center gap-3 mb-5">
-        <div class="w-10 h-10 bg-emerald-50 rounded-2xl flex items-center justify-center">
-          <iconify-icon icon="lucide:list" class="text-tertiary text-lg"></iconify-icon>
-        </div>
-        <div>
-          <h3 class="font-extrabold text-base">আমার Requests</h3>
-          <p class="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">সব withdrawal request এর status</p>
-        </div>
-      </div>
-      <div id="myRequests"><div class="text-center py-8 text-muted-foreground text-sm">কোনো request নেই এখনো</div></div>
-    </div>
+    <div class="bg-card border rounded-[2rem] p-6"><div class="flex gap-3 mb-4"><div class="w-10 h-10 bg-emerald-50 rounded-2xl flex items-center justify-center"><iconify-icon icon="lucide:list" class="text-tertiary"></iconify-icon></div><h3 class="font-extrabold text-lg">My Requests</h3></div><div id="myRequests"></div></div>
   </div>
 </div>
 
-<!-- ===== ADMIN PAGE ===== -->
+<!-- ADMIN PANEL -->
 <div id="adminPage" class="page bg-background min-h-screen pb-8">
   <div class="max-w-6xl mx-auto px-5 py-6">
-    <div class="flex items-center gap-3 mb-6">
-      <div class="w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center">
-        <iconify-icon icon="lucide:shield" class="text-white text-lg"></iconify-icon>
-      </div>
-      <div>
-        <h2 class="text-xl font-extrabold tracking-tight">Admin Panel</h2>
-        <p class="text-xs text-muted-foreground font-medium">RatTara Withdrawal Management</p>
-      </div>
-    </div>
-
+    <div class="flex gap-3 items-center mb-6"><div class="w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center"><iconify-icon icon="lucide:shield" class="text-white text-lg"></iconify-icon></div><div><h2 class="text-xl font-extrabold">Admin Control</h2><p class="text-xs text-muted-foreground">Withdrawal & user management</p></div></div>
     <div class="admin-layout">
-      <!-- Sidebar Nav -->
-      <div class="admin-nav-sidebar">
-        <div class="bg-slate-900 rounded-[1.5rem] p-3 space-y-1">
-          <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white bg-white/10 transition-all" onclick="showTab('overview',this)">
-            <iconify-icon icon="lucide:pie-chart" class="text-lg"></iconify-icon>Overview
-          </div>
-          <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10 hover:text-white transition-all" onclick="showTab('users',this)">
-            <iconify-icon icon="lucide:users" class="text-lg"></iconify-icon>Users
-          </div>
-          <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10 hover:text-white transition-all" onclick="showTab('otp',this)">
-            <iconify-icon icon="lucide:zap" class="text-lg"></iconify-icon>OTP Update
-          </div>
-          <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10 hover:text-white transition-all" onclick="showTab('withdrawals',this)">
-            <iconify-icon icon="lucide:banknote" class="text-lg"></iconify-icon>Withdrawals
-          </div>
-          <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10 hover:text-white transition-all" onclick="showTab('settings',this)">
-            <iconify-icon icon="lucide:settings" class="text-lg"></iconify-icon>Settings
-          </div>
-        </div>
-      </div>
-
-      <!-- Content -->
+      <div class="admin-nav-sidebar"><div class="bg-slate-900 rounded-[1.5rem] p-3 space-y-1"><div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white bg-white/10" onclick="window.showTab('overview',this)"><iconify-icon icon="lucide:pie-chart"></iconify-icon>Overview</div><div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('users',this)"><iconify-icon icon="lucide:users"></iconify-icon>Users</div><div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('otp',this)"><iconify-icon icon="lucide:zap"></iconify-icon>OTP update</div><div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('bulkUser',this)"><iconify-icon icon="lucide:users-round"></iconify-icon>Bulk User</div><div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('withdrawals',this)"><iconify-icon icon="lucide:banknote"></iconify-icon>Withdrawals</div><div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('settings',this)"><iconify-icon icon="lucide:settings"></iconify-icon>Settings</div></div></div>
       <div class="space-y-5">
+        <div class="admin-panel active" id="tab-overview"><div class="grid grid-cols-2 sm:grid-cols-4 gap-4"><div class="bg-card border rounded-2xl p-5"><div class="w-10 h-10 bg-blue-50 rounded-xl mb-3 flex items-center justify-center"><iconify-icon icon="lucide:users" class="text-primary text-xl"></iconify-icon></div><div class="text-2xl font-extrabold" id="st-users">0</div><div class="text-xs font-bold uppercase text-muted-foreground">Total users</div></div><div class="bg-card border rounded-2xl p-5"><div class="w-10 h-10 bg-amber-50 rounded-xl mb-3"><iconify-icon icon="lucide:clock" class="text-amber-500 text-xl"></iconify-icon></div><div class="text-2xl font-extrabold text-amber-500" id="st-pending">0</div><div class="text-xs font-bold uppercase">Pending</div></div><div class="bg-card border rounded-2xl p-5"><div class="w-10 h-10 bg-emerald-50 rounded-xl mb-3"><iconify-icon icon="lucide:check-circle" class="text-tertiary text-xl"></iconify-icon></div><div class="text-2xl font-extrabold text-tertiary" id="st-approved">0</div><div class="text-xs font-bold uppercase">Approved</div></div><div class="bg-card border rounded-2xl p-5"><div class="w-10 h-10 bg-blue-50 rounded-xl mb-3"><iconify-icon icon="lucide:wallet" class="text-primary text-xl"></iconify-icon></div><div class="text-2xl font-extrabold text-primary" id="st-paid">৳0</div><div class="text-xs font-bold uppercase">Total paid</div></div></div><div class="bg-card border rounded-2xl p-6 mt-4"><h3 class="font-extrabold mb-4">Recent requests</h3><div id="recentList"></div></div></div>
+        
+        <div class="admin-panel" id="tab-users"><div class="bg-card border rounded-2xl p-6"><div class="flex gap-3 items-center mb-5"><div class="w-10 h-10 bg-blue-50 rounded-xl"><iconify-icon icon="lucide:user-plus" class="text-primary text-lg"></iconify-icon></div><h3 class="font-extrabold">Add new user</h3></div><div class="bg-secondary p-4 rounded-2xl flex flex-wrap gap-3 items-end"><input type="text" id="newUser" placeholder="Username" class="flex-1 bg-card border rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-primary"/><button onclick="window.addUser()" class="bg-primary text-white px-5 py-3 rounded-xl font-bold flex gap-2 items-center"><iconify-icon icon="lucide:plus"></iconify-icon>Add</button></div><div class="table-wrap mt-5"><table><thead><tr><th>Username</th><th>Total OTP</th><th>Rate</th><th>OTP balance</th><th>Withdrawn</th><th>Available</th><th>Login OTP</th><th>Actions</th></tr</thead><tbody id="usersTable"></tbody></table></div></div></div>
 
-        <!-- OVERVIEW -->
-        <div class="admin-panel active" id="tab-overview">
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-5">
-            <div class="bg-card border border-border rounded-[1.5rem] p-5 shadow-sm">
-              <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center mb-3">
-                <iconify-icon icon="lucide:users" class="text-primary text-xl"></iconify-icon>
-              </div>
-              <div class="text-2xl font-extrabold" id="st-users">0</div>
-              <div class="text-xs text-muted-foreground font-bold uppercase tracking-wider mt-1">Total Users</div>
-            </div>
-            <div class="bg-card border border-border rounded-[1.5rem] p-5 shadow-sm">
-              <div class="w-10 h-10 bg-amber-50 rounded-2xl flex items-center justify-center mb-3">
-                <iconify-icon icon="lucide:clock" class="text-amber-500 text-xl"></iconify-icon>
-              </div>
-              <div class="text-2xl font-extrabold text-amber-500" id="st-pending">0</div>
-              <div class="text-xs text-muted-foreground font-bold uppercase tracking-wider mt-1">Pending</div>
-            </div>
-            <div class="bg-card border border-border rounded-[1.5rem] p-5 shadow-sm">
-              <div class="w-10 h-10 bg-emerald-50 rounded-2xl flex items-center justify-center mb-3">
-                <iconify-icon icon="lucide:check-circle" class="text-tertiary text-xl"></iconify-icon>
-              </div>
-              <div class="text-2xl font-extrabold text-tertiary" id="st-approved">0</div>
-              <div class="text-xs text-muted-foreground font-bold uppercase tracking-wider mt-1">Approved</div>
-            </div>
-            <div class="bg-card border border-border rounded-[1.5rem] p-5 shadow-sm">
-              <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center mb-3">
-                <iconify-icon icon="lucide:wallet" class="text-primary text-xl"></iconify-icon>
-              </div>
-              <div class="text-2xl font-extrabold text-primary" id="st-paid">৳0</div>
-              <div class="text-xs text-muted-foreground font-bold uppercase tracking-wider mt-1">Total Paid</div>
-            </div>
-          </div>
-          <div class="bg-card border border-border rounded-[1.5rem] p-6 shadow-sm">
-            <div class="flex items-center gap-3 mb-5">
-              <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center">
-                <iconify-icon icon="lucide:clock" class="text-primary text-lg"></iconify-icon>
-              </div>
-              <h3 class="font-extrabold text-base">Recent Requests</h3>
-            </div>
-            <div id="recentList"><div class="text-center py-8 text-muted-foreground text-sm">No requests yet</div></div>
-          </div>
-        </div>
+        <!-- BULK USER ADDITION (NEW) -->
+        <div class="admin-panel" id="tab-bulkUser"><div class="bg-card border rounded-2xl p-6"><div class="flex gap-3 items-center mb-4"><div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center"><iconify-icon icon="lucide:users-round" class="text-indigo-600 text-xl"></iconify-icon></div><div><h3 class="font-extrabold">Bulk User Creation</h3><p class="text-[10px] text-muted-foreground uppercase font-bold">Add multiple users at once</p></div></div><div class="bg-amber-50 border border-amber-100 rounded-xl p-3 mb-5 text-sm text-amber-700 flex gap-2"><iconify-icon icon="lucide:alert-circle"></iconify-icon> Format: one username per line. Each user gets a unique 8-character OTP.</div><textarea id="bulkUserInput" class="w-full bg-secondary rounded-2xl p-4 min-h-[180px] font-mono text-sm outline-none" placeholder="Rakib123&#10;Tania_RT&#10;Faruk_007&#10;Shakil_Ahmed"></textarea><div id="bulkUserPreview" class="bulk-preview mt-3"></div><div class="flex gap-3 mt-4 flex-wrap"><button onclick="window.previewBulkUsers()" class="bg-gray-200 text-gray-800 py-2.5 px-5 rounded-xl font-bold flex gap-1 items-center"><iconify-icon icon="lucide:eye"></iconify-icon> Preview</button><button onclick="window.applyBulkUsers()" class="bg-indigo-700 text-white py-2.5 px-6 rounded-xl font-bold flex gap-2 items-center"><iconify-icon icon="lucide:save-all"></iconify-icon> Create Bulk Users</button><button onclick="document.getElementById('bulkUserInput').value='';document.getElementById('bulkUserPreview').style.display='none'" class="bg-secondary border px-5 rounded-xl">Clear</button></div></div></div>
 
-        <!-- USERS -->
-        <div class="admin-panel" id="tab-users">
-          <div class="bg-card border border-border rounded-[1.5rem] p-6 shadow-sm">
-            <div class="flex items-center gap-3 mb-5">
-              <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center">
-                <iconify-icon icon="lucide:user-plus" class="text-primary text-lg"></iconify-icon>
-              </div>
-              <h3 class="font-extrabold text-base">New User Add করুন</h3>
-            </div>
-            <div class="bg-secondary rounded-2xl p-4 mb-5">
-              <div class="flex gap-3 items-end">
-                <div class="flex-1 space-y-1.5">
-                  <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Username</label>
-                  <input type="text" id="newUser" class="w-full bg-card border border-border rounded-xl py-3 px-4 text-foreground focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="username (e.g. RT_Rakib)"/>
-                </div>
-                <button onclick="addUser()" class="bg-primary text-white px-5 py-3 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-blue-700 transition-all shrink-0">
-                  <iconify-icon icon="lucide:plus"></iconify-icon>Add
-                </button>
-              </div>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>Username</th><th>Total OTP</th><th>Rate</th><th>OTP Balance</th><th>Withdrawn</th><th>Available</th><th>Login OTP</th><th>Actions</th></tr></thead>
-                <tbody id="usersTable"><tr><td colspan="8" class="text-center py-8 text-muted-foreground text-sm">No users</td></tr></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+        <div class="admin-panel" id="tab-otp"><div class="bg-card border rounded-2xl p-6"><div class="flex gap-3 mb-4"><div class="w-10 h-10 bg-purple-100 rounded-xl"><iconify-icon icon="lucide:zap" class="text-purple-600 text-xl"></iconify-icon></div><div><h3 class="font-extrabold">Bulk OTP Upload</h3><p class="text-[10px] text-muted-foreground">Username &nbsp; OTP count</p></div></div><div class="bg-blue-50 p-3 rounded-xl text-primary text-sm font-bold flex gap-2 items-center mb-4"><iconify-icon icon="lucide:info"></iconify-icon> Current rate: ৳<span id="currentRateDisplay">1</span> per OTP</div><textarea id="bulkOtpInput" class="w-full bg-secondary rounded-2xl p-4 min-h-[120px] font-mono text-sm outline-none" placeholder="RT_Rakib 1200&#10;RT_Shakil 875"></textarea><div id="bulkPreview" class="bulk-preview mt-3"></div><div class="flex gap-3 mt-4"><button onclick="window.applyBulkOtp()" class="bg-slate-900 text-white py-3 px-6 rounded-xl font-bold">Apply bulk</button><button onclick="document.getElementById('bulkOtpInput').value='';document.getElementById('bulkPreview').style.display='none'" class="bg-secondary border px-6 rounded-xl">Clear</button></div></div><div class="bg-card border rounded-2xl p-6 mt-5"><div class="flex gap-3 mb-4"><div class="w-10 h-10 bg-blue-50 rounded-xl"><iconify-icon icon="lucide:plus-circle" class="text-primary text-xl"></iconify-icon></div><div><h3 class="font-extrabold">Individual OTP</h3></div></div><div class="grid grid-cols-1 sm:grid-cols-3 gap-3"><input type="text" id="singleOtpUser" placeholder="Username" class="bg-secondary rounded-xl p-3 outline-none"/><input type="number" id="singleOtpCount" placeholder="OTP count" class="bg-secondary rounded-xl p-3 outline-none"/><button onclick="window.addSingleOtp()" class="bg-primary text-white py-3 rounded-xl font-bold">Add OTP</button></div></div></div>
 
-        <!-- OTP UPDATE -->
-        <div class="admin-panel" id="tab-otp">
-          <div class="bg-card border border-border rounded-[1.5rem] p-6 shadow-sm mb-5">
-            <div class="flex items-center gap-3 mb-5">
-              <div class="w-10 h-10 bg-purple-100 rounded-2xl flex items-center justify-center">
-                <iconify-icon icon="lucide:zap" class="text-purple-600 text-lg"></iconify-icon>
-              </div>
-              <div>
-                <h3 class="font-extrabold text-base">Bulk OTP Update</h3>
-                <p class="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">প্রতিদিনের OTP data paste করুন</p>
-              </div>
-            </div>
-
-            <div class="bg-blue-50 border border-blue-100 rounded-2xl px-4 py-3 mb-5 text-sm text-primary font-semibold flex items-center gap-2">
-              <iconify-icon icon="lucide:info" class="text-lg shrink-0"></iconify-icon>
-              Current OTP Rate: <strong>৳<span id="currentRateDisplay">1</span> per OTP</strong>
-            </div>
-
-            <div class="bg-secondary border-2 border-dashed border-border rounded-2xl p-4 mb-4">
-              <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 block">OTP Data Paste করুন</label>
-              <p class="text-xs text-muted-foreground mb-3">Format: <code class="bg-white px-2 py-0.5 rounded-lg text-xs">Username&nbsp;&nbsp;&nbsp;OTPCount</code></p>
-              <textarea class="w-full bg-transparent border-none resize-none text-sm font-mono focus:ring-0 outline-none min-h-[120px]" id="bulkOtpInput" placeholder="RT_Rakib    1880&#10;RT_Ashik    3123&#10;RT_Faruk    1300&#10;..." oninput="previewBulk()"></textarea>
-            </div>
-
-            <div class="bulk-preview" id="bulkPreview"></div>
-
-            <div class="flex gap-3 mt-4 flex-wrap">
-              <button onclick="applyBulkOtp()" class="bg-slate-900 text-white font-bold py-3 px-6 rounded-2xl shadow-lg flex items-center gap-2 hover:bg-slate-800 transition-all">
-                <iconify-icon icon="lucide:refresh-cw"></iconify-icon>
-                Apply Updates
-              </button>
-              <button onclick="document.getElementById('bulkOtpInput').value='';document.getElementById('bulkPreview').style.display='none'" class="bg-secondary border border-border text-foreground font-bold py-3 px-6 rounded-2xl flex items-center gap-2 hover:bg-border transition-all">
-                <iconify-icon icon="lucide:trash-2"></iconify-icon>
-                Clear
-              </button>
-            </div>
-          </div>
-
-          <!-- Individual OTP -->
-          <div class="bg-card border border-border rounded-[1.5rem] p-6 shadow-sm">
-            <div class="flex items-center gap-3 mb-5">
-              <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center">
-                <iconify-icon icon="lucide:plus-circle" class="text-primary text-lg"></iconify-icon>
-              </div>
-              <div>
-                <h3 class="font-extrabold text-base">Individual OTP Add</h3>
-                <p class="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">একজন user এর OTP আলাদাভাবে add করুন</p>
-              </div>
-            </div>
-            <div class="bg-secondary rounded-2xl p-4">
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
-                <div class="space-y-1.5">
-                  <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Username</label>
-                  <input type="text" id="singleOtpUser" class="w-full bg-card border border-border rounded-xl py-3 px-4 text-foreground focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="username"/>
-                </div>
-                <div class="space-y-1.5">
-                  <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">OTP Count</label>
-                  <input type="number" id="singleOtpCount" class="w-full bg-card border border-border rounded-xl py-3 px-4 text-foreground focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="e.g. 50"/>
-                </div>
-                <button onclick="addSingleOtp()" class="bg-primary text-white px-5 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-blue-700 transition-all">
-                  <iconify-icon icon="lucide:plus"></iconify-icon>Add OTP
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- WITHDRAWALS -->
-        <div class="admin-panel" id="tab-withdrawals">
-          <div class="bg-card border border-border rounded-[1.5rem] p-6 shadow-sm">
-            <div class="flex items-center gap-3 mb-5">
-              <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center">
-                <iconify-icon icon="lucide:banknote" class="text-primary text-lg"></iconify-icon>
-              </div>
-              <h3 class="font-extrabold text-base">Withdrawal Requests</h3>
-            </div>
-            <div class="flex gap-2 flex-wrap mb-5">
-              <button class="filter-btn active" onclick="filterReq('all',this)">সব</button>
-              <button class="filter-btn" onclick="filterReq('pending',this)">⏳ Pending</button>
-              <button class="filter-btn" onclick="filterReq('approved',this)">✅ Approved</button>
-              <button class="filter-btn" onclick="filterReq('rejected',this)">❌ Rejected</button>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>User</th><th>Method</th><th>Number</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
-                <tbody id="reqTable"><tr><td colspan="6" class="text-center py-8 text-muted-foreground text-sm">No requests</td></tr></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- SETTINGS -->
-        <div class="admin-panel" id="tab-settings">
-          <div class="bg-card border border-border rounded-[1.5rem] p-6 shadow-sm">
-            <div class="flex items-center gap-3 mb-6">
-              <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center">
-                <iconify-icon icon="lucide:settings" class="text-primary text-lg"></iconify-icon>
-              </div>
-              <h3 class="font-extrabold text-base">Settings</h3>
-            </div>
-            <div class="max-w-md space-y-4">
-              <div class="space-y-1.5">
-                <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Minimum Withdrawal (৳)</label>
-                <input type="number" id="setMin" value="100" class="w-full bg-secondary border-none rounded-2xl py-3.5 px-4 text-foreground focus:ring-2 focus:ring-primary outline-none text-sm font-medium"/>
-              </div>
-              <div class="space-y-1.5">
-                <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">OTP Rate (৳ per OTP)</label>
-                <input type="number" id="setOtpRate" value="1" step="0.5" class="w-full bg-secondary border-none rounded-2xl py-3.5 px-4 text-foreground focus:ring-2 focus:ring-primary outline-none text-sm font-medium"/>
-                <p class="text-xs text-muted-foreground ml-1">প্রতিটি OTP এর মূল্য কত টাকা</p>
-              </div>
-              <div class="space-y-1.5">
-                <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Admin Username</label>
-                <input type="text" id="setAdminUser" placeholder="admin" class="w-full bg-secondary border-none rounded-2xl py-3.5 px-4 text-foreground focus:ring-2 focus:ring-primary outline-none text-sm font-medium"/>
-              </div>
-              <div class="space-y-1.5">
-                <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">New Admin Password</label>
-                <input type="password" id="setAdminPass" placeholder="নতুন password" class="w-full bg-secondary border-none rounded-2xl py-3.5 px-4 text-foreground focus:ring-2 focus:ring-primary outline-none text-sm font-medium"/>
-              </div>
-              <button onclick="saveSettings()" class="bg-primary text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-blue-100 flex items-center gap-2 hover:bg-blue-700 transition-all">
-                <iconify-icon icon="lucide:save"></iconify-icon>
-                Save Settings
-              </button>
-            </div>
-          </div>
-        </div>
-
+        <div class="admin-panel" id="tab-withdrawals"><div class="bg-card border rounded-2xl p-6"><div class="flex justify-between flex-wrap items-center mb-5"><h3 class="font-extrabold">All withdrawal requests</h3><div class="flex gap-2"><button class="filter-btn active" onclick="window.filterReq('all',this)">All</button><button class="filter-btn" onclick="window.filterReq('pending',this)">Pending</button><button class="filter-btn" onclick="window.filterReq('approved',this)">Approved</button><button class="filter-btn" onclick="window.filterReq('rejected',this)">Rejected</button></div></div><div class="table-wrap"><table><thead><tr><th>User</th><th>Method</th><th>Number/ID</th><th>Amount</th><th>Status</th><th>Action</th></tr</thead><tbody id="reqTable"></tbody></table></div></div></div>
+        <div class="admin-panel" id="tab-settings"><div class="bg-card border rounded-2xl p-6"><h3 class="font-extrabold flex gap-2 items-center mb-5"><iconify-icon icon="lucide:settings"></iconify-icon> System Config</h3><div class="max-w-md space-y-4"><div><label class="text-[10px] font-bold uppercase">Min withdrawal (৳)</label><input type="number" id="setMin" value="100" class="w-full bg-secondary rounded-2xl py-3 px-4 outline-none"/></div><div><label class="text-[10px] font-bold uppercase">OTP Rate (৳ per OTP)</label><input type="number" step="0.5" id="setOtpRate" value="1" class="w-full bg-secondary rounded-2xl py-3 px-4 outline-none"/></div><div><label class="text-[10px] font-bold uppercase">Admin username</label><input type="text" id="setAdminUser" class="w-full bg-secondary rounded-2xl py-3 px-4 outline-none"/></div><div><label class="text-[10px] font-bold uppercase">New admin password</label><input type="password" id="setAdminPass" class="w-full bg-secondary rounded-2xl py-3 px-4 outline-none"/></div><button onclick="window.saveSettings()" class="bg-primary text-white font-bold py-3 px-6 rounded-2xl flex gap-2 items-center"><iconify-icon icon="lucide:save"></iconify-icon> Save settings</button></div></div></div>
       </div>
     </div>
   </div>
 </div>
-
-<!-- MODAL -->
-<div class="modal-bg" id="modal">
-  <div class="bg-card rounded-[1.5rem] p-7 w-full max-w-sm shadow-2xl border border-border mx-4">
-    <div class="font-extrabold text-lg mb-5" id="modalTitle">Edit</div>
-    <div id="modalBody"></div>
-    <div class="flex gap-3 mt-6">
-      <button onclick="closeModal()" class="flex-1 bg-secondary border border-border text-foreground font-bold py-3 rounded-2xl hover:bg-border transition-all text-sm">Cancel</button>
-      <button class="flex-1 bg-primary text-white font-bold py-3 rounded-2xl hover:bg-blue-700 transition-all text-sm" id="modalOk">Confirm</button>
-    </div>
-  </div>
-</div>
-
-<!-- TOAST -->
+<div class="modal-bg" id="modal"><div class="bg-card rounded-2xl p-6 max-w-sm"><div id="modalTitle" class="font-extrabold text-lg mb-4"></div><div id="modalBody"></div><div class="flex gap-3 mt-6"><button onclick="window.closeModal()" class="flex-1 bg-secondary py-2 rounded-xl">Cancel</button><button id="modalOk" class="flex-1 bg-primary text-white py-2 rounded-xl">Confirm</button></div></div></div>
 <div id="toast"></div>
 
-<script>
-// Helper to toggle admin nav item active state
-document.querySelectorAll('.admin-nav-item').forEach(item => {
-  // handled via showTab
-});
+<script type="importmap">
+  { "imports": { "firebase/app": "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js", "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js" } }
 </script>
-
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp } from "firebase/firestore";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyB6DT5aVGDDW7IAPUMVAmQY8u5PMd1ZLe8",
-  authDomain: "rattara-c6c23.firebaseapp.com",
-  projectId: "rattara-c6c23",
-  storageBucket: "rattara-c6c23.firebasestorage.app",
-  messagingSenderId: "542423756114",
-  appId: "1:542423756114:web:42b7cee066b284fe011e8b",
-  measurementId: "G-PRR976LDTW"
-};
-
+const firebaseConfig = { apiKey: "AIzaSyB6DT5aVGDDW7IAPUMVAmQY8u5PMd1ZLe8", authDomain: "rattara-c6c23.firebaseapp.com", projectId: "rattara-c6c23", storageBucket: "rattara-c6c23.firebasestorage.app", messagingSenderId: "542423756114", appId: "1:542423756114:web:42b7cee066b284fe011e8b", measurementId: "G-PRR976LDTW" };
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let currentUser = null;
-let isAdmin = false;
-let selectedMethod = 'bKash';
-let reqFilter = 'all';
-let allReqs = [];
-let allUsers = [];
-let settings = { minWithdraw: 100, otpRate: 1, adminUser: 'admin', adminPass: 'Tania-Rakib-5687' };
-let unsubAdmin = null;
-let unsubUser = null;
-let unsubReqs = null;
-const SESSION_KEY = 'rt_session';
-const SESSION_DURATION = 30 * 60 * 1000;
+let currentUser=null, isAdmin=false, selectedMethod='bKash', reqFilter='all', allReqs=[], allUsers=[];
+let settings={minWithdraw:100, otpRate:1, adminUser:'admin', adminPass:'Tania-Rakib-5687'};
+let unsubAdmin=null, unsubUser=null, unsubReqs=null;
+const SESSION_KEY='rt_session', SESSION_DURATION=30*60*1000;
 
-function saveSession(data) {
-  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ ...data, ts: Date.now() }));
-}
-function loadSession() {
-  try {
-    const s = JSON.parse(sessionStorage.getItem(SESSION_KEY));
-    if (!s) return null;
-    if (Date.now() - s.ts > SESSION_DURATION) { sessionStorage.removeItem(SESSION_KEY); return null; }
-    return s;
-  } catch { return null; }
-}
-function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
-function startSessionTimer() {
-  clearTimeout(window._sessionTimer);
-  window._sessionTimer = setTimeout(() => {
-    showToast('⏰ Session expired! আবার login করুন', 'error');
-    logout();
-  }, SESSION_DURATION);
-}
+window.selectMethod=(el,method)=>{document.querySelectorAll(".method-btn").forEach(b=>b.classList.remove("active")); el.classList.add("active"); selectedMethod=method; const inp=document.getElementById('wdNumber'); if(method==='Binance') inp.placeholder='UID or Email'; else inp.placeholder='01XXXXXXXXX'; };
+window.showToast=(msg,type='info')=>{const t=document.getElementById('toast'); t.textContent=msg; t.className=`show ${type}`; setTimeout(()=>t.className='',3200);};
+function saveSession(data){sessionStorage.setItem(SESSION_KEY,JSON.stringify({...data,ts:Date.now()}));}
+function loadSession(){try{let s=JSON.parse(sessionStorage.getItem(SESSION_KEY)); if(!s||Date.now()-s.ts>SESSION_DURATION){sessionStorage.removeItem(SESSION_KEY); return null;} return s;}catch{return null;}}
+function clearSession(){sessionStorage.removeItem(SESSION_KEY);}
+function startSessionTimer(){clearTimeout(window._sessionTimer); window._sessionTimer=setTimeout(()=>{window.showToast('Session expired. Login again','error'); window.logout();},SESSION_DURATION);}
+async function loadSettings(){try{const snap=await getDoc(doc(db,'config','settings')); if(snap.exists())settings={...settings,...snap.data()}; else await setDoc(doc(db,'config','settings'),settings); document.getElementById('setMin').value=settings.minWithdraw; document.getElementById('setOtpRate').value=settings.otpRate||1; document.getElementById('currentRateDisplay').innerText=settings.otpRate||1;}catch(e){console.log(e);}}
+function switchPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id)?.classList.add('active');}
+window.showAdminLogin=(e)=>{e?.preventDefault(); switchPage('adminLoginPage');};
+window.showUserLogin=(e)=>{e?.preventDefault(); switchPage('loginPage');};
+window.logout=()=>{clearSession(); if(unsubAdmin)unsubAdmin(); if(unsubUser)unsubUser(); if(unsubReqs)unsubReqs(); currentUser=null; isAdmin=false; document.getElementById('mainNav').classList.add('hidden'); switchPage('loginPage'); clearTimeout(window._sessionTimer);};
+window.userLogin=async()=>{const u=document.getElementById('loginUser').value.trim(),p=document.getElementById('loginPass').value.trim(),err=document.getElementById('loginErr'); err.style.display='none'; if(u===settings.adminUser&&p===settings.adminPass){isAdmin=true; saveSession({isAdmin:true}); document.getElementById('mainNav').classList.remove('hidden'); document.getElementById('navBadge').innerText='🔐 Admin'; switchPage('adminPage'); startAdminLiveListeners(); startSessionTimer(); return;} try{const snap=await getDoc(doc(db,'users',u.toLowerCase())); if(!snap.exists()||snap.data().otp!==p){err.innerText='Invalid username or OTP'; err.style.display='block'; return;} currentUser={id:u.toLowerCase(),...snap.data()}; saveSession({userId:currentUser.id}); document.getElementById('mainNav').classList.remove('hidden'); document.getElementById('navBadge').innerText='👤 '+(currentUser.username||currentUser.id); document.getElementById('dashName').innerText=currentUser.username||currentUser.id; switchPage('dashPage'); updateDashStats(); startUserLiveListeners(); startSessionTimer();}catch(e){err.innerText='Error connecting';err.style.display='block';}};
+window.adminLogin=()=>{const u=document.getElementById('adminUser').value.trim(),p=document.getElementById('adminPass').value.trim(),err=document.getElementById('adminErr'); err.style.display='none'; if(u===settings.adminUser&&p===settings.adminPass){isAdmin=true; saveSession({isAdmin:true}); document.getElementById('mainNav').classList.remove('hidden'); document.getElementById('navBadge').innerText='🔐 Admin'; switchPage('adminPage'); startAdminLiveListeners(); startSessionTimer();}else{err.innerText='Invalid credentials'; err.style.display='block';}};
+function updateDashStats(){if(!currentUser)return; let totalOtp=currentUser.totalOtp||0,rate=settings.otpRate||1,otpBalance=totalOtp*rate,withdrawn=currentUser.totalWithdrawn||0,available=Math.max(0,otpBalance-withdrawn); document.getElementById('dashTotalOtp').innerText=totalOtp; document.getElementById('dashOtpBalance').innerText='৳'+otpBalance; document.getElementById('dashWithdrawn').innerText='৳'+withdrawn; document.getElementById('dashBalance').innerText=available; document.getElementById('dashBalanceMin').innerText=`Min withdraw ৳${settings.minWithdraw}`;}
+function startUserLiveListeners(){if(!currentUser)return; if(unsubUser)unsubUser(); unsubUser=onSnapshot(doc(db,'users',currentUser.id),(snap)=>{if(snap.exists()){currentUser={id:currentUser.id,...snap.data()}; updateDashStats();}}); if(unsubReqs)unsubReqs(); unsubReqs=onSnapshot(query(collection(db,'withdrawals'),orderBy('createdAt','desc')),(snap)=>{let mine=snap.docs.filter(d=>d.data().userId===currentUser.id); let container=document.getElementById('myRequests'); if(!mine.length){container.innerHTML='<div class="text-center py-6 text-muted-foreground">No requests</div>'; return;} container.innerHTML=mine.map(d=>{let r=d.data(); let badge=r.status==='pending'?'badge-pending':r.status==='approved'?'badge-approved':'badge-rejected'; let label=r.status==='pending'?'⏳ Pending':r.status==='approved'?'✅ Approved':'❌ Rejected'; return `<div class="req-item"><div><div class="font-bold">৳${r.amount} — ${r.method}</div><div class="text-xs text-muted-foreground">${r.number} • ${r.fullName}</div></div><span class="badge ${badge}">${label}</span></div>`;}).join('');});}
+window.submitWithdraw=async()=>{const fullName=document.getElementById('wdName').value.trim(),number=document.getElementById('wdNumber').value.trim(),accountType=document.getElementById('wdAccType').value,amount=parseInt(document.getElementById('wdAmount').value),err=document.getElementById('wdErr'); err.style.display='none'; if(!fullName||!number){err.innerText='Name & Number required'; err.style.display='block'; return;} if(selectedMethod!=='Binance'&&!/^01[3-9]\d{8}$/.test(number)){err.innerText='Valid BD number required';err.style.display='block';return;} let totalOtp=currentUser.totalOtp||0,rate=settings.otpRate||1,otpBalance=totalOtp*rate,withdrawn=currentUser.totalWithdrawn||0,available=Math.max(0,otpBalance-withdrawn); if(amount<settings.minWithdraw||amount>available){err.innerText=`Amount must be between ${settings.minWithdraw} and ${available}`; err.style.display='block';return;} const snap=await getDocs(collection(db,'withdrawals')); let hasPending=snap.docs.some(d=>d.data().userId===currentUser.id&&d.data().status==='pending'); if(hasPending){err.innerText='You have a pending request already'; err.style.display='block'; return;} await addDoc(collection(db,'withdrawals'),{userId:currentUser.id,username:currentUser.username||currentUser.id,fullName,number,accountType,amount,method:selectedMethod,status:'pending',createdAt:serverTimestamp()}); window.showToast('Withdrawal request submitted','success'); document.getElementById('wdName').value=''; document.getElementById('wdNumber').value=''; document.getElementById('wdAmount').value='';};
+function startAdminLiveListeners(){if(unsubUser)unsubUser(); unsubUser=onSnapshot(collection(db,'users'),(snap)=>{allUsers=snap.docs.map(d=>({id:d.id,...d.data()})); renderUsersTable();}); if(unsubReqs)unsubReqs(); unsubReqs=onSnapshot(query(collection(db,'withdrawals'),orderBy('createdAt','desc')),(snap)=>{allReqs=snap.docs.map(d=>({id:d.id,...d.data()})); let pending=allReqs.filter(r=>r.status==='pending'),approved=allReqs.filter(r=>r.status==='approved'),totalPaid=approved.reduce((s,r)=>s+(r.amount||0),0); document.getElementById('st-users').innerText=allUsers.length; document.getElementById('st-pending').innerText=pending.length; document.getElementById('st-approved').innerText=approved.length; document.getElementById('st-paid').innerText='৳'+totalPaid; renderReqTable(); document.getElementById('recentList').innerHTML=allReqs.slice(0,5).map(r=>`<div class="req-item"><div><strong>${r.username}</strong> — ৳${r.amount} (${r.method})<div class="text-xs text-muted-foreground">${r.number}</div></div><span class="badge ${r.status==='pending'?'badge-pending':r.status==='approved'?'badge-approved':'badge-rejected'}">${r.status}</span></div>`).join('')||'<div class="text-center text-muted-foreground">No requests</div>';});}
+function renderUsersTable(){let rate=settings.otpRate||1; document.getElementById('usersTable').innerHTML=allUsers.length?allUsers.map(u=>{let totalOtp=u.totalOtp||0,otpBalance=totalOtp*rate,withdrawn=u.totalWithdrawn||0,available=Math.max(0,otpBalance-withdrawn); return `<tr><td><strong>${u.username||u.id}</strong></td><td>${totalOtp}</td><td>৳${rate}</td><td>৳${otpBalance}</td><td>৳${withdrawn}</td><td>৳${available}</td><td><span class="otp-tag">${u.otp||'—'}</span></td><td><div class="flex gap-2"><button class="btn-xs btn-gold-xs" onclick="window.newOtp('${u.id}')">🔑 New OTP</button><button class="btn-xs btn-danger-xs" onclick="window.delUser('${u.id}')">Delete</button></div></td></tr>`;}).join(''):'<tr><td colspan="8" class="text-center py-6">No users</td></tr>';}
+function renderReqTable(){let list=reqFilter==='all'?allReqs:allReqs.filter(r=>r.status===reqFilter); document.getElementById('reqTable').innerHTML=list.length?list.map(r=>`<tr><td><strong>${r.username}</strong></td><td>${r.method}</td><td>${r.number}<br><span class="text-xs text-muted-foreground">${r.accountType}</span></td><td>৳${r.amount}</td><td><span class="badge ${r.status==='pending'?'badge-pending':r.status==='approved'?'badge-approved':'badge-rejected'}">${r.status}</span></td><td>${r.status==='pending'?`<button class="btn-xs btn-success-xs" onclick="window.approveReq('${r.id}','${r.userId}',${r.amount})">✓ Approve</button> <button class="btn-xs btn-danger-xs" onclick="window.rejectReq('${r.id}')">✗ Reject</button>`:'—'}</td></tr>`).join(''):'<tr><td colspan="6" class="text-center py-6">No requests</td></tr>';}
+window.filterReq=(f,el)=>{reqFilter=f; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); renderReqTable();};
+window.approveReq=async(reqId,userId,amount)=>{await updateDoc(doc(db,'withdrawals',reqId),{status:'approved'}); const uSnap=await getDoc(doc(db,'users',userId)); let cur=uSnap.data()?.totalWithdrawn||0; await updateDoc(doc(db,'users',userId),{totalWithdrawn:cur+amount}); window.showToast('Approved','success');};
+window.rejectReq=async(reqId)=>{await updateDoc(doc(db,'withdrawals',reqId),{status:'rejected'}); window.showToast('Rejected','error');};
+window.addUser=async()=>{let username=document.getElementById('newUser').value.trim(); if(!username)return; let otp=Math.random().toString(36).substring(2,10).toUpperCase(); let ref=doc(db,'users',username.toLowerCase()); if((await getDoc(ref)).exists()){window.showToast('User exists','error');return;} await setDoc(ref,{username,totalOtp:0,totalWithdrawn:0,otp,createdAt:serverTimestamp()}); window.showToast(`User added. OTP: ${otp}`,'info'); document.getElementById('newUser').value='';};
+window.parseBulkData=(raw)=>raw.split('\n').map(l=>l.trim()).filter(l=>l&&!l.startsWith('//')).map(l=>{let parts=l.split(/\s+/); if(parts.length<2)return null; let cnt=parseInt(parts[parts.length-1]); let user=parts.slice(0,parts.length-1).join(''); if(!user||isNaN(cnt))return null; return{username:user,count:cnt};}).filter(Boolean);
+window.previewBulk=()=>{let raw=document.getElementById('bulkOtpInput').value; let previewDiv=document.getElementById('bulkPreview'); let lines=window.parseBulkData(raw); if(!lines.length){previewDiv.style.display='none';return;} previewDiv.style.display='block'; previewDiv.innerHTML=`<strong>📋 ${lines.length} entries</strong>`+lines.map(({username,count})=>{let found=allUsers.find(u=>u.id===username.toLowerCase()||(u.username||'').toLowerCase()===username.toLowerCase()); let curOtp=found?(found.totalOtp||0):0; return `<div class="bulk-row"><span>${username}</span><span>+${count} OTP ${found?`<span class="bulk-found">(${curOtp}→${curOtp+count})</span>`:'<span class="bulk-notfound">(missing)</span>'}</span></div>`;}).join('');};
+window.applyBulkOtp=async()=>{let raw=document.getElementById('bulkOtpInput').value; let lines=window.parseBulkData(raw); if(!lines.length){window.showToast('No valid data','error');return;} let updated=0,notFound=0; for(let {username,count} of lines){let found=allUsers.find(u=>u.id===username.toLowerCase()||(u.username||'').toLowerCase()===username.toLowerCase()); if(!found){notFound++;continue;} let cur=found.totalOtp||0; await updateDoc(doc(db,'users',found.id),{totalOtp:cur+count}); updated++;} window.showToast(`✅ ${updated} updated, ${notFound} not found`,'success'); document.getElementById('bulkOtpInput').value=''; document.getElementById('bulkPreview').style.display='none';};
+window.addSingleOtp=async()=>{let username=document.getElementById('singleOtpUser').value.trim(),cnt=parseInt(document.getElementById('singleOtpCount').value); if(!username||isNaN(cnt)||cnt<=0)return; let found=allUsers.find(u=>u.id===username.toLowerCase()||(u.username||'').toLowerCase()===username.toLowerCase()); if(!found){window.showToast('User not found','error');return;} let cur=found.totalOtp||0; await updateDoc(doc(db,'users',found.id),{totalOtp:cur+cnt}); window.showToast(`${found.username}: +${cnt} OTP`,'success'); document.getElementById('singleOtpUser').value=''; document.getElementById('singleOtpCount').value='';};
+window.newOtp=async(userId)=>{let otp=Math.random().toString(36).substring(2,10).toUpperCase(); await updateDoc(doc(db,'users',userId),{otp}); window.showToast(`New Login OTP: ${otp}`,'info');};
+window.delUser=async(userId)=>{if(confirm('Delete user permanently?')){await deleteDoc(doc(db,'users',userId)); window.showToast('User deleted','error');}};
+window.saveSettings=async()=>{let min=parseInt(document.getElementById('setMin').value)||100; let rate=parseFloat(document.getElementById('setOtpRate').value)||1; let adminU=document.getElementById('setAdminUser').value.trim(); let adminP=document.getElementById('setAdminPass').value.trim(); if(adminU)settings.adminUser=adminU; if(adminP)settings.adminPass=adminP; settings.minWithdraw=min; settings.otpRate=rate; await setDoc(doc(db,'config','settings'),settings); document.getElementById('currentRateDisplay').innerText=rate; renderUsersTable(); window.showToast('Settings saved','success');};
+window.showTab=(tab,el)=>{document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active')); document.querySelectorAll('.admin-nav-item').forEach(m=>{m.classList.remove('bg-white/10','text-white');m.classList.add('text-white/50');}); document.getElementById('tab-'+tab).classList.add('active'); el.classList.remove('text-white/50'); el.classList.add('bg-white/10','text-white');};
+window.closeModal=()=>document.getElementById('modal').classList.remove('open');
 
-window.addEventListener('load', async () => {
-  await loadSettings();
-  setTimeout(async () => {
-    document.getElementById('loader').classList.add('hide');
-    const sess = loadSession();
-    if (sess) {
-      if (sess.isAdmin) {
-        isAdmin = true;
-        document.getElementById('mainNav').classList.remove('hidden');
-        document.getElementById('navBadge').textContent = '🔐 Admin';
-        switchPage('adminPage');
-        startAdminLiveListeners();
-        startSessionTimer();
-      } else if (sess.userId) {
-        try {
-          const snap = await getDoc(doc(db, 'users', sess.userId));
-          if (snap.exists()) {
-            currentUser = { id: sess.userId, ...snap.data() };
-            document.getElementById('mainNav').classList.remove('hidden');
-            document.getElementById('navBadge').textContent = '👤 ' + (currentUser.username || currentUser.id);
-            document.getElementById('dashName').textContent = currentUser.username || currentUser.id;
-            switchPage('dashPage');
-            updateDashStats();
-            startUserLiveListeners();
-            startSessionTimer();
-          }
-        } catch {}
-      }
-    }
-  }, 800);
-});
+// BULK USER METHODS
+window.previewBulkUsers=()=>{let raw=document.getElementById('bulkUserInput').value.trim(); let previewDiv=document.getElementById('bulkUserPreview'); if(!raw){previewDiv.style.display='none';return;} let usernames=raw.split('\n').map(l=>l.trim()).filter(l=>l.length>0); let unique=[...new Set(usernames)]; let existingUsers=allUsers.map(u=>u.username?.toLowerCase()||u.id); let newList=unique.filter(u=>!existingUsers.includes(u.toLowerCase())); previewDiv.style.display='block'; previewDiv.innerHTML=`<div class="font-bold mb-2">📋 ${unique.length} total, ${newList.length} will be created</div>`+unique.map(u=>{let exists=existingUsers.includes(u.toLowerCase()); return `<div class="bulk-row"><span>${u}</span><span class="${exists?'bulk-notfound':'bulk-found'}">${exists?'⛔ exists':'✅ new'}</span></div>`;}).join('');};
+window.applyBulkUsers=async()=>{let raw=document.getElementById('bulkUserInput').value.trim(); if(!raw){window.showToast('Enter usernames first','error');return;} let usernames=raw.split('\n').map(l=>l.trim()).filter(l=>l.length>0); let unique=[...new Set(usernames)]; let existingUsers=allUsers.map(u=>u.username?.toLowerCase()||u.id); let toCreate=unique.filter(u=>!existingUsers.includes(u.toLowerCase())); if(toCreate.length===0){window.showToast('No new users to add','info');return;} let created=0; for(let uname of toCreate){let otp=Math.random().toString(36).substring(2,10).toUpperCase(); let ref=doc(db,'users',uname.toLowerCase()); if(!(await getDoc(ref)).exists()){await setDoc(ref,{username:uname,totalOtp:0,totalWithdrawn:0,otp,createdAt:serverTimestamp()}); created++;}} window.showToast(`✅ ${created} new users created with random OTP`,'success'); document.getElementById('bulkUserInput').value=''; document.getElementById('bulkUserPreview').style.display='none';};
 
-async function loadSettings() {
-  try {
-    const snap = await getDoc(doc(db, 'config', 'settings'));
-    if (snap.exists()) settings = { ...settings, ...snap.data() };
-    else await setDoc(doc(db, 'config', 'settings'), settings);
-    document.getElementById('setMin').value = settings.minWithdraw;
-    document.getElementById('setOtpRate').value = settings.otpRate || 1;
-    document.getElementById('currentRateDisplay').textContent = settings.otpRate || 1;
-  } catch(e) { console.log('Settings load error:', e); }
-}
-
-function switchPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  const el = document.getElementById(id);
-  if (el) el.classList.add('active');
-}
-
-window.showAdminLogin = (e) => { e?.preventDefault(); switchPage('adminLoginPage'); };
-window.showUserLogin = (e) => { e?.preventDefault(); switchPage('loginPage'); };
-
-window.logout = () => {
-  clearSession();
-  if (unsubAdmin) { unsubAdmin(); unsubAdmin = null; }
-  if (unsubUser) { unsubUser(); unsubUser = null; }
-  if (unsubReqs) { unsubReqs(); unsubReqs = null; }
-  clearTimeout(window._sessionTimer);
-  currentUser = null; isAdmin = false;
-  document.getElementById('mainNav').classList.add('hidden');
-  switchPage('loginPage');
-  document.getElementById('loginUser').value = '';
-  document.getElementById('loginPass').value = '';
-};
-
-window.userLogin = async () => {
-  const username = document.getElementById('loginUser').value.trim();
-  const pass = document.getElementById('loginPass').value.trim();
-  const errEl = document.getElementById('loginErr');
-  errEl.style.display = 'none';
-  if (!username || !pass) { errEl.textContent = '❌ Username এবং Password দিন'; errEl.style.display = 'block'; return; }
-  if (username === settings.adminUser && pass === settings.adminPass) {
-    isAdmin = true;
-    saveSession({ isAdmin: true });
-    document.getElementById('mainNav').classList.remove('hidden');
-    document.getElementById('navBadge').textContent = '🔐 Admin';
-    switchPage('adminPage');
-    startAdminLiveListeners();
-    startSessionTimer();
-    return;
-  }
-  try {
-    const snap = await getDoc(doc(db, 'users', username.toLowerCase()));
-    if (!snap.exists() || snap.data().otp !== pass) {
-      errEl.textContent = '❌ Username বা OTP ভুল হয়েছে';
-      errEl.style.display = 'block'; return;
-    }
-    currentUser = { id: username.toLowerCase(), ...snap.data() };
-    isAdmin = false;
-    saveSession({ userId: currentUser.id });
-    errEl.style.display = 'none';
-    document.getElementById('mainNav').classList.remove('hidden');
-    document.getElementById('navBadge').textContent = '👤 ' + (currentUser.username || currentUser.id);
-    document.getElementById('dashName').textContent = currentUser.username || currentUser.id;
-    switchPage('dashPage');
-    updateDashStats();
-    startUserLiveListeners();
-    startSessionTimer();
-  } catch(e) { errEl.textContent = '❌ Connection error! Try again.'; errEl.style.display = 'block'; }
-};
-
-window.adminLogin = () => {
-  const u = document.getElementById('adminUser').value.trim();
-  const p = document.getElementById('adminPass').value.trim();
-  const errEl = document.getElementById('adminErr');
-  errEl.style.display = 'none';
-  if (u === settings.adminUser && p === settings.adminPass) {
-    isAdmin = true;
-    saveSession({ isAdmin: true });
-    document.getElementById('mainNav').classList.remove('hidden');
-    document.getElementById('navBadge').textContent = '🔐 Admin';
-    switchPage('adminPage');
-    startAdminLiveListeners();
-    startSessionTimer();
-  } else {
-    errEl.textContent = '❌ Username বা Password ভুল';
-    errEl.style.display = 'block';
-  }
-};
-
-function updateDashStats() {
-  if (!currentUser) return;
-  const totalOtp = currentUser.totalOtp || 0;
-  const rate = settings.otpRate || 1;
-  const otpBalance = totalOtp * rate;
-  const withdrawn = currentUser.totalWithdrawn || 0;
-  const available = Math.max(0, otpBalance - withdrawn);
-  document.getElementById('dashTotalOtp').textContent = totalOtp;
-  document.getElementById('dashOtpBalance').textContent = '৳' + otpBalance;
-  document.getElementById('dashWithdrawn').textContent = '৳' + withdrawn;
-  document.getElementById('dashBalance').textContent = available;
-  document.getElementById('dashBalanceMin').textContent = `সর্বনিম্ন উত্তোলন ৳${settings.minWithdraw}`;
-}
-
-function startUserLiveListeners() {
-  if (!currentUser) return;
-  if (unsubUser) unsubUser();
-  unsubUser = onSnapshot(doc(db, 'users', currentUser.id), (snap) => {
-    if (snap.exists()) {
-      currentUser = { id: currentUser.id, ...snap.data() };
-      updateDashStats();
-    }
-  });
-  if (unsubReqs) unsubReqs();
-  unsubReqs = onSnapshot(
-    query(collection(db, 'withdrawals'), orderBy('createdAt', 'desc')),
-    (snap) => {
-      const mine = snap.docs.filter(d => d.data().userId === currentUser.id);
-      const el = document.getElementById('myRequests');
-      if (!mine.length) { el.innerHTML = '<div class="text-center py-8 text-muted-foreground text-sm">কোনো request নেই এখনো</div>'; return; }
-      el.innerHTML = mine.map(d => {
-        const r = d.data();
-        const badge = r.status === 'pending' ? 'badge-pending' : r.status === 'approved' ? 'badge-approved' : 'badge-rejected';
-        const label = r.status === 'pending' ? '⏳ Pending' : r.status === 'approved' ? '✅ Approved' : '❌ Rejected';
-        return `<div class="req-item">
-          <div>
-            <div class="font-bold text-sm">৳${r.amount} — ${r.method}</div>
-            <div class="text-xs text-muted-foreground mt-1">${r.number} • ${r.accountType} • ${r.fullName}</div>
-          </div>
-          <span class="badge ${badge}">${label}</span>
-        </div>`;
-      }).join('');
-    }
-  );
-}
-
-window.selectMethod = (el, method) => {
-  document.querySelectorAll(".method-btn").forEach(b => b.classList.remove("active"));
-  el.classList.add("active");
-  selectedMethod = method;
-  if (method === "Binance") {
-    document.getElementById("wdNumLabel").textContent = "Binance UID / Email";
-    document.getElementById("wdNumber").placeholder = "Binance UID বা Email দিন";
-  } else {
-    document.getElementById("wdNumLabel").textContent = method + " নম্বর";
-    document.getElementById("wdNumber").placeholder = "01XXXXXXXXX";
-  }
-};
-
-window.submitWithdraw = async () => {
-  const fullName = document.getElementById('wdName').value.trim();
-  const number = document.getElementById('wdNumber').value.trim();
-  const accountType = document.getElementById('wdAccType').value;
-  const amount = parseInt(document.getElementById('wdAmount').value);
-  const errEl = document.getElementById('wdErr');
-  errEl.style.display = 'none';
-  const totalOtp = currentUser.totalOtp || 0;
-  const rate = settings.otpRate || 1;
-  const otpBalance = totalOtp * rate;
-  const withdrawn = currentUser.totalWithdrawn || 0;
-  const available = Math.max(0, otpBalance - withdrawn);
-  if (!fullName) { errEl.textContent = '❌ পূর্ণ নাম দিন'; errEl.style.display = 'block'; return; }
-  if (!number) { errEl.textContent = '❌ ' + selectedMethod + ' নম্বর/ID দিন'; errEl.style.display = 'block'; return; }
-  if (selectedMethod !== 'Binance' && !/^01[3-9]\d{8}$/.test(number)) { errEl.textContent = '❌ Valid Bangladesh নম্বর দিন (01XXXXXXXXX)'; errEl.style.display = 'block'; return; }
-  if (!amount || amount < settings.minWithdraw) { errEl.textContent = `❌ সর্বনিম্ন ৳${settings.minWithdraw} withdraw করতে হবে`; errEl.style.display = 'block'; return; }
-  if (amount > available) { errEl.textContent = '❌ পর্যাপ্ত balance নেই'; errEl.style.display = 'block'; return; }
-  const snap = await getDocs(collection(db, 'withdrawals'));
-  const hasPending = snap.docs.some(d => d.data().userId === currentUser.id && d.data().status === 'pending');
-  if (hasPending) { errEl.textContent = '❌ একটি pending request আছে। Approved হওয়ার পর নতুন request করুন'; errEl.style.display = 'block'; return; }
-  try {
-    await addDoc(collection(db, 'withdrawals'), {
-      userId: currentUser.id, username: currentUser.username || currentUser.id,
-      fullName, number, accountType, amount, method: selectedMethod,
-      status: 'pending', createdAt: serverTimestamp()
-    });
-    showToast('✅ Request submit হয়েছে!', 'success');
-    document.getElementById('wdName').value = '';
-    document.getElementById('wdNumber').value = '';
-    document.getElementById('wdAmount').value = '';
-  } catch(e) { errEl.textContent = '❌ Submit failed. Try again.'; errEl.style.display = 'block'; }
-};
-
-function startAdminLiveListeners() {
-  if (unsubUser) unsubUser();
-  unsubUser = onSnapshot(collection(db, 'users'), (snap) => {
-    allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderUsersTable();
-    const pending = allReqs.filter(r => r.status === 'pending');
-    const approved = allReqs.filter(r => r.status === 'approved');
-    const totalPaid = approved.reduce((s, r) => s + (r.amount || 0), 0);
-    document.getElementById('st-users').textContent = allUsers.length;
-    document.getElementById('st-pending').textContent = pending.length;
-    document.getElementById('st-approved').textContent = approved.length;
-    document.getElementById('st-paid').textContent = '৳' + totalPaid;
-  });
-  if (unsubReqs) unsubReqs();
-  unsubReqs = onSnapshot(
-    query(collection(db, 'withdrawals'), orderBy('createdAt', 'desc')),
-    (snap) => {
-      allReqs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      const pending = allReqs.filter(r => r.status === 'pending');
-      const approved = allReqs.filter(r => r.status === 'approved');
-      const totalPaid = approved.reduce((s, r) => s + (r.amount || 0), 0);
-      document.getElementById('st-users').textContent = allUsers.length;
-      document.getElementById('st-pending').textContent = pending.length;
-      document.getElementById('st-approved').textContent = approved.length;
-      document.getElementById('st-paid').textContent = '৳' + totalPaid;
-      renderReqTable();
-      document.getElementById('recentList').innerHTML = allReqs.slice(0, 5).map(r => {
-        const badge = r.status === 'pending' ? 'badge-pending' : r.status === 'approved' ? 'badge-approved' : 'badge-rejected';
-        return `<div class="req-item">
-          <div>
-            <div class="font-bold text-sm">${r.username} — ৳${r.amount} (${r.method})</div>
-            <div class="text-xs text-muted-foreground mt-1">${r.number} • ${r.accountType} • ${r.fullName}</div>
-          </div>
-          <span class="badge ${badge}">${r.status}</span>
-        </div>`;
-      }).join('') || '<div class="text-center py-8 text-muted-foreground text-sm">No requests yet</div>';
-    }
-  );
-}
-
-function renderUsersTable() {
-  const rate = settings.otpRate || 1;
-  document.getElementById('usersTable').innerHTML = allUsers.length ? allUsers.map(u => {
-    const totalOtp = u.totalOtp || 0;
-    const otpBalance = totalOtp * rate;
-    const withdrawn = u.totalWithdrawn || 0;
-    const available = Math.max(0, otpBalance - withdrawn);
-    return `<tr>
-      <td><strong>${u.username || u.id}</strong></td>
-      <td><strong class="text-purple-600">${totalOtp}</strong></td>
-      <td><span class="text-muted-foreground text-xs">৳${rate}/OTP</span></td>
-      <td><strong class="text-primary">৳${otpBalance}</strong></td>
-      <td><strong class="text-red-500">৳${withdrawn}</strong></td>
-      <td><strong class="text-emerald-600">৳${available}</strong></td>
-      <td><span class="otp-tag">${u.otp || '—'}</span></td>
-      <td><div class="flex gap-2 flex-wrap">
-        <button class="btn-xs btn-gold-xs" onclick="newOtp('${u.id}')">🔑 New OTP</button>
-        <button class="btn-xs btn-danger-xs" onclick="delUser('${u.id}')">🗑️</button>
-      </div></td>
-    </tr>`;
-  }).join('') : '<tr><td colspan="8" class="text-center py-8 text-muted-foreground text-sm">No users yet</td></tr>';
-}
-
-function renderReqTable() {
-  const list = reqFilter === 'all' ? allReqs : allReqs.filter(r => r.status === reqFilter);
-  document.getElementById('reqTable').innerHTML = list.length ? list.map(r => `
-    <tr>
-      <td><strong>${r.username}</strong></td>
-      <td>${r.method}</td>
-      <td>${r.number}<br><small class="text-muted-foreground">${r.accountType}</small></td>
-      <td><strong class="text-primary">৳${r.amount}</strong></td>
-      <td><span class="badge ${r.status==='pending'?'badge-pending':r.status==='approved'?'badge-approved':'badge-rejected'}">${r.status}</span></td>
-      <td><div class="flex gap-2">${r.status === 'pending' ? `
-        <button class="btn-xs btn-success-xs" onclick="approveReq('${r.id}','${r.userId}',${r.amount})">✓ Approve</button>
-        <button class="btn-xs btn-danger-xs" onclick="rejectReq('${r.id}')">✗ Reject</button>` : '—'}</div></td>
-    </tr>`).join('') : '<tr><td colspan="6" class="text-center py-8 text-muted-foreground text-sm">No requests</td></tr>';
-}
-
-window.filterReq = (f, el) => {
-  reqFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  renderReqTable();
-};
-
-window.approveReq = async (reqId, userId, amount) => {
-  try {
-    const uSnap = await getDoc(doc(db, 'users', userId));
-    if (!uSnap.exists()) return;
-    const curWithdrawn = uSnap.data().totalWithdrawn || 0;
-    await updateDoc(doc(db, 'withdrawals', reqId), { status: 'approved' });
-    await updateDoc(doc(db, 'users', userId), { totalWithdrawn: curWithdrawn + amount });
-    showToast('✅ Approved!', 'success');
-  } catch(e) { showToast('Error!', 'error'); }
-};
-
-window.rejectReq = async (reqId) => {
-  await updateDoc(doc(db, 'withdrawals', reqId), { status: 'rejected' });
-  showToast('❌ Rejected', 'error');
-};
-
-window.addUser = async () => {
-  const username = document.getElementById('newUser').value.trim();
-  if (!username) { showToast('Username দিন!', 'error'); return; }
-  const otp = Math.random().toString(36).substring(2, 10).toUpperCase();
-  try {
-    const userDoc = doc(db, 'users', username.toLowerCase());
-    const existing = await getDoc(userDoc);
-    if (existing.exists()) { showToast('❌ User already exists!', 'error'); return; }
-    await setDoc(userDoc, { username, totalOtp: 0, totalWithdrawn: 0, otp, createdAt: serverTimestamp() });
-    showToast(`✅ User added! Login OTP: ${otp}`, 'info');
-    document.getElementById('newUser').value = '';
-  } catch(e) { showToast('Error adding user!', 'error'); }
-};
-
-window.previewBulk = () => {
-  const raw = document.getElementById('bulkOtpInput').value.trim();
-  const preview = document.getElementById('bulkPreview');
-  if (!raw) { preview.style.display = 'none'; return; }
-  const lines = parseBulkData(raw);
-  if (!lines.length) { preview.style.display = 'none'; return; }
-  preview.style.display = 'block';
-  preview.innerHTML = `<strong style="font-size:.82rem;color:#64748B;margin-bottom:8px;display:block">📋 Preview — ${lines.length} entries</strong>` +
-    lines.map(({ username, count }) => {
-      const found = allUsers.find(u => u.id === username.toLowerCase() || (u.username || '').toLowerCase() === username.toLowerCase());
-      const curOtp = found ? (found.totalOtp || 0) : 0;
-      return `<div class="bulk-row">
-        <span>${username}</span>
-        <span>+${count} OTP ${found ? `<span class="bulk-found">(${curOtp} → ${curOtp + count})</span>` : '<span class="bulk-notfound">(user not found)</span>'}</span>
-      </div>`;
-    }).join('');
-};
-
-function parseBulkData(raw) {
-  return raw.split('\n')
-    .map(line => line.trim())
-    .filter(line => line && !line.startsWith('//'))
-    .map(line => {
-      const parts = line.split(/\s+/);
-      if (parts.length < 2) return null;
-      const count = parseInt(parts[parts.length - 1]);
-      const username = parts.slice(0, parts.length - 1).join('');
-      if (!username || isNaN(count) || count < 0) return null;
-      return { username, count };
-    })
-    .filter(Boolean);
-}
-
-window.applyBulkOtp = async () => {
-  const raw = document.getElementById('bulkOtpInput').value.trim();
-  if (!raw) { showToast('Data paste করুন!', 'error'); return; }
-  const lines = parseBulkData(raw);
-  if (!lines.length) { showToast('Valid data নেই!', 'error'); return; }
-  let updated = 0, notFound = 0;
-  showToast('⏳ Updating...', 'info');
-  for (const { username, count } of lines) {
-    const found = allUsers.find(u => u.id === username.toLowerCase() || (u.username || '').toLowerCase() === username.toLowerCase());
-    if (!found) { notFound++; continue; }
-    try {
-      const curOtp = found.totalOtp || 0;
-      await updateDoc(doc(db, 'users', found.id), { totalOtp: curOtp + count });
-      updated++;
-    } catch {}
-  }
-  showToast(`✅ ${updated} users updated! ${notFound > 0 ? `(${notFound} not found)` : ''}`, 'success');
-  document.getElementById('bulkOtpInput').value = '';
-  document.getElementById('bulkPreview').style.display = 'none';
-};
-
-window.addSingleOtp = async () => {
-  const username = document.getElementById('singleOtpUser').value.trim();
-  const count = parseInt(document.getElementById('singleOtpCount').value);
-  if (!username || isNaN(count) || count <= 0) { showToast('Username ও OTP count দিন!', 'error'); return; }
-  const found = allUsers.find(u => u.id === username.toLowerCase() || (u.username || '').toLowerCase() === username.toLowerCase());
-  if (!found) { showToast('❌ User not found!', 'error'); return; }
-  const curOtp = found.totalOtp || 0;
-  await updateDoc(doc(db, 'users', found.id), { totalOtp: curOtp + count });
-  showToast(`✅ ${found.username}: ${curOtp} → ${curOtp + count} OTP`, 'success');
-  document.getElementById('singleOtpUser').value = '';
-  document.getElementById('singleOtpCount').value = '';
-};
-
-window.newOtp = async (userId) => {
-  const otp = Math.random().toString(36).substring(2, 10).toUpperCase();
-  await updateDoc(doc(db, 'users', userId), { otp });
-  showToast(`🔑 New Login OTP: ${otp}`, 'info');
-};
-
-window.delUser = async (userId) => {
-  if (!confirm('এই user delete করবেন?')) return;
-  await deleteDoc(doc(db, 'users', userId));
-  showToast('🗑️ User deleted', 'error');
-};
-
-window.saveSettings = async () => {
-  const min = parseInt(document.getElementById('setMin').value) || 100;
-  const rate = parseFloat(document.getElementById('setOtpRate').value) || 1;
-  const adminU = document.getElementById('setAdminUser').value.trim();
-  const adminP = document.getElementById('setAdminPass').value.trim();
-  if (min) settings.minWithdraw = min;
-  settings.otpRate = rate;
-  if (adminU) settings.adminUser = adminU;
-  if (adminP) settings.adminPass = adminP;
-  await setDoc(doc(db, 'config', 'settings'), settings);
-  document.getElementById('currentRateDisplay').textContent = rate;
-  renderUsersTable();
-  showToast('✅ Settings saved!', 'success');
-};
-
-window.showTab = (tab, el) => {
-  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.admin-nav-item').forEach(m => {
-    m.classList.remove('bg-white/10', 'text-white');
-    m.classList.add('text-white/50');
-  });
-  document.getElementById('tab-' + tab).classList.add('active');
-  el.classList.remove('text-white/50');
-  el.classList.add('bg-white/10', 'text-white');
-};
-
-window.closeModal = () => document.getElementById('modal').classList.remove('open');
-
-function showToast(msg, type = 'info') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = `show ${type}`;
-  setTimeout(() => t.className = '', 3500);
-}
-
-document.getElementById('modal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
+window.addEventListener('load',async()=>{await loadSettings(); setTimeout(async()=>{document.getElementById('loader').classList.add('hide'); let sess=loadSession(); if(sess){if(sess.isAdmin){isAdmin=true; document.getElementById('mainNav').classList.remove('hidden'); document.getElementById('navBadge').innerText='🔐 Admin'; switchPage('adminPage'); startAdminLiveListeners(); startSessionTimer();}else if(sess.userId){let snap=await getDoc(doc(db,'users',sess.userId)); if(snap.exists()){currentUser={id:sess.userId,...snap.data()}; document.getElementById('mainNav').classList.remove('hidden'); document.getElementById('navBadge').innerText='👤 '+(currentUser.username||currentUser.id); document.getElementById('dashName').innerText=currentUser.username||currentUser.id; switchPage('dashPage'); updateDashStats(); startUserLiveListeners(); startSessionTimer();}}}},800);});
 </script>
 </body>
 </html>
