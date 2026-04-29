@@ -350,7 +350,7 @@ tbody tr:hover { background: #F8FAFC; }
       </div>
 
       <!-- Method -->
-      <div class="grid grid-cols-2 gap-3 mb-5">
+      <div class="grid grid-cols-3 gap-3 mb-5">
         <div class="method-btn active" onclick="selectMethod(this,'bKash')">
           <div class="text-2xl mb-1">💜</div>
           <div class="text-xs">bKash</div>
@@ -358,6 +358,10 @@ tbody tr:hover { background: #F8FAFC; }
         <div class="method-btn" onclick="selectMethod(this,'Nagad')">
           <div class="text-2xl mb-1">🧡</div>
           <div class="text-xs">Nagad</div>
+        </div>
+        <div class="method-btn" onclick="selectMethod(this,'Binance')">
+          <div class="text-2xl mb-1">🟡</div>
+          <div class="text-xs">Binance</div>
         </div>
       </div>
 
@@ -884,11 +888,16 @@ function startUserLiveListeners() {
 }
 
 window.selectMethod = (el, method) => {
-  document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
+  document.querySelectorAll(".method-btn").forEach(b => b.classList.remove("active"));
+  el.classList.add("active");
   selectedMethod = method;
-  document.getElementById('wdNumLabel').textContent = method + ' নম্বর';
-  document.getElementById('wdNumber').placeholder = '01XXXXXXXXX';
+  if (method === "Binance") {
+    document.getElementById("wdNumLabel").textContent = "Binance UID / Email";
+    document.getElementById("wdNumber").placeholder = "Binance UID বা Email দিন";
+  } else {
+    document.getElementById("wdNumLabel").textContent = method + " নম্বর";
+    document.getElementById("wdNumber").placeholder = "01XXXXXXXXX";
+  }
 };
 
 window.submitWithdraw = async () => {
@@ -904,8 +913,8 @@ window.submitWithdraw = async () => {
   const withdrawn = currentUser.totalWithdrawn || 0;
   const available = Math.max(0, otpBalance - withdrawn);
   if (!fullName) { errEl.textContent = '❌ পূর্ণ নাম দিন'; errEl.style.display = 'block'; return; }
-  if (!number) { errEl.textContent = '❌ ' + selectedMethod + ' নম্বর দিন'; errEl.style.display = 'block'; return; }
-  if (!/^01[3-9]\d{8}$/.test(number)) { errEl.textContent = '❌ Valid Bangladesh নম্বর দিন (01XXXXXXXXX)'; errEl.style.display = 'block'; return; }
+  if (!number) { errEl.textContent = '❌ ' + selectedMethod + ' নম্বর/ID দিন'; errEl.style.display = 'block'; return; }
+  if (selectedMethod !== 'Binance' && !/^01[3-9]\d{8}$/.test(number)) { errEl.textContent = '❌ Valid Bangladesh নম্বর দিন (01XXXXXXXXX)'; errEl.style.display = 'block'; return; }
   if (!amount || amount < settings.minWithdraw) { errEl.textContent = `❌ সর্বনিম্ন ৳${settings.minWithdraw} withdraw করতে হবে`; errEl.style.display = 'block'; return; }
   if (amount > available) { errEl.textContent = '❌ পর্যাপ্ত balance নেই'; errEl.style.display = 'block'; return; }
   const snap = await getDocs(collection(db, 'withdrawals'));
