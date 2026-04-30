@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes"/>
-<title>RatTara – Withdrawal Portal | Bulk User & OTP</title>
+<title>RatTara – Withdrawal Portal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -133,7 +133,8 @@ tbody tr:hover { background: #F8FAFC; }
 .bulk-found { color: #059669; font-weight: 700; }
 .bulk-notfound { color: #94A3B8; }
 
-.btn-xs { padding: 5px 10px; font-size: .7rem; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; font-family: inherit; display: inline-flex; align-items: center; gap: 4px; }
+.btn-xs { padding: 5px 10px; font-size: .7rem; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; font-family: inherit; display: inline-flex; align-items: center; gap: 4px; transition: opacity .15s; }
+.btn-xs:disabled { opacity: .5; cursor: not-allowed; }
 .btn-success-xs { background: #ECFDF5; color: #059669; border: 1px solid rgba(5,150,105,.2); }
 .btn-danger-xs { background: #FEF2F2; color: #EF4444; border: 1px solid rgba(239,68,68,.2); }
 .btn-gold-xs { background: #FFFBEB; color: #D97706; border: 1px solid rgba(217,119,6,.2); }
@@ -144,6 +145,8 @@ tbody tr:hover { background: #F8FAFC; }
 }
 .method-btn { border: 2px solid #E2E8F0; border-radius: 18px; padding: 12px 5px; text-align: center; cursor: pointer; transition: all .2s; font-size: .8rem; font-weight: 700; color: #64748B; background: #F8FAFC; }
 .method-btn.active { border-color: #2563EB; background: #EFF6FF; color: #2563EB; }
+
+button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-events: none; }
 </style>
 </head>
 <body class="bg-background text-foreground min-h-screen">
@@ -173,15 +176,20 @@ tbody tr:hover { background: #F8FAFC; }
 
 <!-- USER LOGIN -->
 <div id="loginPage" class="page active relative min-h-screen flex items-center justify-center">
-  <div class="absolute -top-24 -left-24 w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-60"></div><div class="absolute -bottom-24 -right-24 w-64 h-64 bg-emerald-100 rounded-full blur-3xl opacity-60"></div>
+  <div class="absolute -top-24 -left-24 w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-60"></div>
+  <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-emerald-100 rounded-full blur-3xl opacity-60"></div>
   <div class="w-full max-w-sm mx-auto px-6 relative z-10">
-    <div class="text-center mb-10"><div class="w-20 h-20 bg-primary rounded-3xl shadow-2xl shadow-blue-200 flex items-center justify-center mx-auto mb-6"><iconify-icon icon="lucide:zap" class="text-4xl text-white"></iconify-icon></div><h1 class="text-3xl font-extrabold">RatTara</h1><p class="text-muted-foreground mt-2 font-medium text-sm">Enter your credentials</p></div>
+    <div class="text-center mb-10">
+      <div class="w-20 h-20 bg-primary rounded-3xl shadow-2xl shadow-blue-200 flex items-center justify-center mx-auto mb-6"><iconify-icon icon="lucide:zap" class="text-4xl text-white"></iconify-icon></div>
+      <h1 class="text-3xl font-extrabold">RatTara</h1>
+      <p class="text-muted-foreground mt-2 font-medium text-sm">Enter your credentials</p>
+    </div>
     <div class="bg-card border border-border rounded-[2rem] p-8 shadow-xl">
       <div class="space-y-5">
-        <div><label class="text-[10px] font-bold uppercase tracking-wider ml-1 text-muted-foreground">Username</label><input type="text" id="loginUser" class="w-full bg-secondary border-none rounded-2xl py-4 pl-5 pr-4 focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="আপনার username"/></div>
-        <div><label class="text-[10px] font-bold uppercase tracking-wider ml-1 text-muted-foreground">Password / OTP</label><input type="password" id="loginPass" class="w-full bg-secondary border-none rounded-2xl py-4 pl-5 pr-4 focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="OTP code" onkeydown="if(event.key==='Enter')window.userLogin()"/></div>
+        <div><label class="text-[10px] font-bold uppercase tracking-wider ml-1 text-muted-foreground">Username</label><input type="text" id="loginUser" autocomplete="username" class="w-full bg-secondary border-none rounded-2xl py-4 pl-5 pr-4 focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="আপনার username"/></div>
+        <div><label class="text-[10px] font-bold uppercase tracking-wider ml-1 text-muted-foreground">Password / OTP</label><input type="password" id="loginPass" autocomplete="current-password" class="w-full bg-secondary border-none rounded-2xl py-4 pl-5 pr-4 focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="OTP code" onkeydown="if(event.key==='Enter')window.userLogin()"/></div>
         <div class="error-box" id="loginErr"></div>
-        <button onclick="window.userLogin()" class="w-full bg-primary text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200 hover:scale-[1.01] transition-all flex items-center justify-center gap-2">Login <iconify-icon icon="lucide:arrow-right"></iconify-icon></button>
+        <button id="loginBtn" onclick="window.userLogin()" class="w-full bg-primary text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200 hover:scale-[1.01] transition-all flex items-center justify-center gap-2">Login <iconify-icon icon="lucide:arrow-right"></iconify-icon></button>
       </div>
     </div>
     <div class="mt-8 text-center"><a href="#" onclick="window.showAdminLogin(event)" class="text-sm font-bold text-primary flex items-center justify-center gap-2"><iconify-icon icon="lucide:shield-check"></iconify-icon> Admin Panel</a></div>
@@ -190,8 +198,19 @@ tbody tr:hover { background: #F8FAFC; }
 
 <!-- ADMIN LOGIN -->
 <div id="adminLoginPage" class="page relative min-h-screen flex items-center justify-center">
-  <div class="w-full max-w-sm mx-auto px-6"><div class="text-center mb-10"><div class="w-20 h-20 bg-slate-900 rounded-3xl shadow-2xl flex items-center justify-center mx-auto mb-6"><iconify-icon icon="lucide:shield" class="text-4xl text-white"></iconify-icon></div><h1 class="text-3xl font-extrabold">Admin Login</h1></div>
-    <div class="bg-card border border-border rounded-[2rem] p-8 shadow-xl"><div class="space-y-5"><div><label class="text-[10px] font-bold uppercase">Username</label><input type="text" id="adminUser" class="w-full bg-secondary rounded-2xl py-4 px-4 focus:ring-2 focus:ring-primary outline-none"/></div><div><label class="text-[10px] font-bold uppercase">Password</label><input type="password" id="adminPass" class="w-full bg-secondary rounded-2xl py-4 px-4 focus:ring-2 focus:ring-primary outline-none" onkeydown="if(event.key==='Enter')window.adminLogin()"/></div><div class="error-box" id="adminErr"></div><button onclick="window.adminLogin()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl">Admin Access</button></div></div>
+  <div class="w-full max-w-sm mx-auto px-6">
+    <div class="text-center mb-10">
+      <div class="w-20 h-20 bg-slate-900 rounded-3xl shadow-2xl flex items-center justify-center mx-auto mb-6"><iconify-icon icon="lucide:shield" class="text-4xl text-white"></iconify-icon></div>
+      <h1 class="text-3xl font-extrabold">Admin Login</h1>
+    </div>
+    <div class="bg-card border border-border rounded-[2rem] p-8 shadow-xl">
+      <div class="space-y-5">
+        <div><label class="text-[10px] font-bold uppercase">Username</label><input type="text" id="adminUser" autocomplete="username" class="w-full bg-secondary rounded-2xl py-4 px-4 focus:ring-2 focus:ring-primary outline-none"/></div>
+        <div><label class="text-[10px] font-bold uppercase">Password</label><input type="password" id="adminPass" autocomplete="current-password" class="w-full bg-secondary rounded-2xl py-4 px-4 focus:ring-2 focus:ring-primary outline-none" onkeydown="if(event.key==='Enter')window.adminLogin()"/></div>
+        <div class="error-box" id="adminErr"></div>
+        <button id="adminLoginBtn" onclick="window.adminLogin()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl">Admin Access</button>
+      </div>
+    </div>
     <div class="mt-8 text-center"><a href="#" onclick="window.showUserLogin(event)" class="text-sm text-muted-foreground flex items-center justify-center gap-2"><iconify-icon icon="lucide:arrow-left"></iconify-icon> User Login</a></div>
   </div>
 </div>
@@ -199,40 +218,207 @@ tbody tr:hover { background: #F8FAFC; }
 <!-- USER DASHBOARD -->
 <div id="dashPage" class="page bg-background min-h-screen pb-8">
   <div class="max-w-lg mx-auto px-5 py-6 space-y-5">
-    <div class="flex justify-between items-center"><div><h2 class="text-2xl font-extrabold tracking-tight">স্বাগতম, <span id="dashName" class="text-primary">User</span>!</h2><p class="text-xs text-muted-foreground">Withdrawal Portal</p></div><div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center"><iconify-icon icon="lucide:user" class="text-2xl text-primary"></iconify-icon></div></div>
-    <div class="grid grid-cols-3 gap-3"><div class="bg-card border rounded-3xl p-4"><div class="w-8 h-8 bg-purple-100 rounded-xl flex items-center justify-center mb-2"><iconify-icon icon="lucide:star" class="text-purple-600"></iconify-icon></div><div class="text-xl font-extrabold" id="dashTotalOtp">0</div><div class="text-[9px] font-bold text-muted-foreground uppercase">Total OTP</div></div><div class="bg-card border rounded-3xl p-4"><div class="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center mb-2"><iconify-icon icon="lucide:coins" class="text-blue-600"></iconify-icon></div><div class="text-xl font-extrabold" id="dashOtpBalance">৳0</div><div class="text-[9px] font-bold text-muted-foreground uppercase">OTP Value</div></div><div class="bg-card border rounded-3xl p-4"><div class="w-8 h-8 bg-red-100 rounded-xl flex items-center justify-center mb-2"><iconify-icon icon="lucide:arrow-down-right" class="text-red-500"></iconify-icon></div><div class="text-xl font-extrabold" id="dashWithdrawn">৳0</div><div class="text-[9px] font-bold text-muted-foreground uppercase">Withdrawn</div></div></div>
-    <div class="bg-primary rounded-[2rem] p-7 text-white relative overflow-hidden shadow-xl"><div class="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20 blur-2xl"></div><div class="relative"><p class="text-[10px] font-bold uppercase tracking-widest opacity-80">Available Balance</p><div class="flex items-baseline gap-1"><span class="text-2xl font-semibold">৳</span><span class="text-5xl font-extrabold" id="dashBalance">0</span></div><div class="mt-4 inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold"><iconify-icon icon="lucide:info"></iconify-icon><span id="dashBalanceMin">Min withdrawal ৳100</span></div></div></div>
-    <div class="bg-card border rounded-[2rem] p-6 shadow-sm"><div class="flex items-center gap-3 mb-5"><div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center"><iconify-icon icon="lucide:send" class="text-primary text-lg"></iconify-icon></div><div><h3 class="font-extrabold">New Withdrawal</h3><p class="text-[10px] text-muted-foreground font-bold uppercase">Select method</p></div></div>
-      <div class="grid grid-cols-3 gap-3 mb-5"><div class="method-btn active" onclick="window.selectMethod(this,'bKash')"><div class="text-2xl">💜</div><div>bKash</div></div><div class="method-btn" onclick="window.selectMethod(this,'Nagad')"><div class="text-2xl">🧡</div><div>Nagad</div></div><div class="method-btn" onclick="window.selectMethod(this,'Binance')"><div class="text-2xl">🟡</div><div>Binance</div></div></div>
-      <div class="space-y-4"><input type="text" id="wdName" class="w-full bg-secondary rounded-2xl py-3.5 px-4 outline-none focus:ring-2 focus:ring-primary" placeholder="পূর্ণ নাম"/><input type="text" id="wdNumber" class="w-full bg-secondary rounded-2xl py-3.5 px-4 outline-none" placeholder="01XXXXXXXXX"/><select id="wdAccType" class="w-full bg-secondary rounded-2xl py-3.5 px-4 outline-none"><option>Personal</option></select><input type="number" id="wdAmount" class="w-full bg-secondary rounded-2xl py-3.5 px-4 outline-none" placeholder="Amount (৳)" min="100"/><div class="error-box" id="wdErr"></div><button onclick="window.submitWithdraw()" class="w-full bg-primary text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2">Request Submit <iconify-icon icon="lucide:send"></iconify-icon></button></div>
+    <div class="flex justify-between items-center">
+      <div><h2 class="text-2xl font-extrabold tracking-tight">স্বাগতম, <span id="dashName" class="text-primary">User</span>!</h2><p class="text-xs text-muted-foreground">Withdrawal Portal</p></div>
+      <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center"><iconify-icon icon="lucide:user" class="text-2xl text-primary"></iconify-icon></div>
     </div>
-    <div class="bg-card border rounded-[2rem] p-6"><div class="flex gap-3 mb-4"><div class="w-10 h-10 bg-emerald-50 rounded-2xl flex items-center justify-center"><iconify-icon icon="lucide:list" class="text-tertiary"></iconify-icon></div><h3 class="font-extrabold text-lg">My Requests</h3></div><div id="myRequests"></div></div>
+    <div class="grid grid-cols-3 gap-3">
+      <div class="bg-card border rounded-3xl p-4"><div class="w-8 h-8 bg-purple-100 rounded-xl flex items-center justify-center mb-2"><iconify-icon icon="lucide:star" class="text-purple-600"></iconify-icon></div><div class="text-xl font-extrabold" id="dashTotalOtp">0</div><div class="text-[9px] font-bold text-muted-foreground uppercase">Total OTP</div></div>
+      <div class="bg-card border rounded-3xl p-4"><div class="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center mb-2"><iconify-icon icon="lucide:coins" class="text-blue-600"></iconify-icon></div><div class="text-xl font-extrabold" id="dashOtpBalance">৳0</div><div class="text-[9px] font-bold text-muted-foreground uppercase">OTP Value</div></div>
+      <div class="bg-card border rounded-3xl p-4"><div class="w-8 h-8 bg-red-100 rounded-xl flex items-center justify-center mb-2"><iconify-icon icon="lucide:arrow-down-right" class="text-red-500"></iconify-icon></div><div class="text-xl font-extrabold" id="dashWithdrawn">৳0</div><div class="text-[9px] font-bold text-muted-foreground uppercase">Withdrawn</div></div>
+    </div>
+    <div class="bg-primary rounded-[2rem] p-7 text-white relative overflow-hidden shadow-xl">
+      <div class="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20 blur-2xl"></div>
+      <div class="relative">
+        <p class="text-[10px] font-bold uppercase tracking-widest opacity-80">Available Balance</p>
+        <div class="flex items-baseline gap-1"><span class="text-2xl font-semibold">৳</span><span class="text-5xl font-extrabold" id="dashBalance">0</span></div>
+        <div class="mt-4 inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold"><iconify-icon icon="lucide:info"></iconify-icon><span id="dashBalanceMin">Min withdrawal ৳100</span></div>
+      </div>
+    </div>
+    <div class="bg-card border rounded-[2rem] p-6 shadow-sm">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center"><iconify-icon icon="lucide:send" class="text-primary text-lg"></iconify-icon></div>
+        <div><h3 class="font-extrabold">New Withdrawal</h3><p class="text-[10px] text-muted-foreground font-bold uppercase">Select method</p></div>
+      </div>
+      <div class="grid grid-cols-3 gap-3 mb-5">
+        <div class="method-btn active" onclick="window.selectMethod(this,'bKash')"><div class="text-2xl">💜</div><div>bKash</div></div>
+        <div class="method-btn" onclick="window.selectMethod(this,'Nagad')"><div class="text-2xl">🧡</div><div>Nagad</div></div>
+        <div class="method-btn" onclick="window.selectMethod(this,'Binance')"><div class="text-2xl">🟡</div><div>Binance</div></div>
+      </div>
+      <div class="space-y-4">
+        <input type="text" id="wdName" class="w-full bg-secondary rounded-2xl py-3.5 px-4 outline-none focus:ring-2 focus:ring-primary" placeholder="পূর্ণ নাম"/>
+        <input type="text" id="wdNumber" class="w-full bg-secondary rounded-2xl py-3.5 px-4 outline-none" placeholder="01XXXXXXXXX"/>
+        <select id="wdAccType" class="w-full bg-secondary rounded-2xl py-3.5 px-4 outline-none"><option>Personal</option><option>Agent</option><option>Merchant</option></select>
+        <input type="number" id="wdAmount" class="w-full bg-secondary rounded-2xl py-3.5 px-4 outline-none" placeholder="Amount (৳)" min="100"/>
+        <div class="error-box" id="wdErr"></div>
+        <button id="wdBtn" onclick="window.submitWithdraw()" class="w-full bg-primary text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2">Request Submit <iconify-icon icon="lucide:send"></iconify-icon></button>
+      </div>
+    </div>
+    <div class="bg-card border rounded-[2rem] p-6">
+      <div class="flex gap-3 mb-4"><div class="w-10 h-10 bg-emerald-50 rounded-2xl flex items-center justify-center"><iconify-icon icon="lucide:list" class="text-tertiary"></iconify-icon></div><h3 class="font-extrabold text-lg">My Requests</h3></div>
+      <div id="myRequests"></div>
+    </div>
   </div>
 </div>
 
 <!-- ADMIN PANEL -->
 <div id="adminPage" class="page bg-background min-h-screen pb-8">
   <div class="max-w-6xl mx-auto px-5 py-6">
-    <div class="flex gap-3 items-center mb-6"><div class="w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center"><iconify-icon icon="lucide:shield" class="text-white text-lg"></iconify-icon></div><div><h2 class="text-xl font-extrabold">Admin Control</h2><p class="text-xs text-muted-foreground">Withdrawal & user management</p></div></div>
+    <div class="flex gap-3 items-center mb-6">
+      <div class="w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center"><iconify-icon icon="lucide:shield" class="text-white text-lg"></iconify-icon></div>
+      <div><h2 class="text-xl font-extrabold">Admin Control</h2><p class="text-xs text-muted-foreground">Withdrawal & user management</p></div>
+    </div>
     <div class="admin-layout">
-      <div class="admin-nav-sidebar"><div class="bg-slate-900 rounded-[1.5rem] p-3 space-y-1"><div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white bg-white/10" onclick="window.showTab('overview',this)"><iconify-icon icon="lucide:pie-chart"></iconify-icon>Overview</div><div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('users',this)"><iconify-icon icon="lucide:users"></iconify-icon>Users</div><div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('otp',this)"><iconify-icon icon="lucide:zap"></iconify-icon>OTP update</div><div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('bulkUser',this)"><iconify-icon icon="lucide:users-round"></iconify-icon>Bulk User</div><div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('withdrawals',this)"><iconify-icon icon="lucide:banknote"></iconify-icon>Withdrawals</div><div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('settings',this)"><iconify-icon icon="lucide:settings"></iconify-icon>Settings</div></div></div>
+      <div class="admin-nav-sidebar">
+        <div class="bg-slate-900 rounded-[1.5rem] p-3 space-y-1">
+          <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white bg-white/10" onclick="window.showTab('overview',this)"><iconify-icon icon="lucide:pie-chart"></iconify-icon>Overview</div>
+          <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('users',this)"><iconify-icon icon="lucide:users"></iconify-icon>Users</div>
+          <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('otp',this)"><iconify-icon icon="lucide:zap"></iconify-icon>OTP update</div>
+          <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('bulkUser',this)"><iconify-icon icon="lucide:users-round"></iconify-icon>Bulk User</div>
+          <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('withdrawals',this)"><iconify-icon icon="lucide:banknote"></iconify-icon>Withdrawals</div>
+          <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('settings',this)"><iconify-icon icon="lucide:settings"></iconify-icon>Settings</div>
+        </div>
+      </div>
       <div class="space-y-5">
-        <div class="admin-panel active" id="tab-overview"><div class="grid grid-cols-2 sm:grid-cols-4 gap-4"><div class="bg-card border rounded-2xl p-5"><div class="w-10 h-10 bg-blue-50 rounded-xl mb-3 flex items-center justify-center"><iconify-icon icon="lucide:users" class="text-primary text-xl"></iconify-icon></div><div class="text-2xl font-extrabold" id="st-users">0</div><div class="text-xs font-bold uppercase text-muted-foreground">Total users</div></div><div class="bg-card border rounded-2xl p-5"><div class="w-10 h-10 bg-amber-50 rounded-xl mb-3"><iconify-icon icon="lucide:clock" class="text-amber-500 text-xl"></iconify-icon></div><div class="text-2xl font-extrabold text-amber-500" id="st-pending">0</div><div class="text-xs font-bold uppercase">Pending</div></div><div class="bg-card border rounded-2xl p-5"><div class="w-10 h-10 bg-emerald-50 rounded-xl mb-3"><iconify-icon icon="lucide:check-circle" class="text-tertiary text-xl"></iconify-icon></div><div class="text-2xl font-extrabold text-tertiary" id="st-approved">0</div><div class="text-xs font-bold uppercase">Approved</div></div><div class="bg-card border rounded-2xl p-5"><div class="w-10 h-10 bg-blue-50 rounded-xl mb-3"><iconify-icon icon="lucide:wallet" class="text-primary text-xl"></iconify-icon></div><div class="text-2xl font-extrabold text-primary" id="st-paid">৳0</div><div class="text-xs font-bold uppercase">Total paid</div></div></div><div class="bg-card border rounded-2xl p-6 mt-4"><h3 class="font-extrabold mb-4">Recent requests</h3><div id="recentList"></div></div></div>
-        
-        <div class="admin-panel" id="tab-users"><div class="bg-card border rounded-2xl p-6"><div class="flex gap-3 items-center mb-5"><div class="w-10 h-10 bg-blue-50 rounded-xl"><iconify-icon icon="lucide:user-plus" class="text-primary text-lg"></iconify-icon></div><h3 class="font-extrabold">Add new user</h3></div><div class="bg-secondary p-4 rounded-2xl flex flex-wrap gap-3 items-end"><input type="text" id="newUser" placeholder="Username" class="flex-1 bg-card border rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-primary"/><button onclick="window.addUser()" class="bg-primary text-white px-5 py-3 rounded-xl font-bold flex gap-2 items-center"><iconify-icon icon="lucide:plus"></iconify-icon>Add</button></div><div class="table-wrap mt-5"><table><thead><tr><th>Username</th><th>Total OTP</th><th>Rate</th><th>OTP balance</th><th>Withdrawn</th><th>Available</th><th>Login OTP</th><th>Actions</th></tr</thead><tbody id="usersTable"></tbody></table></div></div></div>
 
-        <!-- BULK USER ADDITION (NEW) -->
-        <div class="admin-panel" id="tab-bulkUser"><div class="bg-card border rounded-2xl p-6"><div class="flex gap-3 items-center mb-4"><div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center"><iconify-icon icon="lucide:users-round" class="text-indigo-600 text-xl"></iconify-icon></div><div><h3 class="font-extrabold">Bulk User Creation</h3><p class="text-[10px] text-muted-foreground uppercase font-bold">Add multiple users at once</p></div></div><div class="bg-amber-50 border border-amber-100 rounded-xl p-3 mb-5 text-sm text-amber-700 flex gap-2"><iconify-icon icon="lucide:alert-circle"></iconify-icon> Format: one username per line. Each user gets a unique 8-character OTP.</div><textarea id="bulkUserInput" class="w-full bg-secondary rounded-2xl p-4 min-h-[180px] font-mono text-sm outline-none" placeholder="Rakib123&#10;Tania_RT&#10;Faruk_007&#10;Shakil_Ahmed"></textarea><div id="bulkUserPreview" class="bulk-preview mt-3"></div><div class="flex gap-3 mt-4 flex-wrap"><button onclick="window.previewBulkUsers()" class="bg-gray-200 text-gray-800 py-2.5 px-5 rounded-xl font-bold flex gap-1 items-center"><iconify-icon icon="lucide:eye"></iconify-icon> Preview</button><button onclick="window.applyBulkUsers()" class="bg-indigo-700 text-white py-2.5 px-6 rounded-xl font-bold flex gap-2 items-center"><iconify-icon icon="lucide:save-all"></iconify-icon> Create Bulk Users</button><button onclick="document.getElementById('bulkUserInput').value='';document.getElementById('bulkUserPreview').style.display='none'" class="bg-secondary border px-5 rounded-xl">Clear</button></div></div></div>
+        <!-- OVERVIEW -->
+        <div class="admin-panel active" id="tab-overview">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="bg-card border rounded-2xl p-5"><div class="w-10 h-10 bg-blue-50 rounded-xl mb-3 flex items-center justify-center"><iconify-icon icon="lucide:users" class="text-primary text-xl"></iconify-icon></div><div class="text-2xl font-extrabold" id="st-users">0</div><div class="text-xs font-bold uppercase text-muted-foreground">Total users</div></div>
+            <div class="bg-card border rounded-2xl p-5"><div class="w-10 h-10 bg-amber-50 rounded-xl mb-3 flex items-center justify-center"><iconify-icon icon="lucide:clock" class="text-amber-500 text-xl"></iconify-icon></div><div class="text-2xl font-extrabold text-amber-500" id="st-pending">0</div><div class="text-xs font-bold uppercase">Pending</div></div>
+            <div class="bg-card border rounded-2xl p-5"><div class="w-10 h-10 bg-emerald-50 rounded-xl mb-3 flex items-center justify-center"><iconify-icon icon="lucide:check-circle" class="text-tertiary text-xl"></iconify-icon></div><div class="text-2xl font-extrabold text-tertiary" id="st-approved">0</div><div class="text-xs font-bold uppercase">Approved</div></div>
+            <div class="bg-card border rounded-2xl p-5"><div class="w-10 h-10 bg-blue-50 rounded-xl mb-3 flex items-center justify-center"><iconify-icon icon="lucide:wallet" class="text-primary text-xl"></iconify-icon></div><div class="text-2xl font-extrabold text-primary" id="st-paid">৳0</div><div class="text-xs font-bold uppercase">Total paid</div></div>
+          </div>
+          <div class="bg-card border rounded-2xl p-6 mt-4"><h3 class="font-extrabold mb-4">Recent requests</h3><div id="recentList"></div></div>
+        </div>
 
-        <div class="admin-panel" id="tab-otp"><div class="bg-card border rounded-2xl p-6"><div class="flex gap-3 mb-4"><div class="w-10 h-10 bg-purple-100 rounded-xl"><iconify-icon icon="lucide:zap" class="text-purple-600 text-xl"></iconify-icon></div><div><h3 class="font-extrabold">Bulk OTP Upload</h3><p class="text-[10px] text-muted-foreground">Username &nbsp; OTP count</p></div></div><div class="bg-blue-50 p-3 rounded-xl text-primary text-sm font-bold flex gap-2 items-center mb-4"><iconify-icon icon="lucide:info"></iconify-icon> Current rate: ৳<span id="currentRateDisplay">1</span> per OTP</div><textarea id="bulkOtpInput" class="w-full bg-secondary rounded-2xl p-4 min-h-[120px] font-mono text-sm outline-none" placeholder="RT_Rakib 1200&#10;RT_Shakil 875"></textarea><div id="bulkPreview" class="bulk-preview mt-3"></div><div class="flex gap-3 mt-4"><button onclick="window.applyBulkOtp()" class="bg-slate-900 text-white py-3 px-6 rounded-xl font-bold">Apply bulk</button><button onclick="document.getElementById('bulkOtpInput').value='';document.getElementById('bulkPreview').style.display='none'" class="bg-secondary border px-6 rounded-xl">Clear</button></div></div><div class="bg-card border rounded-2xl p-6 mt-5"><div class="flex gap-3 mb-4"><div class="w-10 h-10 bg-blue-50 rounded-xl"><iconify-icon icon="lucide:plus-circle" class="text-primary text-xl"></iconify-icon></div><div><h3 class="font-extrabold">Individual OTP</h3></div></div><div class="grid grid-cols-1 sm:grid-cols-3 gap-3"><input type="text" id="singleOtpUser" placeholder="Username" class="bg-secondary rounded-xl p-3 outline-none"/><input type="number" id="singleOtpCount" placeholder="OTP count" class="bg-secondary rounded-xl p-3 outline-none"/><button onclick="window.addSingleOtp()" class="bg-primary text-white py-3 rounded-xl font-bold">Add OTP</button></div></div></div>
+        <!-- USERS -->
+        <div class="admin-panel" id="tab-users">
+          <div class="bg-card border rounded-2xl p-6">
+            <div class="flex gap-3 items-center mb-5">
+              <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center"><iconify-icon icon="lucide:user-plus" class="text-primary text-lg"></iconify-icon></div>
+              <h3 class="font-extrabold">Add new user</h3>
+            </div>
+            <div class="bg-secondary p-4 rounded-2xl flex flex-wrap gap-3 items-end">
+              <input type="text" id="newUser" placeholder="Username" class="flex-1 bg-card border rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-primary"/>
+              <button onclick="window.addUser()" class="bg-primary text-white px-5 py-3 rounded-xl font-bold flex gap-2 items-center"><iconify-icon icon="lucide:plus"></iconify-icon>Add</button>
+            </div>
+            <div class="table-wrap mt-5">
+              <table>
+                <thead><tr><th>Username</th><th>Total OTP</th><th>Rate</th><th>OTP balance</th><th>Withdrawn</th><th>Available</th><th>Login OTP</th><th>Actions</th></tr></thead>
+                <tbody id="usersTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
 
-        <div class="admin-panel" id="tab-withdrawals"><div class="bg-card border rounded-2xl p-6"><div class="flex justify-between flex-wrap items-center mb-5"><h3 class="font-extrabold">All withdrawal requests</h3><div class="flex gap-2"><button class="filter-btn active" onclick="window.filterReq('all',this)">All</button><button class="filter-btn" onclick="window.filterReq('pending',this)">Pending</button><button class="filter-btn" onclick="window.filterReq('approved',this)">Approved</button><button class="filter-btn" onclick="window.filterReq('rejected',this)">Rejected</button></div></div><div class="table-wrap"><table><thead><tr><th>User</th><th>Method</th><th>Number/ID</th><th>Amount</th><th>Status</th><th>Action</th></tr</thead><tbody id="reqTable"></tbody></table></div></div></div>
-        <div class="admin-panel" id="tab-settings"><div class="bg-card border rounded-2xl p-6"><h3 class="font-extrabold flex gap-2 items-center mb-5"><iconify-icon icon="lucide:settings"></iconify-icon> System Config</h3><div class="max-w-md space-y-4"><div><label class="text-[10px] font-bold uppercase">Min withdrawal (৳)</label><input type="number" id="setMin" value="100" class="w-full bg-secondary rounded-2xl py-3 px-4 outline-none"/></div><div><label class="text-[10px] font-bold uppercase">OTP Rate (৳ per OTP)</label><input type="number" step="0.5" id="setOtpRate" value="1" class="w-full bg-secondary rounded-2xl py-3 px-4 outline-none"/></div><div><label class="text-[10px] font-bold uppercase">Admin username</label><input type="text" id="setAdminUser" class="w-full bg-secondary rounded-2xl py-3 px-4 outline-none"/></div><div><label class="text-[10px] font-bold uppercase">New admin password</label><input type="password" id="setAdminPass" class="w-full bg-secondary rounded-2xl py-3 px-4 outline-none"/></div><button onclick="window.saveSettings()" class="bg-primary text-white font-bold py-3 px-6 rounded-2xl flex gap-2 items-center"><iconify-icon icon="lucide:save"></iconify-icon> Save settings</button></div></div></div>
+        <!-- BULK USER -->
+        <div class="admin-panel" id="tab-bulkUser">
+          <div class="bg-card border rounded-2xl p-6">
+            <div class="flex gap-3 items-center mb-4">
+              <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center"><iconify-icon icon="lucide:users-round" class="text-indigo-600 text-xl"></iconify-icon></div>
+              <div><h3 class="font-extrabold">Bulk User Creation</h3><p class="text-[10px] text-muted-foreground uppercase font-bold">Add multiple users at once</p></div>
+            </div>
+            <div class="bg-amber-50 border border-amber-100 rounded-xl p-3 mb-5 text-sm text-amber-700 flex gap-2 items-start">
+              <iconify-icon icon="lucide:alert-circle" class="mt-0.5 shrink-0"></iconify-icon>
+              Format: one username per line. Each user gets a unique 8-character OTP.
+            </div>
+            <textarea id="bulkUserInput" class="w-full bg-secondary rounded-2xl p-4 min-h-[180px] font-mono text-sm outline-none" placeholder="Rakib123&#10;Tania_RT&#10;Faruk_007&#10;Shakil_Ahmed"></textarea>
+            <div id="bulkUserPreview" class="bulk-preview mt-3"></div>
+            <div class="flex gap-3 mt-4 flex-wrap">
+              <button onclick="window.previewBulkUsers()" class="bg-gray-200 text-gray-800 py-2.5 px-5 rounded-xl font-bold flex gap-1 items-center"><iconify-icon icon="lucide:eye"></iconify-icon> Preview</button>
+              <button onclick="window.applyBulkUsers()" class="bg-indigo-700 text-white py-2.5 px-6 rounded-xl font-bold flex gap-2 items-center"><iconify-icon icon="lucide:save-all"></iconify-icon> Create Bulk Users</button>
+              <button onclick="document.getElementById('bulkUserInput').value='';document.getElementById('bulkUserPreview').style.display='none'" class="bg-secondary border px-5 rounded-xl">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- OTP UPDATE -->
+        <div class="admin-panel" id="tab-otp">
+          <div class="bg-card border rounded-2xl p-6">
+            <div class="flex gap-3 mb-4">
+              <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center"><iconify-icon icon="lucide:zap" class="text-purple-600 text-xl"></iconify-icon></div>
+              <div><h3 class="font-extrabold">Bulk OTP Upload</h3><p class="text-[10px] text-muted-foreground">Username &nbsp; OTP count (space separated)</p></div>
+            </div>
+            <div class="bg-blue-50 p-3 rounded-xl text-primary text-sm font-bold flex gap-2 items-center mb-4"><iconify-icon icon="lucide:info"></iconify-icon> Current rate: ৳<span id="currentRateDisplay">1</span> per OTP</div>
+            <textarea id="bulkOtpInput" class="w-full bg-secondary rounded-2xl p-4 min-h-[120px] font-mono text-sm outline-none" placeholder="RT_Rakib 1200&#10;RT_Shakil 875"></textarea>
+            <div id="bulkPreview" class="bulk-preview mt-3"></div>
+            <div class="flex gap-3 mt-4">
+              <button onclick="window.previewBulkOtp()" class="bg-gray-200 text-gray-800 py-3 px-5 rounded-xl font-bold flex gap-1 items-center"><iconify-icon icon="lucide:eye"></iconify-icon> Preview</button>
+              <button onclick="window.applyBulkOtp()" class="bg-slate-900 text-white py-3 px-6 rounded-xl font-bold">Apply bulk</button>
+              <button onclick="document.getElementById('bulkOtpInput').value='';document.getElementById('bulkPreview').style.display='none'" class="bg-secondary border px-6 rounded-xl">Clear</button>
+            </div>
+          </div>
+          <div class="bg-card border rounded-2xl p-6 mt-5">
+            <div class="flex gap-3 mb-4">
+              <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center"><iconify-icon icon="lucide:plus-circle" class="text-primary text-xl"></iconify-icon></div>
+              <div><h3 class="font-extrabold">Individual OTP</h3></div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <input type="text" id="singleOtpUser" placeholder="Username" class="bg-secondary rounded-xl p-3 outline-none"/>
+              <input type="number" id="singleOtpCount" placeholder="OTP count" class="bg-secondary rounded-xl p-3 outline-none"/>
+              <button onclick="window.addSingleOtp()" class="bg-primary text-white py-3 rounded-xl font-bold">Add OTP</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- WITHDRAWALS -->
+        <div class="admin-panel" id="tab-withdrawals">
+          <div class="bg-card border rounded-2xl p-6">
+            <div class="flex justify-between flex-wrap items-center mb-5 gap-3">
+              <h3 class="font-extrabold">All withdrawal requests</h3>
+              <div class="flex gap-2 flex-wrap">
+                <button class="filter-btn active" onclick="window.filterReq('all',this)">All</button>
+                <button class="filter-btn" onclick="window.filterReq('pending',this)">Pending</button>
+                <button class="filter-btn" onclick="window.filterReq('approved',this)">Approved</button>
+                <button class="filter-btn" onclick="window.filterReq('rejected',this)">Rejected</button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>User</th><th>Method</th><th>Number/ID</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody id="reqTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div class="admin-panel" id="tab-settings">
+          <div class="bg-card border rounded-2xl p-6">
+            <h3 class="font-extrabold flex gap-2 items-center mb-5"><iconify-icon icon="lucide:settings"></iconify-icon> System Config</h3>
+            <div class="max-w-md space-y-4">
+              <div><label class="text-[10px] font-bold uppercase">Min withdrawal (৳)</label><input type="number" id="setMin" value="100" class="w-full bg-secondary rounded-2xl py-3 px-4 outline-none"/></div>
+              <div><label class="text-[10px] font-bold uppercase">OTP Rate (৳ per OTP)</label><input type="number" step="0.5" id="setOtpRate" value="1" class="w-full bg-secondary rounded-2xl py-3 px-4 outline-none"/></div>
+              <div class="border-t border-border pt-4 mt-4">
+                <p class="text-xs text-muted-foreground mb-3 font-bold">⚠️ Change admin credentials — leave blank to keep current</p>
+                <div class="space-y-3">
+                  <div><label class="text-[10px] font-bold uppercase">New admin username</label><input type="text" id="setAdminUser" class="w-full bg-secondary rounded-2xl py-3 px-4 outline-none" placeholder="Leave blank to keep current"/></div>
+                  <div><label class="text-[10px] font-bold uppercase">New admin password</label><input type="password" id="setAdminPass" class="w-full bg-secondary rounded-2xl py-3 px-4 outline-none" placeholder="Leave blank to keep current"/></div>
+                </div>
+              </div>
+              <button onclick="window.saveSettings()" class="bg-primary text-white font-bold py-3 px-6 rounded-2xl flex gap-2 items-center"><iconify-icon icon="lucide:save"></iconify-icon> Save settings</button>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
 </div>
-<div class="modal-bg" id="modal"><div class="bg-card rounded-2xl p-6 max-w-sm"><div id="modalTitle" class="font-extrabold text-lg mb-4"></div><div id="modalBody"></div><div class="flex gap-3 mt-6"><button onclick="window.closeModal()" class="flex-1 bg-secondary py-2 rounded-xl">Cancel</button><button id="modalOk" class="flex-1 bg-primary text-white py-2 rounded-xl">Confirm</button></div></div></div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal">
+  <div class="bg-card rounded-2xl p-6 max-w-sm w-full">
+    <div id="modalTitle" class="font-extrabold text-lg mb-4"></div>
+    <div id="modalBody"></div>
+    <div class="flex gap-3 mt-6">
+      <button onclick="window.closeModal()" class="flex-1 bg-secondary py-2 rounded-xl">Cancel</button>
+      <button id="modalOk" class="flex-1 bg-primary text-white py-2 rounded-xl">Confirm</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script type="importmap">
@@ -240,55 +426,649 @@ tbody tr:hover { background: #F8FAFC; }
 </script>
 <script type="module">
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp } from "firebase/firestore";
+import {
+  getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs,
+  updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp, where
+} from "firebase/firestore";
 
-const firebaseConfig = { apiKey: "AIzaSyB6DT5aVGDDW7IAPUMVAmQY8u5PMd1ZLe8", authDomain: "rattara-c6c23.firebaseapp.com", projectId: "rattara-c6c23", storageBucket: "rattara-c6c23.firebasestorage.app", messagingSenderId: "542423756114", appId: "1:542423756114:web:42b7cee066b284fe011e8b", measurementId: "G-PRR976LDTW" };
+// ─── Firebase config ───────────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyB6DT5aVGDDW7IAPUMVAmQY8u5PMd1ZLe8",
+  authDomain: "rattara-c6c23.firebaseapp.com",
+  projectId: "rattara-c6c23",
+  storageBucket: "rattara-c6c23.firebasestorage.app",
+  messagingSenderId: "542423756114",
+  appId: "1:542423756114:web:42b7cee066b284fe011e8b"
+};
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let currentUser=null, isAdmin=false, selectedMethod='bKash', reqFilter='all', allReqs=[], allUsers=[];
-let settings={minWithdraw:100, otpRate:1, adminUser:'admin', adminPass:'Tania-Rakib-5687'};
-let unsubAdmin=null, unsubUser=null, unsubReqs=null;
-const SESSION_KEY='rt_session', SESSION_DURATION=30*60*1000;
+// ─── State ─────────────────────────────────────────────────────────────────
+let currentUser = null;
+let isAdmin = false;
+let selectedMethod = 'bKash';
+let reqFilter = 'all';
+let allReqs = [];
+let allUsers = [];
+let settings = { minWithdraw: 100, otpRate: 1, adminUser: 'admin', adminPass: 'Tania-Rakib-5687' };
+let unsubAdmin = null, unsubUser = null, unsubReqs = null;
 
-window.selectMethod=(el,method)=>{document.querySelectorAll(".method-btn").forEach(b=>b.classList.remove("active")); el.classList.add("active"); selectedMethod=method; const inp=document.getElementById('wdNumber'); if(method==='Binance') inp.placeholder='UID or Email'; else inp.placeholder='01XXXXXXXXX'; };
-window.showToast=(msg,type='info')=>{const t=document.getElementById('toast'); t.textContent=msg; t.className=`show ${type}`; setTimeout(()=>t.className='',3200);};
-function saveSession(data){sessionStorage.setItem(SESSION_KEY,JSON.stringify({...data,ts:Date.now()}));}
-function loadSession(){try{let s=JSON.parse(sessionStorage.getItem(SESSION_KEY)); if(!s||Date.now()-s.ts>SESSION_DURATION){sessionStorage.removeItem(SESSION_KEY); return null;} return s;}catch{return null;}}
-function clearSession(){sessionStorage.removeItem(SESSION_KEY);}
-function startSessionTimer(){clearTimeout(window._sessionTimer); window._sessionTimer=setTimeout(()=>{window.showToast('Session expired. Login again','error'); window.logout();},SESSION_DURATION);}
-async function loadSettings(){try{const snap=await getDoc(doc(db,'config','settings')); if(snap.exists())settings={...settings,...snap.data()}; else await setDoc(doc(db,'config','settings'),settings); document.getElementById('setMin').value=settings.minWithdraw; document.getElementById('setOtpRate').value=settings.otpRate||1; document.getElementById('currentRateDisplay').innerText=settings.otpRate||1;}catch(e){console.log(e);}}
-function switchPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id)?.classList.add('active');}
-window.showAdminLogin=(e)=>{e?.preventDefault(); switchPage('adminLoginPage');};
-window.showUserLogin=(e)=>{e?.preventDefault(); switchPage('loginPage');};
-window.logout=()=>{clearSession(); if(unsubAdmin)unsubAdmin(); if(unsubUser)unsubUser(); if(unsubReqs)unsubReqs(); currentUser=null; isAdmin=false; document.getElementById('mainNav').classList.add('hidden'); switchPage('loginPage'); clearTimeout(window._sessionTimer);};
-window.userLogin=async()=>{const u=document.getElementById('loginUser').value.trim(),p=document.getElementById('loginPass').value.trim(),err=document.getElementById('loginErr'); err.style.display='none'; if(u===settings.adminUser&&p===settings.adminPass){isAdmin=true; saveSession({isAdmin:true}); document.getElementById('mainNav').classList.remove('hidden'); document.getElementById('navBadge').innerText='🔐 Admin'; switchPage('adminPage'); startAdminLiveListeners(); startSessionTimer(); return;} try{const snap=await getDoc(doc(db,'users',u.toLowerCase())); if(!snap.exists()||snap.data().otp!==p){err.innerText='Invalid username or OTP'; err.style.display='block'; return;} currentUser={id:u.toLowerCase(),...snap.data()}; saveSession({userId:currentUser.id}); document.getElementById('mainNav').classList.remove('hidden'); document.getElementById('navBadge').innerText='👤 '+(currentUser.username||currentUser.id); document.getElementById('dashName').innerText=currentUser.username||currentUser.id; switchPage('dashPage'); updateDashStats(); startUserLiveListeners(); startSessionTimer();}catch(e){err.innerText='Error connecting';err.style.display='block';}};
-window.adminLogin=()=>{const u=document.getElementById('adminUser').value.trim(),p=document.getElementById('adminPass').value.trim(),err=document.getElementById('adminErr'); err.style.display='none'; if(u===settings.adminUser&&p===settings.adminPass){isAdmin=true; saveSession({isAdmin:true}); document.getElementById('mainNav').classList.remove('hidden'); document.getElementById('navBadge').innerText='🔐 Admin'; switchPage('adminPage'); startAdminLiveListeners(); startSessionTimer();}else{err.innerText='Invalid credentials'; err.style.display='block';}};
-function updateDashStats(){if(!currentUser)return; let totalOtp=currentUser.totalOtp||0,rate=settings.otpRate||1,otpBalance=totalOtp*rate,withdrawn=currentUser.totalWithdrawn||0,available=Math.max(0,otpBalance-withdrawn); document.getElementById('dashTotalOtp').innerText=totalOtp; document.getElementById('dashOtpBalance').innerText='৳'+otpBalance; document.getElementById('dashWithdrawn').innerText='৳'+withdrawn; document.getElementById('dashBalance').innerText=available; document.getElementById('dashBalanceMin').innerText=`Min withdraw ৳${settings.minWithdraw}`;}
-function startUserLiveListeners(){if(!currentUser)return; if(unsubUser)unsubUser(); unsubUser=onSnapshot(doc(db,'users',currentUser.id),(snap)=>{if(snap.exists()){currentUser={id:currentUser.id,...snap.data()}; updateDashStats();}}); if(unsubReqs)unsubReqs(); unsubReqs=onSnapshot(query(collection(db,'withdrawals'),orderBy('createdAt','desc')),(snap)=>{let mine=snap.docs.filter(d=>d.data().userId===currentUser.id); let container=document.getElementById('myRequests'); if(!mine.length){container.innerHTML='<div class="text-center py-6 text-muted-foreground">No requests</div>'; return;} container.innerHTML=mine.map(d=>{let r=d.data(); let badge=r.status==='pending'?'badge-pending':r.status==='approved'?'badge-approved':'badge-rejected'; let label=r.status==='pending'?'⏳ Pending':r.status==='approved'?'✅ Approved':'❌ Rejected'; return `<div class="req-item"><div><div class="font-bold">৳${r.amount} — ${r.method}</div><div class="text-xs text-muted-foreground">${r.number} • ${r.fullName}</div></div><span class="badge ${badge}">${label}</span></div>`;}).join('');});}
-window.submitWithdraw=async()=>{const fullName=document.getElementById('wdName').value.trim(),number=document.getElementById('wdNumber').value.trim(),accountType=document.getElementById('wdAccType').value,amount=parseInt(document.getElementById('wdAmount').value),err=document.getElementById('wdErr'); err.style.display='none'; if(!fullName||!number){err.innerText='Name & Number required'; err.style.display='block'; return;} if(selectedMethod!=='Binance'&&!/^01[3-9]\d{8}$/.test(number)){err.innerText='Valid BD number required';err.style.display='block';return;} let totalOtp=currentUser.totalOtp||0,rate=settings.otpRate||1,otpBalance=totalOtp*rate,withdrawn=currentUser.totalWithdrawn||0,available=Math.max(0,otpBalance-withdrawn); if(amount<settings.minWithdraw||amount>available){err.innerText=`Amount must be between ${settings.minWithdraw} and ${available}`; err.style.display='block';return;} const snap=await getDocs(collection(db,'withdrawals')); let hasPending=snap.docs.some(d=>d.data().userId===currentUser.id&&d.data().status==='pending'); if(hasPending){err.innerText='You have a pending request already'; err.style.display='block'; return;} await addDoc(collection(db,'withdrawals'),{userId:currentUser.id,username:currentUser.username||currentUser.id,fullName,number,accountType,amount,method:selectedMethod,status:'pending',createdAt:serverTimestamp()}); window.showToast('Withdrawal request submitted','success'); document.getElementById('wdName').value=''; document.getElementById('wdNumber').value=''; document.getElementById('wdAmount').value='';};
-function startAdminLiveListeners(){if(unsubUser)unsubUser(); unsubUser=onSnapshot(collection(db,'users'),(snap)=>{allUsers=snap.docs.map(d=>({id:d.id,...d.data()})); renderUsersTable();}); if(unsubReqs)unsubReqs(); unsubReqs=onSnapshot(query(collection(db,'withdrawals'),orderBy('createdAt','desc')),(snap)=>{allReqs=snap.docs.map(d=>({id:d.id,...d.data()})); let pending=allReqs.filter(r=>r.status==='pending'),approved=allReqs.filter(r=>r.status==='approved'),totalPaid=approved.reduce((s,r)=>s+(r.amount||0),0); document.getElementById('st-users').innerText=allUsers.length; document.getElementById('st-pending').innerText=pending.length; document.getElementById('st-approved').innerText=approved.length; document.getElementById('st-paid').innerText='৳'+totalPaid; renderReqTable(); document.getElementById('recentList').innerHTML=allReqs.slice(0,5).map(r=>`<div class="req-item"><div><strong>${r.username}</strong> — ৳${r.amount} (${r.method})<div class="text-xs text-muted-foreground">${r.number}</div></div><span class="badge ${r.status==='pending'?'badge-pending':r.status==='approved'?'badge-approved':'badge-rejected'}">${r.status}</span></div>`).join('')||'<div class="text-center text-muted-foreground">No requests</div>';});}
-function renderUsersTable(){let rate=settings.otpRate||1; document.getElementById('usersTable').innerHTML=allUsers.length?allUsers.map(u=>{let totalOtp=u.totalOtp||0,otpBalance=totalOtp*rate,withdrawn=u.totalWithdrawn||0,available=Math.max(0,otpBalance-withdrawn); return `<tr><td><strong>${u.username||u.id}</strong></td><td>${totalOtp}</td><td>৳${rate}</td><td>৳${otpBalance}</td><td>৳${withdrawn}</td><td>৳${available}</td><td><span class="otp-tag">${u.otp||'—'}</span></td><td><div class="flex gap-2"><button class="btn-xs btn-gold-xs" onclick="window.newOtp('${u.id}')">🔑 New OTP</button><button class="btn-xs btn-danger-xs" onclick="window.delUser('${u.id}')">Delete</button></div></td></tr>`;}).join(''):'<tr><td colspan="8" class="text-center py-6">No users</td></tr>';}
-function renderReqTable(){let list=reqFilter==='all'?allReqs:allReqs.filter(r=>r.status===reqFilter); document.getElementById('reqTable').innerHTML=list.length?list.map(r=>`<tr><td><strong>${r.username}</strong></td><td>${r.method}</td><td>${r.number}<br><span class="text-xs text-muted-foreground">${r.accountType}</span></td><td>৳${r.amount}</td><td><span class="badge ${r.status==='pending'?'badge-pending':r.status==='approved'?'badge-approved':'badge-rejected'}">${r.status}</span></td><td>${r.status==='pending'?`<button class="btn-xs btn-success-xs" onclick="window.approveReq('${r.id}','${r.userId}',${r.amount})">✓ Approve</button> <button class="btn-xs btn-danger-xs" onclick="window.rejectReq('${r.id}')">✗ Reject</button>`:'—'}</td></tr>`).join(''):'<tr><td colspan="6" class="text-center py-6">No requests</td></tr>';}
-window.filterReq=(f,el)=>{reqFilter=f; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); renderReqTable();};
-window.approveReq=async(reqId,userId,amount)=>{await updateDoc(doc(db,'withdrawals',reqId),{status:'approved'}); const uSnap=await getDoc(doc(db,'users',userId)); let cur=uSnap.data()?.totalWithdrawn||0; await updateDoc(doc(db,'users',userId),{totalWithdrawn:cur+amount}); window.showToast('Approved','success');};
-window.rejectReq=async(reqId)=>{await updateDoc(doc(db,'withdrawals',reqId),{status:'rejected'}); window.showToast('Rejected','error');};
-window.addUser=async()=>{let username=document.getElementById('newUser').value.trim(); if(!username)return; let otp=Math.random().toString(36).substring(2,10).toUpperCase(); let ref=doc(db,'users',username.toLowerCase()); if((await getDoc(ref)).exists()){window.showToast('User exists','error');return;} await setDoc(ref,{username,totalOtp:0,totalWithdrawn:0,otp,createdAt:serverTimestamp()}); window.showToast(`User added. OTP: ${otp}`,'info'); document.getElementById('newUser').value='';};
-window.parseBulkData=(raw)=>raw.split('\n').map(l=>l.trim()).filter(l=>l&&!l.startsWith('//')).map(l=>{let parts=l.split(/\s+/); if(parts.length<2)return null; let cnt=parseInt(parts[parts.length-1]); let user=parts.slice(0,parts.length-1).join(''); if(!user||isNaN(cnt))return null; return{username:user,count:cnt};}).filter(Boolean);
-window.previewBulk=()=>{let raw=document.getElementById('bulkOtpInput').value; let previewDiv=document.getElementById('bulkPreview'); let lines=window.parseBulkData(raw); if(!lines.length){previewDiv.style.display='none';return;} previewDiv.style.display='block'; previewDiv.innerHTML=`<strong>📋 ${lines.length} entries</strong>`+lines.map(({username,count})=>{let found=allUsers.find(u=>u.id===username.toLowerCase()||(u.username||'').toLowerCase()===username.toLowerCase()); let curOtp=found?(found.totalOtp||0):0; return `<div class="bulk-row"><span>${username}</span><span>+${count} OTP ${found?`<span class="bulk-found">(${curOtp}→${curOtp+count})</span>`:'<span class="bulk-notfound">(missing)</span>'}</span></div>`;}).join('');};
-window.applyBulkOtp=async()=>{let raw=document.getElementById('bulkOtpInput').value; let lines=window.parseBulkData(raw); if(!lines.length){window.showToast('No valid data','error');return;} let updated=0,notFound=0; for(let {username,count} of lines){let found=allUsers.find(u=>u.id===username.toLowerCase()||(u.username||'').toLowerCase()===username.toLowerCase()); if(!found){notFound++;continue;} let cur=found.totalOtp||0; await updateDoc(doc(db,'users',found.id),{totalOtp:cur+count}); updated++;} window.showToast(`✅ ${updated} updated, ${notFound} not found`,'success'); document.getElementById('bulkOtpInput').value=''; document.getElementById('bulkPreview').style.display='none';};
-window.addSingleOtp=async()=>{let username=document.getElementById('singleOtpUser').value.trim(),cnt=parseInt(document.getElementById('singleOtpCount').value); if(!username||isNaN(cnt)||cnt<=0)return; let found=allUsers.find(u=>u.id===username.toLowerCase()||(u.username||'').toLowerCase()===username.toLowerCase()); if(!found){window.showToast('User not found','error');return;} let cur=found.totalOtp||0; await updateDoc(doc(db,'users',found.id),{totalOtp:cur+cnt}); window.showToast(`${found.username}: +${cnt} OTP`,'success'); document.getElementById('singleOtpUser').value=''; document.getElementById('singleOtpCount').value='';};
-window.newOtp=async(userId)=>{let otp=Math.random().toString(36).substring(2,10).toUpperCase(); await updateDoc(doc(db,'users',userId),{otp}); window.showToast(`New Login OTP: ${otp}`,'info');};
-window.delUser=async(userId)=>{if(confirm('Delete user permanently?')){await deleteDoc(doc(db,'users',userId)); window.showToast('User deleted','error');}};
-window.saveSettings=async()=>{let min=parseInt(document.getElementById('setMin').value)||100; let rate=parseFloat(document.getElementById('setOtpRate').value)||1; let adminU=document.getElementById('setAdminUser').value.trim(); let adminP=document.getElementById('setAdminPass').value.trim(); if(adminU)settings.adminUser=adminU; if(adminP)settings.adminPass=adminP; settings.minWithdraw=min; settings.otpRate=rate; await setDoc(doc(db,'config','settings'),settings); document.getElementById('currentRateDisplay').innerText=rate; renderUsersTable(); window.showToast('Settings saved','success');};
-window.showTab=(tab,el)=>{document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active')); document.querySelectorAll('.admin-nav-item').forEach(m=>{m.classList.remove('bg-white/10','text-white');m.classList.add('text-white/50');}); document.getElementById('tab-'+tab).classList.add('active'); el.classList.remove('text-white/50'); el.classList.add('bg-white/10','text-white');};
-window.closeModal=()=>document.getElementById('modal').classList.remove('open');
+const SESSION_KEY = 'rt_session';
+const SESSION_DURATION = 30 * 60 * 1000; // 30 minutes
 
-// BULK USER METHODS
-window.previewBulkUsers=()=>{let raw=document.getElementById('bulkUserInput').value.trim(); let previewDiv=document.getElementById('bulkUserPreview'); if(!raw){previewDiv.style.display='none';return;} let usernames=raw.split('\n').map(l=>l.trim()).filter(l=>l.length>0); let unique=[...new Set(usernames)]; let existingUsers=allUsers.map(u=>u.username?.toLowerCase()||u.id); let newList=unique.filter(u=>!existingUsers.includes(u.toLowerCase())); previewDiv.style.display='block'; previewDiv.innerHTML=`<div class="font-bold mb-2">📋 ${unique.length} total, ${newList.length} will be created</div>`+unique.map(u=>{let exists=existingUsers.includes(u.toLowerCase()); return `<div class="bulk-row"><span>${u}</span><span class="${exists?'bulk-notfound':'bulk-found'}">${exists?'⛔ exists':'✅ new'}</span></div>`;}).join('');};
-window.applyBulkUsers=async()=>{let raw=document.getElementById('bulkUserInput').value.trim(); if(!raw){window.showToast('Enter usernames first','error');return;} let usernames=raw.split('\n').map(l=>l.trim()).filter(l=>l.length>0); let unique=[...new Set(usernames)]; let existingUsers=allUsers.map(u=>u.username?.toLowerCase()||u.id); let toCreate=unique.filter(u=>!existingUsers.includes(u.toLowerCase())); if(toCreate.length===0){window.showToast('No new users to add','info');return;} let created=0; for(let uname of toCreate){let otp=Math.random().toString(36).substring(2,10).toUpperCase(); let ref=doc(db,'users',uname.toLowerCase()); if(!(await getDoc(ref)).exists()){await setDoc(ref,{username:uname,totalOtp:0,totalWithdrawn:0,otp,createdAt:serverTimestamp()}); created++;}} window.showToast(`✅ ${created} new users created with random OTP`,'success'); document.getElementById('bulkUserInput').value=''; document.getElementById('bulkUserPreview').style.display='none';};
+// ─── Helpers ────────────────────────────────────────────────────────────────
+function genOtp() {
+  return Math.random().toString(36).substring(2, 10).toUpperCase();
+}
 
-window.addEventListener('load',async()=>{await loadSettings(); setTimeout(async()=>{document.getElementById('loader').classList.add('hide'); let sess=loadSession(); if(sess){if(sess.isAdmin){isAdmin=true; document.getElementById('mainNav').classList.remove('hidden'); document.getElementById('navBadge').innerText='🔐 Admin'; switchPage('adminPage'); startAdminLiveListeners(); startSessionTimer();}else if(sess.userId){let snap=await getDoc(doc(db,'users',sess.userId)); if(snap.exists()){currentUser={id:sess.userId,...snap.data()}; document.getElementById('mainNav').classList.remove('hidden'); document.getElementById('navBadge').innerText='👤 '+(currentUser.username||currentUser.id); document.getElementById('dashName').innerText=currentUser.username||currentUser.id; switchPage('dashPage'); updateDashStats(); startUserLiveListeners(); startSessionTimer();}}}},800);});
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = loading;
+}
+
+window.showToast = (msg, type = 'info') => {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `show ${type}`;
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.className = '', 3200);
+};
+
+function saveSession(data) {
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ ...data, ts: Date.now() }));
+}
+
+function loadSession() {
+  try {
+    const s = JSON.parse(sessionStorage.getItem(SESSION_KEY));
+    if (!s || Date.now() - s.ts > SESSION_DURATION) {
+      sessionStorage.removeItem(SESSION_KEY);
+      return null;
+    }
+    return s;
+  } catch { return null; }
+}
+
+function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
+
+// Reset session timer on any user activity
+function resetSessionTimer() {
+  clearTimeout(window._sessionTimer);
+  window._sessionTimer = setTimeout(() => {
+    window.showToast('Session expired. Please login again.', 'error');
+    window.logout();
+  }, SESSION_DURATION);
+}
+
+function bindActivityListeners() {
+  ['click', 'keydown', 'mousemove', 'touchstart'].forEach(ev =>
+    document.addEventListener(ev, resetSessionTimer, { passive: true })
+  );
+}
+
+function unbindActivityListeners() {
+  ['click', 'keydown', 'mousemove', 'touchstart'].forEach(ev =>
+    document.removeEventListener(ev, resetSessionTimer)
+  );
+}
+
+function switchPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active');
+}
+
+// ─── Auth ───────────────────────────────────────────────────────────────────
+async function loadSettings() {
+  try {
+    const snap = await getDoc(doc(db, 'config', 'settings'));
+    if (snap.exists()) settings = { ...settings, ...snap.data() };
+    else await setDoc(doc(db, 'config', 'settings'), settings);
+    document.getElementById('setMin').value = settings.minWithdraw;
+    document.getElementById('setOtpRate').value = settings.otpRate || 1;
+    document.getElementById('currentRateDisplay').innerText = settings.otpRate || 1;
+  } catch (e) { console.error('loadSettings:', e); }
+}
+
+window.showAdminLogin = (e) => { e?.preventDefault(); switchPage('adminLoginPage'); };
+window.showUserLogin = (e) => { e?.preventDefault(); switchPage('loginPage'); };
+
+window.logout = () => {
+  clearSession();
+  unbindActivityListeners();
+  clearTimeout(window._sessionTimer);
+  if (unsubAdmin) { unsubAdmin(); unsubAdmin = null; }
+  if (unsubUser) { unsubUser(); unsubUser = null; }
+  if (unsubReqs) { unsubReqs(); unsubReqs = null; }
+  currentUser = null;
+  isAdmin = false;
+  document.getElementById('mainNav').classList.add('hidden');
+  switchPage('loginPage');
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginErr').style.display = 'none';
+};
+
+window.userLogin = async () => {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value.trim();
+  const err = document.getElementById('loginErr');
+  err.style.display = 'none';
+  if (!u || !p) { err.innerText = 'Username and OTP required'; err.style.display = 'block'; return; }
+
+  // Admin shortcut via user login
+  if (u === settings.adminUser && p === settings.adminPass) {
+    _enterAdmin();
+    return;
+  }
+
+  setLoading('loginBtn', true);
+  try {
+    const snap = await getDoc(doc(db, 'users', u.toLowerCase()));
+    if (!snap.exists() || snap.data().otp !== p) {
+      err.innerText = 'Invalid username or OTP';
+      err.style.display = 'block';
+      setLoading('loginBtn', false);
+      return;
+    }
+    currentUser = { id: u.toLowerCase(), ...snap.data() };
+    saveSession({ userId: currentUser.id });
+    document.getElementById('mainNav').classList.remove('hidden');
+    document.getElementById('navBadge').innerText = '👤 ' + (currentUser.username || currentUser.id);
+    document.getElementById('dashName').innerText = currentUser.username || currentUser.id;
+    switchPage('dashPage');
+    updateDashStats();
+    startUserLiveListeners();
+    bindActivityListeners();
+    resetSessionTimer();
+  } catch (e) {
+    err.innerText = 'Connection error. Try again.';
+    err.style.display = 'block';
+  }
+  setLoading('loginBtn', false);
+};
+
+window.adminLogin = () => {
+  const u = document.getElementById('adminUser').value.trim();
+  const p = document.getElementById('adminPass').value.trim();
+  const err = document.getElementById('adminErr');
+  err.style.display = 'none';
+  if (u === settings.adminUser && p === settings.adminPass) {
+    _enterAdmin();
+  } else {
+    err.innerText = 'Invalid credentials';
+    err.style.display = 'block';
+  }
+};
+
+function _enterAdmin() {
+  isAdmin = true;
+  saveSession({ isAdmin: true });
+  document.getElementById('mainNav').classList.remove('hidden');
+  document.getElementById('navBadge').innerText = '🔐 Admin';
+  document.getElementById('adminUser').value = '';
+  document.getElementById('adminPass').value = '';
+  switchPage('adminPage');
+  startAdminLiveListeners();
+  bindActivityListeners();
+  resetSessionTimer();
+}
+
+// ─── Dashboard stats ────────────────────────────────────────────────────────
+function calcAvailable(user) {
+  const totalOtp = user.totalOtp || 0;
+  const rate = settings.otpRate || 1;
+  const otpBalance = totalOtp * rate;
+  const withdrawn = user.totalWithdrawn || 0;
+  const pending = user.totalPending || 0;
+  return Math.max(0, otpBalance - withdrawn - pending);
+}
+
+function updateDashStats() {
+  if (!currentUser) return;
+  const totalOtp = currentUser.totalOtp || 0;
+  const rate = settings.otpRate || 1;
+  const otpBalance = totalOtp * rate;
+  const withdrawn = currentUser.totalWithdrawn || 0;
+  const available = calcAvailable(currentUser);
+  document.getElementById('dashTotalOtp').innerText = totalOtp;
+  document.getElementById('dashOtpBalance').innerText = '৳' + otpBalance;
+  document.getElementById('dashWithdrawn').innerText = '৳' + withdrawn;
+  document.getElementById('dashBalance').innerText = available;
+  document.getElementById('dashBalanceMin').innerText = `Min withdraw ৳${settings.minWithdraw}`;
+}
+
+// ─── User live listeners ────────────────────────────────────────────────────
+function startUserLiveListeners() {
+  if (!currentUser) return;
+  if (unsubUser) unsubUser();
+  unsubUser = onSnapshot(doc(db, 'users', currentUser.id), snap => {
+    if (snap.exists()) {
+      currentUser = { id: currentUser.id, ...snap.data() };
+      updateDashStats();
+    }
+  });
+  if (unsubReqs) unsubReqs();
+  unsubReqs = onSnapshot(
+    query(collection(db, 'withdrawals'), orderBy('createdAt', 'desc')),
+    snap => {
+      const mine = snap.docs.filter(d => d.data().userId === currentUser.id);
+      const container = document.getElementById('myRequests');
+      if (!mine.length) {
+        container.innerHTML = '<div class="text-center py-6 text-muted-foreground">No requests yet</div>';
+        return;
+      }
+      container.innerHTML = mine.map(d => {
+        const r = d.data();
+        const badge = r.status === 'pending' ? 'badge-pending' : r.status === 'approved' ? 'badge-approved' : 'badge-rejected';
+        const label = r.status === 'pending' ? '⏳ Pending' : r.status === 'approved' ? '✅ Approved' : '❌ Rejected';
+        return `<div class="req-item"><div><div class="font-bold">৳${r.amount} — ${r.method}</div><div class="text-xs text-muted-foreground">${r.number} • ${r.fullName}</div></div><span class="badge ${badge}">${label}</span></div>`;
+      }).join('');
+    }
+  );
+}
+
+// ─── Withdrawal submit ───────────────────────────────────────────────────────
+window.selectMethod = (el, method) => {
+  document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  selectedMethod = method;
+  document.getElementById('wdNumber').placeholder = method === 'Binance' ? 'UID or Email' : '01XXXXXXXXX';
+};
+
+window.submitWithdraw = async () => {
+  const fullName = document.getElementById('wdName').value.trim();
+  const number = document.getElementById('wdNumber').value.trim();
+  const accountType = document.getElementById('wdAccType').value;
+  const amount = parseInt(document.getElementById('wdAmount').value);
+  const err = document.getElementById('wdErr');
+  err.style.display = 'none';
+
+  if (!fullName || !number) { err.innerText = 'Name & Number required'; err.style.display = 'block'; return; }
+  if (selectedMethod !== 'Binance' && !/^01[3-9]\d{8}$/.test(number)) { err.innerText = 'Valid BD number required (01X-XXXXXXXX)'; err.style.display = 'block'; return; }
+
+  const available = calcAvailable(currentUser);
+  if (isNaN(amount) || amount < settings.minWithdraw) {
+    err.innerText = `Minimum withdrawal is ৳${settings.minWithdraw}`;
+    err.style.display = 'block'; return;
+  }
+  if (amount > available) {
+    err.innerText = `Insufficient balance. Available: ৳${available}`;
+    err.style.display = 'block'; return;
+  }
+
+  setLoading('wdBtn', true);
+  try {
+    // Re-check for pending requests server-side
+    const pendingSnap = await getDocs(
+      query(collection(db, 'withdrawals'),
+        where('userId', '==', currentUser.id),
+        where('status', '==', 'pending'))
+    );
+    if (!pendingSnap.empty) {
+      err.innerText = 'You already have a pending request. Wait for it to be processed.';
+      err.style.display = 'block';
+      setLoading('wdBtn', false); return;
+    }
+
+    // Re-read current user balance from Firestore to prevent race conditions
+    const freshUser = await getDoc(doc(db, 'users', currentUser.id));
+    if (!freshUser.exists()) { err.innerText = 'User not found'; err.style.display = 'block'; setLoading('wdBtn', false); return; }
+    const freshData = freshUser.data();
+    const freshAvailable = Math.max(0, (freshData.totalOtp || 0) * (settings.otpRate || 1) - (freshData.totalWithdrawn || 0) - (freshData.totalPending || 0));
+    if (amount > freshAvailable) {
+      err.innerText = `Insufficient balance. Available: ৳${freshAvailable}`;
+      err.style.display = 'block'; setLoading('wdBtn', false); return;
+    }
+
+    // Reserve pending amount on user doc to prevent over-withdrawal
+    await updateDoc(doc(db, 'users', currentUser.id), { totalPending: (freshData.totalPending || 0) + amount });
+
+    await addDoc(collection(db, 'withdrawals'), {
+      userId: currentUser.id,
+      username: currentUser.username || currentUser.id,
+      fullName, number, accountType, amount,
+      method: selectedMethod,
+      status: 'pending',
+      createdAt: serverTimestamp()
+    });
+
+    window.showToast('Withdrawal request submitted successfully', 'success');
+    document.getElementById('wdName').value = '';
+    document.getElementById('wdNumber').value = '';
+    document.getElementById('wdAmount').value = '';
+  } catch (e) {
+    console.error('submitWithdraw:', e);
+    err.innerText = 'Error submitting request. Please try again.';
+    err.style.display = 'block';
+  }
+  setLoading('wdBtn', false);
+};
+
+// ─── Admin live listeners ────────────────────────────────────────────────────
+function startAdminLiveListeners() {
+  if (unsubUser) unsubUser();
+  unsubUser = onSnapshot(collection(db, 'users'), snap => {
+    allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderUsersTable();
+    document.getElementById('st-users').innerText = allUsers.length;
+  });
+  if (unsubReqs) unsubReqs();
+  unsubReqs = onSnapshot(
+    query(collection(db, 'withdrawals'), orderBy('createdAt', 'desc')),
+    snap => {
+      allReqs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const pending = allReqs.filter(r => r.status === 'pending');
+      const approved = allReqs.filter(r => r.status === 'approved');
+      const totalPaid = approved.reduce((s, r) => s + (r.amount || 0), 0);
+      document.getElementById('st-pending').innerText = pending.length;
+      document.getElementById('st-approved').innerText = approved.length;
+      document.getElementById('st-paid').innerText = '৳' + totalPaid;
+      renderReqTable();
+      document.getElementById('recentList').innerHTML = allReqs.slice(0, 5).map(r =>
+        `<div class="req-item"><div><strong>${r.username}</strong> — ৳${r.amount} (${r.method})<div class="text-xs text-muted-foreground">${r.number}</div></div><span class="badge ${r.status === 'pending' ? 'badge-pending' : r.status === 'approved' ? 'badge-approved' : 'badge-rejected'}">${r.status}</span></div>`
+      ).join('') || '<div class="text-center text-muted-foreground py-4">No requests</div>';
+    }
+  );
+}
+
+function renderUsersTable() {
+  const rate = settings.otpRate || 1;
+  document.getElementById('usersTable').innerHTML = allUsers.length
+    ? allUsers.map(u => {
+        const totalOtp = u.totalOtp || 0;
+        const otpBalance = totalOtp * rate;
+        const withdrawn = u.totalWithdrawn || 0;
+        const pending = u.totalPending || 0;
+        const available = Math.max(0, otpBalance - withdrawn - pending);
+        return `<tr>
+          <td><strong>${escHtml(u.username || u.id)}</strong></td>
+          <td>${totalOtp}</td>
+          <td>৳${rate}</td>
+          <td>৳${otpBalance}</td>
+          <td>৳${withdrawn}</td>
+          <td>৳${available}</td>
+          <td><span class="otp-tag">${escHtml(u.otp || '—')}</span></td>
+          <td><div class="flex gap-2">
+            <button class="btn-xs btn-gold-xs" onclick="window.newOtp('${escAttr(u.id)}')">🔑 New OTP</button>
+            <button class="btn-xs btn-danger-xs" onclick="window.delUser('${escAttr(u.id)}', '${escAttr(u.username || u.id)}')">Delete</button>
+          </div></td>
+        </tr>`;
+      }).join('')
+    : '<tr><td colspan="8" class="text-center py-6">No users yet</td></tr>';
+}
+
+function renderReqTable() {
+  const list = reqFilter === 'all' ? allReqs : allReqs.filter(r => r.status === reqFilter);
+  document.getElementById('reqTable').innerHTML = list.length
+    ? list.map(r => `<tr>
+        <td><strong>${escHtml(r.username)}</strong></td>
+        <td>${escHtml(r.method)}</td>
+        <td>${escHtml(r.number)}<br><span class="text-xs text-muted-foreground">${escHtml(r.accountType || '')}</span></td>
+        <td>৳${r.amount}</td>
+        <td><span class="badge ${r.status === 'pending' ? 'badge-pending' : r.status === 'approved' ? 'badge-approved' : 'badge-rejected'}">${r.status}</span></td>
+        <td>${r.status === 'pending'
+          ? `<button class="btn-xs btn-success-xs" onclick="window.approveReq('${escAttr(r.id)}','${escAttr(r.userId)}',${r.amount})">✓ Approve</button>
+             <button class="btn-xs btn-danger-xs" onclick="window.rejectReq('${escAttr(r.id)}','${escAttr(r.userId)}',${r.amount})">✗ Reject</button>`
+          : '—'}
+        </td>
+      </tr>`).join('')
+    : '<tr><td colspan="6" class="text-center py-6">No requests</td></tr>';
+}
+
+window.filterReq = (f, el) => {
+  reqFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderReqTable();
+};
+
+// ─── Approve / reject (with pending balance reconciliation) ─────────────────
+window.approveReq = async (reqId, userId, amount) => {
+  try {
+    await updateDoc(doc(db, 'withdrawals', reqId), { status: 'approved' });
+    const uSnap = await getDoc(doc(db, 'users', userId));
+    if (uSnap.exists()) {
+      const d = uSnap.data();
+      await updateDoc(doc(db, 'users', userId), {
+        totalWithdrawn: (d.totalWithdrawn || 0) + amount,
+        totalPending: Math.max(0, (d.totalPending || 0) - amount)
+      });
+    }
+    window.showToast('Request approved ✓', 'success');
+  } catch (e) {
+    console.error('approveReq:', e);
+    window.showToast('Error approving request', 'error');
+  }
+};
+
+window.rejectReq = async (reqId, userId, amount) => {
+  try {
+    await updateDoc(doc(db, 'withdrawals', reqId), { status: 'rejected' });
+    const uSnap = await getDoc(doc(db, 'users', userId));
+    if (uSnap.exists()) {
+      const d = uSnap.data();
+      // Release the reserved pending amount back to user
+      await updateDoc(doc(db, 'users', userId), {
+        totalPending: Math.max(0, (d.totalPending || 0) - amount)
+      });
+    }
+    window.showToast('Request rejected', 'error');
+  } catch (e) {
+    console.error('rejectReq:', e);
+    window.showToast('Error rejecting request', 'error');
+  }
+};
+
+// ─── User management ─────────────────────────────────────────────────────────
+window.addUser = async () => {
+  const username = document.getElementById('newUser').value.trim();
+  if (!username) return;
+  if (!/^[a-zA-Z0-9_\-\.]{3,30}$/.test(username)) {
+    window.showToast('Username must be 3–30 chars: letters, numbers, _ - .', 'error');
+    return;
+  }
+  const otp = genOtp();
+  const ref = doc(db, 'users', username.toLowerCase());
+  if ((await getDoc(ref)).exists()) { window.showToast('User already exists', 'error'); return; }
+  await setDoc(ref, { username, totalOtp: 0, totalWithdrawn: 0, totalPending: 0, otp, createdAt: serverTimestamp() });
+  window.showToast(`User added. Login OTP: ${otp}`, 'info');
+  document.getElementById('newUser').value = '';
+};
+
+window.newOtp = async (userId) => {
+  const otp = genOtp();
+  await updateDoc(doc(db, 'users', userId), { otp });
+  window.showToast(`New Login OTP: ${otp}`, 'info');
+};
+
+window.delUser = async (userId, username) => {
+  if (!confirm(`Permanently delete user "${username}"? This cannot be undone.`)) return;
+  await deleteDoc(doc(db, 'users', userId));
+  window.showToast('User deleted', 'error');
+};
+
+// ─── OTP bulk parse (fixed: username is everything before the last token) ────
+window.parseBulkData = (raw) => {
+  return raw.split('\n')
+    .map(l => l.trim())
+    .filter(l => l && !l.startsWith('//'))
+    .map(l => {
+      const parts = l.split(/\s+/);
+      if (parts.length < 2) return null;
+      const countStr = parts[parts.length - 1];
+      const cnt = parseInt(countStr);
+      if (isNaN(cnt) || cnt <= 0) return null;
+      // Everything before the last token is the username
+      const username = parts.slice(0, parts.length - 1).join('_');
+      if (!username) return null;
+      return { username, count: cnt };
+    })
+    .filter(Boolean);
+};
+
+// ─── Bulk OTP preview (was missing for OTP tab) ───────────────────────────
+window.previewBulkOtp = () => {
+  const raw = document.getElementById('bulkOtpInput').value;
+  const previewDiv = document.getElementById('bulkPreview');
+  const lines = window.parseBulkData(raw);
+  if (!lines.length) { previewDiv.style.display = 'none'; return; }
+  previewDiv.style.display = 'block';
+  previewDiv.innerHTML = `<strong class="block mb-2">📋 ${lines.length} entries found</strong>` +
+    lines.map(({ username, count }) => {
+      const found = allUsers.find(u =>
+        u.id === username.toLowerCase() ||
+        (u.username || '').toLowerCase() === username.toLowerCase()
+      );
+      const curOtp = found ? (found.totalOtp || 0) : 0;
+      return `<div class="bulk-row">
+        <span>${escHtml(username)}</span>
+        <span>+${count} ${found
+          ? `<span class="bulk-found">(${curOtp} → ${curOtp + count})</span>`
+          : '<span class="bulk-notfound">(user not found)</span>'}</span>
+      </div>`;
+    }).join('');
+};
+
+window.applyBulkOtp = async () => {
+  const raw = document.getElementById('bulkOtpInput').value;
+  const lines = window.parseBulkData(raw);
+  if (!lines.length) { window.showToast('No valid data found', 'error'); return; }
+  let updated = 0, notFound = 0;
+  for (const { username, count } of lines) {
+    const found = allUsers.find(u =>
+      u.id === username.toLowerCase() ||
+      (u.username || '').toLowerCase() === username.toLowerCase()
+    );
+    if (!found) { notFound++; continue; }
+    await updateDoc(doc(db, 'users', found.id), { totalOtp: (found.totalOtp || 0) + count });
+    updated++;
+  }
+  window.showToast(`✅ ${updated} updated, ${notFound} not found`, updated > 0 ? 'success' : 'error');
+  document.getElementById('bulkOtpInput').value = '';
+  document.getElementById('bulkPreview').style.display = 'none';
+};
+
+window.addSingleOtp = async () => {
+  const username = document.getElementById('singleOtpUser').value.trim();
+  const cnt = parseInt(document.getElementById('singleOtpCount').value);
+  if (!username || isNaN(cnt) || cnt <= 0) { window.showToast('Enter valid username and count', 'error'); return; }
+  const found = allUsers.find(u =>
+    u.id === username.toLowerCase() ||
+    (u.username || '').toLowerCase() === username.toLowerCase()
+  );
+  if (!found) { window.showToast('User not found', 'error'); return; }
+  await updateDoc(doc(db, 'users', found.id), { totalOtp: (found.totalOtp || 0) + cnt });
+  window.showToast(`${found.username}: +${cnt} OTP added`, 'success');
+  document.getElementById('singleOtpUser').value = '';
+  document.getElementById('singleOtpCount').value = '';
+};
+
+// ─── Bulk user creation ───────────────────────────────────────────────────────
+window.previewBulkUsers = () => {
+  const raw = document.getElementById('bulkUserInput').value.trim();
+  const previewDiv = document.getElementById('bulkUserPreview');
+  if (!raw) { previewDiv.style.display = 'none'; return; }
+  const usernames = [...new Set(raw.split('\n').map(l => l.trim()).filter(l => l.length > 0))];
+  const existingIds = allUsers.map(u => (u.username || u.id).toLowerCase());
+  previewDiv.style.display = 'block';
+  previewDiv.innerHTML = `<div class="font-bold mb-2">📋 ${usernames.length} total, ${usernames.filter(u => !existingIds.includes(u.toLowerCase())).length} will be created</div>` +
+    usernames.map(u => {
+      const exists = existingIds.includes(u.toLowerCase());
+      return `<div class="bulk-row"><span>${escHtml(u)}</span><span class="${exists ? 'bulk-notfound' : 'bulk-found'}">${exists ? '⛔ already exists' : '✅ will be created'}</span></div>`;
+    }).join('');
+};
+
+window.applyBulkUsers = async () => {
+  const raw = document.getElementById('bulkUserInput').value.trim();
+  if (!raw) { window.showToast('Enter usernames first', 'error'); return; }
+  const usernames = [...new Set(raw.split('\n').map(l => l.trim()).filter(l => l.length > 0))];
+  const existingIds = allUsers.map(u => (u.username || u.id).toLowerCase());
+  const toCreate = usernames.filter(u => !existingIds.includes(u.toLowerCase()));
+  if (!toCreate.length) { window.showToast('No new users to add — all already exist', 'info'); return; }
+  let created = 0;
+  for (const uname of toCreate) {
+    const otp = genOtp();
+    const ref = doc(db, 'users', uname.toLowerCase());
+    if (!(await getDoc(ref)).exists()) {
+      await setDoc(ref, { username: uname, totalOtp: 0, totalWithdrawn: 0, totalPending: 0, otp, createdAt: serverTimestamp() });
+      created++;
+    }
+  }
+  window.showToast(`✅ ${created} new users created with random OTP`, 'success');
+  document.getElementById('bulkUserInput').value = '';
+  document.getElementById('bulkUserPreview').style.display = 'none';
+};
+
+// ─── Settings ─────────────────────────────────────────────────────────────────
+window.saveSettings = async () => {
+  const min = parseInt(document.getElementById('setMin').value) || 100;
+  const rate = parseFloat(document.getElementById('setOtpRate').value) || 1;
+  const newAdminU = document.getElementById('setAdminUser').value.trim();
+  const newAdminP = document.getElementById('setAdminPass').value.trim();
+  // Only update if non-empty — prevent accidental lockout
+  if (newAdminU) settings.adminUser = newAdminU;
+  if (newAdminP) settings.adminPass = newAdminP;
+  settings.minWithdraw = min;
+  settings.otpRate = rate;
+  await setDoc(doc(db, 'config', 'settings'), settings);
+  document.getElementById('currentRateDisplay').innerText = rate;
+  document.getElementById('setAdminUser').value = '';
+  document.getElementById('setAdminPass').value = '';
+  renderUsersTable();
+  window.showToast('Settings saved successfully', 'success');
+};
+
+// ─── Tab navigation ───────────────────────────────────────────────────────────
+window.showTab = (tab, el) => {
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.admin-nav-item').forEach(m => {
+    m.classList.remove('bg-white/10', 'text-white');
+    m.classList.add('text-white/50');
+  });
+  document.getElementById('tab-' + tab).classList.add('active');
+  el.classList.remove('text-white/50');
+  el.classList.add('bg-white/10', 'text-white');
+};
+
+window.closeModal = () => document.getElementById('modal').classList.remove('open');
+
+// ─── XSS-safe helpers ─────────────────────────────────────────────────────────
+function escHtml(str) {
+  return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function escAttr(str) {
+  return String(str ?? '').replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+// ─── Boot ─────────────────────────────────────────────────────────────────────
+window.addEventListener('load', async () => {
+  await loadSettings();
+  setTimeout(async () => {
+    document.getElementById('loader').classList.add('hide');
+    const sess = loadSession();
+    if (sess) {
+      if (sess.isAdmin) {
+        _enterAdmin();
+      } else if (sess.userId) {
+        try {
+          const snap = await getDoc(doc(db, 'users', sess.userId));
+          if (snap.exists()) {
+            currentUser = { id: sess.userId, ...snap.data() };
+            document.getElementById('mainNav').classList.remove('hidden');
+            document.getElementById('navBadge').innerText = '👤 ' + (currentUser.username || currentUser.id);
+            document.getElementById('dashName').innerText = currentUser.username || currentUser.id;
+            switchPage('dashPage');
+            updateDashStats();
+            startUserLiveListeners();
+            bindActivityListeners();
+            resetSessionTimer();
+          }
+        } catch (e) { clearSession(); }
+      }
+    }
+  }, 800);
+});
 </script>
 </body>
 </html>
