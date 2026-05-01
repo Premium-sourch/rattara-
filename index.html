@@ -1210,7 +1210,7 @@ window.onUsernameInput = () => {
   icon.classList.add('hidden'); icon.textContent = '';
 };
 
-window.checkUsernameLive = async () => {
+  window.checkUsernameLive = async () => {
   const val = document.getElementById('regUsername').value.trim();
   const icon = document.getElementById('unCheckIcon');
   const takenMsg = document.getElementById('unTakenMsg');
@@ -1224,31 +1224,38 @@ window.checkUsernameLive = async () => {
   if (!val || val.length < 3) return;
 
   try {
-    // 1. Check active user
+    // 1. Check active user (genuinely taken)
     const userSnap = await getDoc(doc(db, 'users', val.toLowerCase()));
     if (userSnap.exists()) {
       icon.textContent = '❌'; icon.classList.remove('hidden');
       takenMsg.classList.remove('hidden'); return;
     }
-    // 2. Check pending/approved registration
-    const regSnap = await getDocs(query(collection(db, 'registrations'), where('usernameLower', '==', val.toLowerCase())));
-    const activePending = regSnap.docs.find(d => ['pending','approved'].includes(d.data().status));
-    if (activePending) {
+
+    // 2. Check ONLY pending/approved registrations — ignore rejected ones
+    const regSnap = await getDocs(query(
+      collection(db, 'registrations'),
+      where('usernameLower', '==', val.toLowerCase())
+    ));
+    const activePending  = regSnap.docs.find(d => d.data().status === 'pending');
+    const activeApproved = regSnap.docs.find(d => d.data().status === 'approved');
+    if (activePending || activeApproved) {
       icon.textContent = '❌'; icon.classList.remove('hidden');
       takenMsg.classList.remove('hidden'); return;
     }
-    // 3. Check if this username was previously deleted (recycled user)
+
+    // 3. Check deleted user record — show warning but ALLOW registration
     const deletedSnap = await getDoc(doc(db, 'deletedUsers', val.toLowerCase()));
     if (deletedSnap.exists()) {
       const dd = deletedSnap.data();
       icon.textContent = '🔄'; icon.classList.remove('hidden');
       recycledNotice.classList.remove('hidden');
       const otpInfo = dd.savedOtpCount > 0
-        ? `A previous account with this username had <strong>${dd.savedOtpCount} OTPs (৳${dd.savedOtpBalance})</strong> remaining. Once approved, these will be transferred to your account.`
+        ? `A previous account with this username had <strong>${dd.savedOtpCount} OTPs (৳${dd.savedOtpBalance})</strong> remaining. Once approved, these will be transferred to your new account automatically.`
         : `A previous account existed with this username but had no remaining OTP balance.`;
       recycledDetail.innerHTML = otpInfo;
       return;
     }
+
     // 4. Check preload
     const preloadSnap = await getDoc(doc(db, 'otpPreloads', val.toLowerCase()));
     if (preloadSnap.exists()) {
@@ -1272,9 +1279,10 @@ window.submitRegister = async () => {
   const err = document.getElementById('regErr');
   err.style.display = 'none';
 
-  if (!document.getElementById('unTakenMsg').classList.contains('hidden')) {
+  iif (!document.getElementById('unTakenMsg').classList.contains('hidden')) {
     err.innerText = 'This username is already taken.'; err.style.display = 'block'; return;
   }
+  // Allow recycled usernames — recycledUserNotice showing is NOT a block
   if (!fullName)  { err.innerText = 'Please enter your full name'; err.style.display = 'block'; return; }
   if (!username)  { err.innerText = 'Please enter a username'; err.style.display = 'block'; return; }
   if (!/^[a-zA-Z0-9_\-\.]{3,30}$/.test(username)) {
@@ -1301,14 +1309,24 @@ window.submitRegister = async () => {
     }
 
     // Check only non-rejected registrations to allow re-registration after rejection
-    const existingRegs = await getDocs(query(collection(db, 'registrations'), where('usernameLower', '==', username.toLowerCase())));
+    const existingRegs = await getDocs(query(
+      collection(db, 'registrations'),
+      where('usernameLower', '==', username.toLowerCase())
+    ));
     if (!existingRegs.empty) {
-      const ex = existingRegs.docs.find(d => ['pending','approved'].includes(d.data().status));
-      if (ex && ex.data().status === 'pending') {
-        err.innerText = 'A request with this username already exists.'; err.style.display = 'block'; setLoading('regBtn', false); return;
+      const hasPending  = existingRegs.docs.some(d => d.data().status === 'pending');
+      const hasApproved = existingRegs.docs.some(d => d.data().status === 'approved');
+      if (hasPending) {
+        err.innerText = 'A pending request with this username already exists.';
+        err.style.display = 'block'; setLoading('regBtn', false); return;
       }
-      if (ex && ex.data().status === 'approved') {
-        err.innerText = 'This username has already been approved.'; err.style.display = 'block'; setLoading('regBtn', false); return;
+      if (hasApproved) {
+        const activeUser = await getDoc(doc(db, 'users', username.toLowerCase()));
+        if (activeUser.exists()) {
+          err.innerText = 'This username is already taken.';
+          err.style.display = 'block'; setLoading('regBtn', false); return;
+        }
+        // User was deleted after approval — fall through and allow re-registration
       }
     }
 
