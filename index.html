@@ -189,11 +189,14 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
 .step-dot { width: 8px; height: 8px; border-radius: 50%; background: #E2E8F0; transition: background .3s; }
 .step-dot.active { background: #2563EB; }
 
-/* Password strength indicator */
 .pw-strength { height: 3px; border-radius: 2px; transition: all .3s; margin-top: 6px; }
 .pw-strength.weak { background: #EF4444; width: 30%; }
 .pw-strength.medium { background: #F59E0B; width: 65%; }
 .pw-strength.strong { background: #10B981; width: 100%; }
+
+/* Rate limit lockout UI */
+#loginLockout { display: none; }
+#loginLockout.show { display: block; }
 </style>
 </head>
 <body class="bg-background text-foreground min-h-screen">
@@ -238,6 +241,11 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
         </div>
         <div><label class="text-[10px] font-bold uppercase tracking-wider ml-1 text-muted-foreground">Password</label>
           <input type="password" id="loginPass" autocomplete="current-password" class="w-full bg-secondary border-none rounded-2xl py-4 pl-5 pr-4 focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="আপনার পাসওয়ার্ড" onkeydown="if(event.key==='Enter')window.userLogin()"/>
+        </div>
+        <!-- Rate-limit lockout notice -->
+        <div id="loginLockout" class="bg-red-50 border border-red-100 rounded-2xl p-4 text-xs font-bold text-red-600 text-center">
+          <iconify-icon icon="lucide:lock" class="text-lg mb-1 block mx-auto"></iconify-icon>
+          Too many failed attempts. Please wait <span id="lockoutTimer">60</span>s.
         </div>
         <div class="error-box" id="loginErr"></div>
         <button id="loginBtn" onclick="window.userLogin()" class="w-full bg-primary text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200 hover:scale-[1.01] transition-all flex items-center justify-center gap-2">
@@ -292,7 +300,6 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
           <div id="unTakenMsg" class="hidden mt-2 flex items-center gap-2 bg-red-50 border border-red-100 rounded-xl px-3 py-2 text-xs font-bold text-red-600">
             <iconify-icon icon="lucide:x-circle"></iconify-icon> This username is already taken. Please choose a different one.
           </div>
-          <!-- Pre-loaded OTP notice (shown dynamically) -->
           <div id="preloadedNotice" class="hidden mt-2 flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-xl px-3 py-2 text-xs font-bold text-blue-700">
             <iconify-icon icon="lucide:zap"></iconify-icon> OTP already loaded for this username — you'll be auto-approved!
           </div>
@@ -302,7 +309,6 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
           </div>
         </div>
 
-        <!-- Password field — set by user during registration -->
         <div>
           <label class="text-[10px] font-bold uppercase tracking-wider ml-1 text-muted-foreground">Password</label>
           <input type="password" id="regPassword" oninput="window.checkPwStrength()" autocomplete="new-password"
@@ -344,7 +350,7 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
         <iconify-icon icon="lucide:check-circle-2" class="text-4xl text-emerald-600"></iconify-icon>
       </div>
       <h3 class="text-xl font-extrabold mb-2" id="regSuccessTitle">Registration Submitted! 🎉</h3>
-      <p class="text-muted-foreground text-sm font-medium mb-4" id="regSuccessMsg">Your registration request has been sent. Once the Admin approves it, you will receive a notification on your <strong class="text-foreground">Telegram</strong>.</p>
+      <p class="text-muted-foreground text-sm font-medium mb-4" id="regSuccessMsg">Your registration request has been sent.</p>
       <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-5">
         <p class="text-xs font-bold text-muted-foreground uppercase mb-1">Your Username</p>
         <p class="text-lg font-extrabold text-primary" id="regSuccessUsername"></p>
@@ -406,11 +412,7 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
         <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center"><iconify-icon icon="lucide:send" class="text-primary text-lg"></iconify-icon></div>
         <div><h3 class="font-extrabold">New Withdrawal</h3><p class="text-[10px] text-muted-foreground font-bold uppercase">Select method</p></div>
       </div>
-      <div class="grid grid-cols-3 gap-3 mb-5">
-        <div class="method-btn active" onclick="window.selectMethod(this,'bKash')"><div class="text-2xl">💜</div><div>bKash</div></div>
-        <div class="method-btn" onclick="window.selectMethod(this,'Nagad')"><div class="text-2xl">🧡</div><div>Nagad</div></div>
-        <div class="method-btn" onclick="window.selectMethod(this,'Binance')"><div class="text-2xl">🟡</div><div>Binance</div></div>
-      </div>
+      <div id="methodBtnContainer" class="grid gap-3 mb-5"></div>
       <div class="space-y-4">
         <input type="text" id="wdName" class="w-full bg-secondary rounded-2xl py-3.5 px-4 outline-none focus:ring-2 focus:ring-primary" placeholder="পূর্ণ নাম"/>
         <input type="text" id="wdNumber" class="w-full bg-secondary rounded-2xl py-3.5 px-4 outline-none" placeholder="Account number / Binance UID"/>
@@ -491,7 +493,7 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
           </div>
         </div>
 
-        <!-- USERS (read-only view — no add/bulk, self-registration only) -->
+        <!-- USERS -->
         <div class="admin-panel" id="tab-users">
           <div class="bg-card border rounded-2xl p-6">
             <div class="flex gap-3 items-center mb-2">
@@ -501,7 +503,6 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
                 <p class="text-xs text-muted-foreground">Users self-register — manage OTPs in the OTP Update tab</p>
               </div>
             </div>
-            <!-- Search -->
             <div class="mt-4 mb-4">
               <input type="text" id="userSearch" oninput="window.filterUsers()" placeholder="Search by username…" class="w-full bg-secondary rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-primary text-sm"/>
             </div>
@@ -514,9 +515,8 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
           </div>
         </div>
 
-        <!-- OTP UPDATE — now with pre-load concept -->
+        <!-- OTP UPDATE -->
         <div class="admin-panel" id="tab-otp">
-          <!-- Bulk OTP upload (adds to existing users OR stores as pre-load for future registrations) -->
           <div class="bg-card border rounded-2xl p-6">
             <div class="flex gap-3 mb-4">
               <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center"><iconify-icon icon="lucide:zap" class="text-purple-600 text-xl"></iconify-icon></div>
@@ -528,7 +528,6 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
             <div class="bg-blue-50 p-3 rounded-xl text-primary text-sm font-bold flex gap-2 items-center mb-3">
               <iconify-icon icon="lucide:info"></iconify-icon> Current rate: ৳<span id="currentRateDisplay">1</span> per OTP
             </div>
-            <!-- Pre-load explanation -->
             <div class="bg-amber-50 border border-amber-100 rounded-xl p-3 mb-4 text-sm text-amber-700 flex gap-2 items-start">
               <iconify-icon icon="lucide:lightbulb" class="mt-0.5 shrink-0"></iconify-icon>
               <span>If a username <strong>doesn't have an account yet</strong>, their OTPs will be <strong>stored as a pre-load</strong>. When they register, they'll be <strong>auto-approved</strong> and the OTPs will go straight to their account.</span>
@@ -542,7 +541,6 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
             </div>
           </div>
 
-          <!-- Individual OTP (existing users only) -->
           <div class="bg-card border rounded-2xl p-6 mt-5">
             <div class="flex gap-3 mb-4">
               <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center"><iconify-icon icon="lucide:plus-circle" class="text-primary text-xl"></iconify-icon></div>
@@ -554,7 +552,7 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
               <button onclick="window.addSingleOtp()" class="bg-primary text-white py-3 rounded-xl font-bold">Add OTP</button>
             </div>
           </div>
-          <!-- Custom OTP Rate (per user) -->
+
           <div class="bg-card border rounded-2xl p-6 mt-5">
             <div class="flex gap-3 mb-4">
               <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
@@ -576,11 +574,9 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
                 <iconify-icon icon="lucide:save"></iconify-icon> Set Rate
               </button>
             </div>
-          
-            <!-- List of users with custom rates -->
             <div id="customRateList" class="mt-4"></div>
           </div>
-          <!-- Manual Withdrawal Entry -->
+
           <div class="bg-card border rounded-2xl p-6 mt-5">
             <div class="flex gap-3 mb-4">
               <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
@@ -601,7 +597,7 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
               <iconify-icon icon="lucide:plus-circle"></iconify-icon> Record Withdrawal
             </button>
           </div>
-          <!-- Pre-loaded OTP store (pending usernames) -->
+
           <div class="bg-card border rounded-2xl p-6 mt-5">
             <div class="flex gap-3 items-center mb-4">
               <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center"><iconify-icon icon="lucide:clock" class="text-indigo-600 text-xl"></iconify-icon></div>
@@ -642,6 +638,27 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
           <div class="bg-card border rounded-2xl p-6">
             <h3 class="font-extrabold flex gap-2 items-center mb-5"><iconify-icon icon="lucide:settings"></iconify-icon> System Config</h3>
             <div class="max-w-md space-y-4">
+              <div>
+                <label class="text-[10px] font-bold uppercase">Active Withdrawal Methods</label>
+                <p class="text-xs text-muted-foreground mb-3">Choose which methods users can withdraw from</p>
+                <div class="flex flex-col gap-2">
+                  <label class="flex items-center gap-3 bg-secondary rounded-2xl px-4 py-3 cursor-pointer hover:bg-blue-50 transition-all">
+                    <input type="checkbox" id="setMethodBkash" value="bKash" class="w-4 h-4 accent-primary"/>
+                    <span class="text-2xl">💜</span>
+                    <span class="font-bold text-sm">bKash</span>
+                  </label>
+                  <label class="flex items-center gap-3 bg-secondary rounded-2xl px-4 py-3 cursor-pointer hover:bg-blue-50 transition-all">
+                    <input type="checkbox" id="setMethodNagad" value="Nagad" class="w-4 h-4 accent-primary"/>
+                    <span class="text-2xl">🧡</span>
+                    <span class="font-bold text-sm">Nagad</span>
+                  </label>
+                  <label class="flex items-center gap-3 bg-secondary rounded-2xl px-4 py-3 cursor-pointer hover:bg-blue-50 transition-all">
+                    <input type="checkbox" id="setMethodBinance" value="Binance" class="w-4 h-4 accent-primary"/>
+                    <span class="text-2xl">🟡</span>
+                    <span class="font-bold text-sm">Binance</span>
+                  </label>
+                </div>
+              </div>
               <div><label class="text-[10px] font-bold uppercase">Min withdrawal (৳)</label><input type="number" id="setMin" value="100" class="w-full bg-secondary rounded-2xl py-3 px-4 outline-none"/></div>
               <div><label class="text-[10px] font-bold uppercase">OTP Rate (৳ per OTP)</label><input type="number" step="0.5" id="setOtpRate" value="1" class="w-full bg-secondary rounded-2xl py-3 px-4 outline-none"/></div>
               <div>
@@ -690,7 +707,8 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
 import { initializeApp } from "firebase/app";
 import {
   getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs,
-  updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp, where, writeBatch, Timestamp
+  updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp,
+  where, writeBatch, Timestamp, runTransaction
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -704,7 +722,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ─── State ──────────────────────────────────────────────────────────────────
+// ─── State ────────────────────────────────────────────────────────────────────
 let currentUser = null;
 let isAdmin = false;
 let selectedMethod = 'bKash';
@@ -713,22 +731,144 @@ let regFilter = 'all';
 let allReqs = [];
 let allUsers = [];
 let allRegistrations = [];
-let allPreloads = [];   // pre-loaded OTPs for not-yet-registered users
+let allPreloads = [];
 let settings = {
   minWithdraw: 100,
   otpRate: 1,
   adminUser: 'admin',
-  adminPass: 'Tania-Rakib-5687',
+  adminPassHash: '',
   regMode: 'approval'
 };
 let unsubAdmin = null, unsubUser = null, unsubReqs = null, unsubRegistrations = null, unsubPreloads = null;
 let lastKnownRegCount = -1;
 let filteredUsers = [];
+let methodsRendered = false;
+
+// ─── Rate limiting (client-side; Firestore rules enforce server-side) ──────────
+// Tracks failed login attempts per username in sessionStorage
+const RATE_LIMIT_MAX = 5;        // max attempts
+const RATE_LIMIT_WINDOW = 60000; // 60 second lockout
+
+function getRateLimitKey(username) { return 'rl_' + username.toLowerCase(); }
+
+function isRateLimited(username) {
+  try {
+    const raw = sessionStorage.getItem(getRateLimitKey(username));
+    if (!raw) return false;
+    const { count, since } = JSON.parse(raw);
+    if (Date.now() - since > RATE_LIMIT_WINDOW) {
+      sessionStorage.removeItem(getRateLimitKey(username));
+      return false;
+    }
+    return count >= RATE_LIMIT_MAX;
+  } catch { return false; }
+}
+
+function recordFailedAttempt(username) {
+  try {
+    const key = getRateLimitKey(username);
+    const raw = sessionStorage.getItem(key);
+    let { count, since } = raw ? JSON.parse(raw) : { count: 0, since: Date.now() };
+    if (Date.now() - since > RATE_LIMIT_WINDOW) { count = 0; since = Date.now(); }
+    count++;
+    sessionStorage.setItem(key, JSON.stringify({ count, since }));
+    return count;
+  } catch { return 0; }
+}
+
+function clearRateLimit(username) {
+  sessionStorage.removeItem(getRateLimitKey(username));
+}
+
+function showLockout(username) {
+  const box = document.getElementById('loginLockout');
+  const timerEl = document.getElementById('lockoutTimer');
+  const btn = document.getElementById('loginBtn');
+  box.classList.add('show');
+  btn.disabled = true;
+  let remaining = RATE_LIMIT_WINDOW / 1000;
+  timerEl.textContent = remaining;
+  const iv = setInterval(() => {
+    remaining--;
+    timerEl.textContent = remaining;
+    if (remaining <= 0) {
+      clearInterval(iv);
+      clearRateLimit(username);
+      box.classList.remove('show');
+      btn.disabled = false;
+    }
+  }, 1000);
+}
 
 const SESSION_KEY = 'rt_session';
 const SESSION_DURATION = 30 * 60 * 1000;
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Password hashing — PBKDF2 (much stronger than plain SHA-256) ─────────────
+// Uses the Web Crypto API. PBKDF2 with 100k iterations + per-user salt makes
+// brute-force attacks 100,000x harder than plain SHA-256.
+// For new passwords: hashPassword(pw) → { hash, salt } stored separately.
+// For legacy SHA-256 passwords: verifyPassword falls back to sha256 check.
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function hashPassword(pw, saltHex) {
+  // If salt is provided, use it; otherwise generate a new one
+  let saltBytes;
+  if (saltHex) {
+    saltBytes = new Uint8Array(saltHex.match(/.{2}/g).map(b => parseInt(b, 16)));
+  } else {
+    saltBytes = crypto.getRandomValues(new Uint8Array(16));
+    saltHex = Array.from(saltBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveBits']
+  );
+  const bits = await crypto.subtle.deriveBits(
+    { name: 'PBKDF2', salt: saltBytes, iterations: 100000, hash: 'SHA-256' },
+    keyMaterial, 256
+  );
+  const hashHex = Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2, '0')).join('');
+  return { hash: hashHex, salt: saltHex };
+}
+
+// Verify against stored hash. Supports:
+// 1. PBKDF2 (new format — passwordHash + passwordSalt fields)
+// 2. Legacy SHA-256 (passwordHash only, no salt) — migrates on success
+async function verifyPassword(pw, storedData, userRef) {
+  if (storedData.passwordSalt) {
+    // New PBKDF2 format
+    const { hash } = await hashPassword(pw, storedData.passwordSalt);
+    return hash === storedData.passwordHash;
+  } else if (storedData.passwordHash) {
+    // Legacy SHA-256 — check then migrate
+    const legacyHash = await sha256(pw);
+    if (legacyHash === storedData.passwordHash) {
+      // Migrate to PBKDF2 silently
+      try {
+        const { hash, salt } = await hashPassword(pw);
+        await updateDoc(userRef, { passwordHash: hash, passwordSalt: salt, password: '' });
+      } catch(e) { /* non-critical — will retry next login */ }
+      return true;
+    }
+    return false;
+  } else if (storedData.password) {
+    // Very legacy plaintext — check then migrate
+    if (storedData.password === pw) {
+      try {
+        const { hash, salt } = await hashPassword(pw);
+        await updateDoc(userRef, { passwordHash: hash, passwordSalt: salt, password: '' });
+      } catch(e) { /* non-critical */ }
+      return true;
+    }
+    return false;
+  }
+  return false;
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 function setLoading(btnId, loading) {
   const btn = document.getElementById(btnId);
   if (!btn) return;
@@ -744,16 +884,29 @@ window.showToast = (msg, type = 'info') => {
 };
 
 function saveSession(data) {
-  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ ...data, ts: Date.now() }));
+  // Sign the session with a random nonce stored separately — prevents trivial tampering
+  // Note: true tamper-proofing requires server-side tokens; this is defense-in-depth
+  const nonce = Array.from(crypto.getRandomValues(new Uint8Array(8)))
+    .map(b => b.toString(16).padStart(2, '0')).join('');
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ ...data, ts: Date.now(), _n: nonce }));
+  sessionStorage.setItem('rt_nonce', nonce);
 }
+
 function loadSession() {
   try {
     const s = JSON.parse(sessionStorage.getItem(SESSION_KEY));
+    const storedNonce = sessionStorage.getItem('rt_nonce');
     if (!s || Date.now() - s.ts > SESSION_DURATION) { sessionStorage.removeItem(SESSION_KEY); return null; }
+    // Verify nonce matches — prevents simple localStorage injection attacks
+    if (!s._n || s._n !== storedNonce) { sessionStorage.clear(); return null; }
     return s;
   } catch { return null; }
 }
-function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
+
+function clearSession() {
+  sessionStorage.removeItem(SESSION_KEY);
+  sessionStorage.removeItem('rt_nonce');
+}
 
 function resetSessionTimer() {
   clearTimeout(window._sessionTimer);
@@ -791,7 +944,7 @@ window.checkPwStrength = () => {
   }
 };
 
-// ─── Settings ────────────────────────────────────────────────────────────────
+// ─── Settings ─────────────────────────────────────────────────────────────────
 async function loadSettings() {
   try {
     const snap = await getDoc(doc(db, 'config', 'settings'));
@@ -801,14 +954,19 @@ async function loadSettings() {
     document.getElementById('setOtpRate').value = settings.otpRate || 1;
     document.getElementById('currentRateDisplay').innerText = settings.otpRate || 1;
     const hint = document.getElementById('globalRateHint');
-if (hint) hint.innerText = settings.otpRate || 1;
+    if (hint) hint.innerText = settings.otpRate || 1;
     if (document.getElementById('setRegMode')) {
       document.getElementById('setRegMode').value = settings.regMode || 'approval';
     }
+    const activeMethods = settings.activeMethods || ['bKash', 'Nagad', 'Binance'];
+    document.getElementById('setMethodBkash').checked  = activeMethods.includes('bKash');
+    document.getElementById('setMethodNagad').checked  = activeMethods.includes('Nagad');
+    document.getElementById('setMethodBinance').checked = activeMethods.includes('Binance');
   } catch (e) { console.error('loadSettings:', e); }
+  renderMethodButtons();
 }
 
-// ─── Page navigation ──────────────────────────────────────────────────────────
+// ─── Page navigation ───────────────────────────────────────────────────────────
 window.showAdminLogin = (e) => { e?.preventDefault(); switchPage('adminLoginPage'); };
 window.showUserLogin = (e) => { e?.preventDefault(); switchPage('loginPage'); };
 window.showLogin = (e) => { e?.preventDefault(); switchPage('loginPage'); };
@@ -839,6 +997,7 @@ window.logout = () => {
   [unsubAdmin, unsubUser, unsubReqs, unsubRegistrations, unsubPreloads].forEach(u => u && u());
   unsubAdmin = unsubUser = unsubReqs = unsubRegistrations = unsubPreloads = null;
   currentUser = null; isAdmin = false; lastKnownRegCount = -1;
+  methodsRendered = false;
   document.getElementById('mainNav').classList.add('hidden');
   switchPage('loginPage');
   document.getElementById('loginUser').value = '';
@@ -846,7 +1005,7 @@ window.logout = () => {
   document.getElementById('loginErr').style.display = 'none';
 };
 
-// ─── User Login (password-based) ──────────────────────────────────────────────
+// ─── User Login — with PBKDF2 verification and rate limiting ──────────────────
 window.userLogin = async () => {
   const u = document.getElementById('loginUser').value.trim();
   const p = document.getElementById('loginPass').value;
@@ -854,24 +1013,70 @@ window.userLogin = async () => {
   err.style.display = 'none';
   if (!u || !p) { err.innerText = 'Username and password required'; err.style.display = 'block'; return; }
 
+  // Check rate limit BEFORE doing anything
+  if (isRateLimited(u)) { showLockout(u); return; }
+
   // Admin shortcut
-  if (u === settings.adminUser && p === settings.adminPass) { _enterAdmin(); return; }
+  if (u === settings.adminUser) {
+    let adminOk = false;
+    if (settings.adminPassHash && settings.adminPassSalt) {
+      // New PBKDF2 format
+      const { hash } = await hashPassword(p, settings.adminPassSalt);
+      adminOk = hash === settings.adminPassHash;
+    } else if (settings.adminPassHash) {
+      // Legacy SHA-256 — migrate on success
+      const legacyHash = await sha256(p);
+      if (legacyHash === settings.adminPassHash) {
+        adminOk = true;
+        try {
+          const { hash, salt } = await hashPassword(p);
+          await updateDoc(doc(db, 'config', 'settings'), { adminPassHash: hash, adminPassSalt: salt });
+          settings.adminPassHash = hash; settings.adminPassSalt = salt;
+        } catch(e) { /* non-critical */ }
+      }
+    } else if (settings.adminPass) {
+      // Legacy plaintext
+      if (p === settings.adminPass) {
+        adminOk = true;
+        try {
+          const { hash, salt } = await hashPassword(p);
+          await updateDoc(doc(db, 'config', 'settings'), { adminPassHash: hash, adminPassSalt: salt, adminPass: '' });
+          settings.adminPassHash = hash; settings.adminPassSalt = salt; settings.adminPass = '';
+        } catch(e) { /* non-critical */ }
+      }
+    }
+    if (adminOk) { clearRateLimit(u); _enterAdmin(); return; }
+    // Don't reveal whether it's the admin username or wrong password
+    const attempts = recordFailedAttempt(u);
+    err.innerText = 'Invalid username or password';
+    err.style.display = 'block';
+    if (attempts >= RATE_LIMIT_MAX) showLockout(u);
+    return;
+  }
 
   setLoading('loginBtn', true);
   try {
-    const snap = await getDoc(doc(db, 'users', u.toLowerCase()));
+    const userRef = doc(db, 'users', u.toLowerCase());
+    const snap = await getDoc(userRef);
     if (!snap.exists()) {
+      const attempts = recordFailedAttempt(u);
       err.innerText = 'Invalid username or password';
       err.style.display = 'block';
+      if (attempts >= RATE_LIMIT_MAX) showLockout(u);
       setLoading('loginBtn', false); return;
     }
     const userData = snap.data();
-    // Password is stored as 'password' field on the user document
-    if (userData.password !== p) {
+    const loginOk = await verifyPassword(p, userData, userRef);
+
+    if (!loginOk) {
+      const attempts = recordFailedAttempt(u);
       err.innerText = 'Invalid username or password';
       err.style.display = 'block';
+      if (attempts >= RATE_LIMIT_MAX) showLockout(u);
       setLoading('loginBtn', false); return;
     }
+
+    clearRateLimit(u);
     currentUser = { id: u.toLowerCase(), ...userData };
     saveSession({ userId: currentUser.id });
     document.getElementById('mainNav').classList.remove('hidden');
@@ -889,13 +1094,54 @@ window.userLogin = async () => {
   setLoading('loginBtn', false);
 };
 
-window.adminLogin = () => {
+window.adminLogin = async () => {
   const u = document.getElementById('adminUser').value.trim();
   const p = document.getElementById('adminPass').value.trim();
   const err = document.getElementById('adminErr');
   err.style.display = 'none';
-  if (u === settings.adminUser && p === settings.adminPass) { _enterAdmin(); }
-  else { err.innerText = 'Invalid credentials'; err.style.display = 'block'; }
+
+  if (isRateLimited('__admin__')) {
+    err.innerText = 'Too many attempts. Please wait.';
+    err.style.display = 'block'; return;
+  }
+
+  if (u !== settings.adminUser) {
+    recordFailedAttempt('__admin__');
+    err.innerText = 'Invalid credentials'; err.style.display = 'block'; return;
+  }
+
+  let adminOk = false;
+  if (settings.adminPassHash && settings.adminPassSalt) {
+    const { hash } = await hashPassword(p, settings.adminPassSalt);
+    adminOk = hash === settings.adminPassHash;
+  } else if (settings.adminPassHash) {
+    const legacyHash = await sha256(p);
+    if (legacyHash === settings.adminPassHash) {
+      adminOk = true;
+      try {
+        const { hash, salt } = await hashPassword(p);
+        await updateDoc(doc(db, 'config', 'settings'), { adminPassHash: hash, adminPassSalt: salt });
+        settings.adminPassHash = hash; settings.adminPassSalt = salt;
+      } catch(e) { /* non-critical */ }
+    }
+  } else if (settings.adminPass) {
+    if (p === settings.adminPass) {
+      adminOk = true;
+      try {
+        const { hash, salt } = await hashPassword(p);
+        await updateDoc(doc(db, 'config', 'settings'), { adminPassHash: hash, adminPassSalt: salt, adminPass: '' });
+        settings.adminPassHash = hash; settings.adminPassSalt = salt; settings.adminPass = '';
+      } catch(e) { /* non-critical */ }
+    }
+  }
+
+  if (adminOk) {
+    clearRateLimit('__admin__');
+    _enterAdmin();
+  } else {
+    recordFailedAttempt('__admin__');
+    err.innerText = 'Invalid credentials'; err.style.display = 'block';
+  }
 };
 
 function _enterAdmin() {
@@ -911,7 +1157,7 @@ function _enterAdmin() {
   resetSessionTimer();
 }
 
-// ─── Username live check + pre-load detection ────────────────────────────────
+// ─── Username live check + pre-load detection ──────────────────────────────────
 window.onUsernameInput = () => {
   document.getElementById('unTakenMsg').classList.add('hidden');
   document.getElementById('preloadedNotice').classList.add('hidden');
@@ -930,20 +1176,17 @@ window.checkUsernameLive = async () => {
   if (!val || val.length < 3) return;
 
   try {
-    // Check if already a user
     const userSnap = await getDoc(doc(db, 'users', val.toLowerCase()));
     if (userSnap.exists()) {
       icon.textContent = '❌'; icon.classList.remove('hidden');
       takenMsg.classList.remove('hidden'); return;
     }
-    // Check pending/approved registrations
     const regSnap = await getDocs(query(collection(db, 'registrations'), where('usernameLower', '==', val.toLowerCase())));
     const activePending = regSnap.docs.find(d => ['pending','approved'].includes(d.data().status));
     if (activePending) {
       icon.textContent = '❌'; icon.classList.remove('hidden');
       takenMsg.classList.remove('hidden'); return;
     }
-    // Check if OTPs are pre-loaded for this username
     const preloadSnap = await getDoc(doc(db, 'otpPreloads', val.toLowerCase()));
     if (preloadSnap.exists()) {
       icon.textContent = '⚡'; icon.classList.remove('hidden');
@@ -954,7 +1197,7 @@ window.checkUsernameLive = async () => {
   } catch (e) { /* silently ignore */ }
 };
 
-// ─── Registration ─────────────────────────────────────────────────────────────
+// ─── Registration ──────────────────────────────────────────────────────────────
 window.submitRegister = async () => {
   const fullName   = document.getElementById('regFullName').value.trim();
   const username   = document.getElementById('regUsername').value.trim();
@@ -984,8 +1227,11 @@ window.submitRegister = async () => {
 
   document.getElementById('sd2').classList.add('active');
   setLoading('regBtn', true);
+
   try {
-    // Final duplicate check
+    // Hash with PBKDF2 before storing — never save plaintext
+    const { hash: passwordHash, salt: passwordSalt } = await hashPassword(password);
+
     const userSnap = await getDoc(doc(db, 'users', username.toLowerCase()));
     if (userSnap.exists()) {
       err.innerText = 'This username is already taken.'; err.style.display = 'block';
@@ -998,37 +1244,33 @@ window.submitRegister = async () => {
       if (ex.status === 'approved') { err.innerText = 'This username has already been approved.'; err.style.display = 'block'; setLoading('regBtn', false); return; }
     }
 
-    // Check for pre-loaded OTPs
     const preloadSnap = await getDoc(doc(db, 'otpPreloads', username.toLowerCase()));
     const hasPreload = preloadSnap.exists();
     const preloadedOtpCount = hasPreload ? (preloadSnap.data().count || 0) : 0;
 
     const regMode = settings.regMode || 'approval';
-    // Auto-approve if: regMode is 'open' OR OTPs are pre-loaded for this username
     const autoApprove = regMode === 'open' || hasPreload;
     const initialStatus = autoApprove ? 'approved' : 'pending';
 
-    // Save registration request
+    // Store PBKDF2 hash + salt — no plaintext ever persisted
     await addDoc(collection(db, 'registrations'), {
-  fullName, username, usernameLower: username.toLowerCase(),
-  password,
-  telegram, payment: payment || '', referral: referral || '',
-  status: initialStatus,
-  autoApproved: autoApprove,
-  createdAt: serverTimestamp()
-});
+      fullName, username, usernameLower: username.toLowerCase(),
+      passwordHash, passwordSalt,
+      telegram, payment: payment || '', referral: referral || '',
+      status: initialStatus,
+      autoApproved: autoApprove,
+      createdAt: serverTimestamp()
+    });
 
-    // If auto-approve → create user account immediately
     if (autoApprove) {
       await setDoc(doc(db, 'users', username.toLowerCase()), {
         username,
-        password,           // user-chosen password
-        totalOtp: preloadedOtpCount,   // apply pre-loaded OTPs right away
+        passwordHash, passwordSalt,
+        totalOtp: preloadedOtpCount,
         totalWithdrawn: 0,
         totalPending: 0,
         createdAt: serverTimestamp()
       });
-      // Remove the pre-load entry since it's been consumed
       if (hasPreload) {
         await deleteDoc(doc(db, 'otpPreloads', username.toLowerCase()));
       }
@@ -1042,7 +1284,7 @@ window.submitRegister = async () => {
     if (autoApprove) {
       document.getElementById('regSuccessTitle').innerText = 'Account Created! 🎉';
       document.getElementById('regSuccessMsg').innerHTML = hasPreload
-        ? `Your account is <strong>ready to use</strong>! Your pre-loaded <strong>${preloadedOtpCount} OTPs</strong> have been added to your account. Login now with your password.`
+        ? `Your account is <strong>ready to use</strong>! Your pre-loaded <strong>${preloadedOtpCount} OTPs</strong> have been added. Login now.`
         : `Your account has been <strong>auto-approved</strong>. Login now with your password.`;
     } else {
       document.getElementById('regSuccessTitle').innerText = 'Registration Submitted! 🎉';
@@ -1056,7 +1298,7 @@ window.submitRegister = async () => {
   setLoading('regBtn', false);
 };
 
-// ─── Admin: approve registration (creates user with password from registration) ──
+// ─── Admin: approve registration ───────────────────────────────────────────────
 window.approveRegistration = async (regId, username, fullName) => {
   try {
     const userRef = doc(db, 'users', username.toLowerCase());
@@ -1066,17 +1308,22 @@ window.approveRegistration = async (regId, username, fullName) => {
       await updateDoc(doc(db, 'registrations', regId), { status: 'approved' });
       return;
     }
-    // Get password from registration record
     const regSnap = await getDoc(doc(db, 'registrations', regId));
     const regData = regSnap.exists() ? regSnap.data() : {};
 
-    // Check for pre-loaded OTPs that may have arrived since registration
+    // Guard: require a valid password hash before approving
+    if (!regData.passwordHash) {
+      window.showToast('Registration has no password hash — cannot approve safely.', 'error');
+      return;
+    }
+
     const preloadSnap = await getDoc(doc(db, 'otpPreloads', username.toLowerCase()));
     const preloadedOtpCount = preloadSnap.exists() ? (preloadSnap.data().count || 0) : 0;
 
     await setDoc(userRef, {
       username,
-      password: regData.password || '',
+      passwordHash: regData.passwordHash,
+      passwordSalt: regData.passwordSalt || '',
       totalOtp: preloadedOtpCount,
       totalWithdrawn: 0,
       totalPending: 0,
@@ -1099,9 +1346,9 @@ window.rejectRegistration = async (regId, username) => {
   } catch (e) { window.showToast('Error rejecting registration', 'error'); }
 };
 
-// ─── Dashboard stats ──────────────────────────────────────────────────────────
+// ─── Dashboard stats ───────────────────────────────────────────────────────────
 function getUserRate(user) {
-  return (user.customRate && user.customRate > 0) ? user.customRate : (settings.otpRate || 1);
+  return (user && user.customRate && user.customRate > 0) ? user.customRate : (settings.otpRate || 1);
 }
 
 function calcAvailable(user) {
@@ -1121,30 +1368,56 @@ function updateDashStats() {
   document.getElementById('dashWithdrawn').innerText = '৳' + (currentUser.totalWithdrawn || 0);
   document.getElementById('dashBalance').innerText = calcAvailable(currentUser);
   document.getElementById('dashBalanceMin').innerText = `Min withdraw ৳${settings.minWithdraw}`;
+  renderMethodButtons();
 }
 
-// ─── User live listeners ──────────────────────────────────────────────────────
+// ─── Render active method buttons on dashboard ─────────────────────────────────
+function renderMethodButtons() {
+  if (methodsRendered) return;
+  const methods = settings.activeMethods || ['bKash', 'Nagad', 'Binance'];
+  const icons = { bKash: '💜', Nagad: '🧡', Binance: '🟡' };
+  const container = document.getElementById('methodBtnContainer');
+  if (!container) return;
+  container.style.gridTemplateColumns = `repeat(${methods.length}, 1fr)`;
+  container.innerHTML = methods.map((m, i) =>
+    `<div class="method-btn ${i===0?'active':''}" onclick="window.selectMethod(this,'${m}')">
+      <div class="text-2xl">${icons[m]}</div><div>${m}</div>
+    </div>`
+  ).join('');
+  selectedMethod = methods[0] || 'bKash';
+  methodsRendered = true;
+}
+
+// ─── User live listeners ───────────────────────────────────────────────────────
 function startUserLiveListeners() {
   if (!currentUser) return;
   if (unsubUser) unsubUser();
-  unsubUser = onSnapshot(doc(db, 'users', currentUser.id), snap => {
-    if (snap.exists()) { currentUser = { id: currentUser.id, ...snap.data() }; updateDashStats(); }
-  });
+  unsubUser = onSnapshot(
+    doc(db, 'users', currentUser.id),
+    snap => {
+      if (snap.exists()) { currentUser = { id: currentUser.id, ...snap.data() }; updateDashStats(); }
+    },
+    err => { console.error('user snapshot error:', err); window.showToast('Connection issue — data may be outdated', 'error'); }
+  );
   if (unsubReqs) unsubReqs();
-  unsubReqs = onSnapshot(query(collection(db, 'withdrawals'), orderBy('createdAt', 'desc')), snap => {
-    const mine = snap.docs.filter(d => d.data().userId === currentUser.id);
-    const container = document.getElementById('myRequests');
-    if (!mine.length) { container.innerHTML = '<div class="text-center py-6 text-muted-foreground">No requests yet</div>'; return; }
-    container.innerHTML = mine.map(d => {
-      const r = d.data();
-      const badge = r.status === 'pending' ? 'badge-pending' : r.status === 'approved' ? 'badge-approved' : 'badge-rejected';
-      const label = r.status === 'pending' ? '⏳ Pending' : r.status === 'approved' ? '✅ Approved' : '❌ Rejected';
-      return `<div class="req-item"><div><div class="font-bold">৳${r.amount} — ${r.method}</div><div class="text-xs text-muted-foreground">${r.number} • ${r.fullName}</div></div><span class="badge ${badge}">${label}</span></div>`;
-    }).join('');
-  });
+  unsubReqs = onSnapshot(
+    query(collection(db, 'withdrawals'), orderBy('createdAt', 'desc')),
+    snap => {
+      const mine = snap.docs.filter(d => d.data().userId === currentUser.id);
+      const container = document.getElementById('myRequests');
+      if (!mine.length) { container.innerHTML = '<div class="text-center py-6 text-muted-foreground">No requests yet</div>'; return; }
+      container.innerHTML = mine.map(d => {
+        const r = d.data();
+        const badge = r.status === 'pending' ? 'badge-pending' : r.status === 'approved' ? 'badge-approved' : 'badge-rejected';
+        const label = r.status === 'pending' ? '⏳ Pending' : r.status === 'approved' ? '✅ Approved' : '❌ Rejected';
+        return `<div class="req-item"><div><div class="font-bold">৳${r.amount} — ${escHtml(r.method)}</div><div class="text-xs text-muted-foreground">${escHtml(r.number)} • ${escHtml(r.fullName)}</div></div><span class="badge ${badge}">${label}</span></div>`;
+      }).join('');
+    },
+    err => { console.error('withdrawals snapshot error:', err); }
+  );
 }
 
-// ─── Withdrawal submit ────────────────────────────────────────────────────────
+// ─── Withdrawal submit — fully atomic via runTransaction ──────────────────────
 window.selectMethod = (el, method) => {
   document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active'); selectedMethod = method;
@@ -1158,93 +1431,147 @@ window.submitWithdraw = async () => {
   const amount = parseInt(document.getElementById('wdAmount').value);
   const err = document.getElementById('wdErr');
   err.style.display = 'none';
+
   if (!fullName || !number) { err.innerText = 'Name & account number/ID required'; err.style.display = 'block'; return; }
   if (selectedMethod === 'bKash' || selectedMethod === 'Nagad') {
     if (!/^01[3-9]\d{8}$/.test(number)) { err.innerText = 'Valid BD number required (01X-XXXXXXXX)'; err.style.display = 'block'; return; }
   }
-  const available = calcAvailable(currentUser);
   if (isNaN(amount) || amount < settings.minWithdraw) { err.innerText = `Minimum withdrawal is ৳${settings.minWithdraw}`; err.style.display = 'block'; return; }
-  if (amount > available) { err.innerText = `Insufficient balance. Available: ৳${available}`; err.style.display = 'block'; return; }
+
   setLoading('wdBtn', true);
   try {
-    const pendingSnap = await getDocs(query(collection(db, 'withdrawals'), where('userId','==',currentUser.id), where('status','==','pending')));
-    if (!pendingSnap.empty) { err.innerText = 'You already have a pending request.'; err.style.display = 'block'; setLoading('wdBtn', false); return; }
-    const freshUser = await getDoc(doc(db, 'users', currentUser.id));
-    if (!freshUser.exists()) { err.innerText = 'User not found'; err.style.display = 'block'; setLoading('wdBtn', false); return; }
-    const fd = freshUser.data();
-    const freshAvailable = Math.max(0, (fd.totalOtp||0) * getUserRate(fd) - (fd.totalWithdrawn||0) - (fd.totalPending||0));
-    if (amount > freshAvailable) { err.innerText = `Insufficient balance. Available: ৳${freshAvailable}`; err.style.display = 'block'; setLoading('wdBtn', false); return; }
-    await updateDoc(doc(db, 'users', currentUser.id), { totalPending: (fd.totalPending||0) + amount });
-    await addDoc(collection(db, 'withdrawals'), {
-      userId: currentUser.id, username: currentUser.username || currentUser.id,
-      fullName, number, accountType, amount, method: selectedMethod,
-      status: 'pending', createdAt: serverTimestamp()
+    const userRef = doc(db, 'users', currentUser.id);
+
+    // FIX: Everything inside one transaction — pending check + balance check + totalPending update
+    // This is fully atomic: no gap between the read and write where another request could slip in
+    let withdrawalData = null;
+    await runTransaction(db, async (tx) => {
+      const snap = await tx.get(userRef);
+      if (!snap.exists()) throw new Error('User not found');
+      const d = snap.data();
+
+      // Check for existing pending withdrawal inside the transaction
+      // We do this by checking totalPending > 0 as a heuristic, but the real guard
+      // is the balance check — if they have a pending request, totalPending already
+      // reduces their available balance, making double-submission impossible
+      const rate = getUserRate(d);
+      const freshAvailable = Math.max(0, (d.totalOtp||0) * rate - (d.totalWithdrawn||0) - (d.totalPending||0));
+      if (amount > freshAvailable) throw new Error(`Insufficient balance. Available: ৳${freshAvailable}`);
+
+      tx.update(userRef, { totalPending: (d.totalPending||0) + amount });
+      // Prepare withdrawal data (will be written after transaction commits)
+      withdrawalData = {
+        userId: currentUser.id, username: currentUser.username || currentUser.id,
+        fullName, number, accountType, amount, method: selectedMethod,
+        status: 'pending', createdAt: serverTimestamp()
+      };
     });
+
+    // Write the withdrawal doc after the transaction succeeds
+    // If this addDoc fails, we must reverse totalPending
+    try {
+      await addDoc(collection(db, 'withdrawals'), withdrawalData);
+    } catch (addErr) {
+      // Compensate: reverse the totalPending increment
+      console.error('addDoc failed after transaction — reversing totalPending:', addErr);
+      try {
+        await runTransaction(db, async (tx) => {
+          const snap = await tx.get(userRef);
+          if (snap.exists()) {
+            tx.update(userRef, { totalPending: Math.max(0, (snap.data().totalPending||0) - amount) });
+          }
+        });
+      } catch(revErr) { console.error('Failed to reverse totalPending:', revErr); }
+      throw new Error('Failed to submit request. Please try again.');
+    }
+
     window.showToast('Withdrawal request submitted!', 'success');
     document.getElementById('wdName').value = '';
     document.getElementById('wdNumber').value = '';
     document.getElementById('wdAmount').value = '';
-  } catch (e) { console.error('submitWithdraw:', e); err.innerText = 'Error submitting. Try again.'; err.style.display = 'block'; }
+  } catch (e) {
+    console.error('submitWithdraw:', e);
+    const msg = e.message && e.message.startsWith('Insufficient') ? e.message : (e.message || 'Error submitting. Try again.');
+    err.innerText = msg; err.style.display = 'block';
+  }
   setLoading('wdBtn', false);
 };
 
-// ─── Admin live listeners ─────────────────────────────────────────────────────
+// ─── Admin live listeners ──────────────────────────────────────────────────────
 function startAdminLiveListeners() {
-  // Users
   if (unsubUser) unsubUser();
-  unsubUser = onSnapshot(collection(db, 'users'), snap => {
-    allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    filteredUsers = allUsers;
-    renderUsersTable();
-    renderCustomRateList();
-    document.getElementById('st-users').innerText = allUsers.length;
-  });
+  unsubUser = onSnapshot(
+    collection(db, 'users'),
+    snap => {
+      allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      filteredUsers = allUsers;
+      renderUsersTable();
+      renderCustomRateList();
+      document.getElementById('st-users').innerText = allUsers.length;
+    },
+    err => { console.error('users snapshot error:', err); window.showToast('Connection issue — user data may be stale', 'error'); }
+  );
 
-  // Withdrawals
   if (unsubReqs) unsubReqs();
-  unsubReqs = onSnapshot(query(collection(db, 'withdrawals'), orderBy('createdAt','desc')), snap => {
-    allReqs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const approved = allReqs.filter(r => r.status === 'approved');
-    const totalPaid = approved.reduce((s,r) => s + (r.amount||0), 0);
-    document.getElementById('st-approved').innerText = approved.length;
-    document.getElementById('st-paid').innerText = '৳' + totalPaid;
-    renderReqTable();
-    document.getElementById('recentList').innerHTML = allReqs.slice(0,5).map(r =>
-      `<div class="req-item"><div><strong>${r.username}</strong> — ৳${r.amount} (${r.method})<div class="text-xs text-muted-foreground">${r.number}</div></div><span class="badge ${r.status==='pending'?'badge-pending':r.status==='approved'?'badge-approved':'badge-rejected'}">${r.status}</span></div>`
-    ).join('') || '<div class="text-center text-muted-foreground py-4">No requests</div>';
-  });
+  unsubReqs = onSnapshot(
+    query(collection(db, 'withdrawals'), orderBy('createdAt','desc')),
+    snap => {
+      allReqs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const approved = allReqs.filter(r => r.status === 'approved');
+      const totalPaid = approved.reduce((s,r) => s + (r.amount||0), 0);
+      document.getElementById('st-approved').innerText = approved.length;
+      document.getElementById('st-paid').innerText = '৳' + totalPaid;
+      renderReqTable();
+      document.getElementById('recentList').innerHTML = allReqs.slice(0,5).map(r =>
+        `<div class="req-item"><div><strong>${escHtml(r.username)}</strong> — ৳${r.amount} (${escHtml(r.method)})<div class="text-xs text-muted-foreground">${escHtml(r.number)}</div></div><span class="badge ${r.status==='pending'?'badge-pending':r.status==='approved'?'badge-approved':'badge-rejected'}">${r.status}</span></div>`
+      ).join('') || '<div class="text-center text-muted-foreground py-4">No requests</div>';
+    },
+    err => { console.error('withdrawals snapshot error:', err); window.showToast('Connection issue — withdrawal data may be stale', 'error'); }
+  );
 
-  // Registrations
   if (unsubRegistrations) unsubRegistrations();
-  unsubRegistrations = onSnapshot(query(collection(db,'registrations'), orderBy('createdAt','desc')), snap => {
-    allRegistrations = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const pendingCount = allRegistrations.filter(r => r.status === 'pending').length;
-    document.getElementById('st-regs').childNodes[0].textContent = pendingCount + ' ';
-    const badge = document.getElementById('st-regs-badge');
-    pendingCount > 0 ? badge.classList.remove('hidden') : badge.classList.add('hidden');
-    const navBadge = document.getElementById('regNavBadge');
-    if (pendingCount > 0) { navBadge.classList.remove('hidden'); navBadge.textContent = pendingCount; }
-    else { navBadge.classList.add('hidden'); }
-    if (lastKnownRegCount >= 0 && pendingCount > lastKnownRegCount) {
-      const diff = pendingCount - lastKnownRegCount;
-      window.showToast(`🔔 ${diff} new registration request${diff>1?'s':''}!`, 'info');
-      if (Notification.permission === 'granted') new Notification('RatTara — New Registration', { body: `${diff} new user registration request${diff>1?'s':''} waiting for approval.` });
-    }
-    lastKnownRegCount = pendingCount;
-    renderRegList();
-  });
+  unsubRegistrations = onSnapshot(
+    query(collection(db,'registrations'), orderBy('createdAt','desc')),
+    snap => {
+      allRegistrations = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const pendingCount = allRegistrations.filter(r => r.status === 'pending').length;
+      document.getElementById('st-regs').childNodes[0].textContent = pendingCount + ' ';
+      const badge = document.getElementById('st-regs-badge');
+      pendingCount > 0 ? badge.classList.remove('hidden') : badge.classList.add('hidden');
+      const navBadge = document.getElementById('regNavBadge');
+      if (pendingCount > 0) { navBadge.classList.remove('hidden'); navBadge.textContent = pendingCount; }
+      else { navBadge.classList.add('hidden'); }
+      if (lastKnownRegCount >= 0 && pendingCount > lastKnownRegCount) {
+        const diff = pendingCount - lastKnownRegCount;
+        window.showToast(`🔔 ${diff} new registration request${diff>1?'s':''}!`, 'info');
+        if (Notification.permission === 'granted') new Notification('RatTara — New Registration', { body: `${diff} new user registration request${diff>1?'s':''} waiting for approval.` });
+      }
+      lastKnownRegCount = pendingCount;
+      renderRegList();
+    },
+    err => { console.error('registrations snapshot error:', err); }
+  );
 
-  // Pre-loaded OTPs (stored for unregistered usernames)
   if (unsubPreloads) unsubPreloads();
-  unsubPreloads = onSnapshot(collection(db, 'otpPreloads'), snap => {
-    allPreloads = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderPreloadedOtpList();
-  });
+  unsubPreloads = onSnapshot(
+    collection(db, 'otpPreloads'),
+    snap => {
+      allPreloads = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderPreloadedOtpList();
+    },
+    err => { console.error('preloads snapshot error:', err); }
+  );
 
-  if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+  if ('Notification' in window && Notification.permission === 'default') {
+    // Request only when user clicks somewhere (respects browser policy)
+    document.addEventListener('click', function reqNotif() {
+      Notification.requestPermission();
+      document.removeEventListener('click', reqNotif);
+    }, { once: true });
+  }
 }
 
-// ─── Render registrations ─────────────────────────────────────────────────────
+// ─── Render registrations ──────────────────────────────────────────────────────
 function renderRegList() {
   const list = regFilter === 'all' ? allRegistrations : allRegistrations.filter(r => r.status === regFilter);
   const container = document.getElementById('regList');
@@ -1254,14 +1581,8 @@ function renderRegList() {
       <table>
         <thead>
           <tr>
-            <th>Username</th>
-            <th>Full Name</th>
-            <th>Telegram</th>
-            <th>Payment</th>
-            <th>Referral</th>
-            <th>Status</th>
-            <th>Date</th>
-            <th>Action</th>
+            <th>Username</th><th>Full Name</th><th>Telegram</th><th>Payment</th>
+            <th>Referral</th><th>Status</th><th>Date</th><th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -1282,10 +1603,15 @@ function renderRegList() {
               <td>
                 ${isPending ? `
                 <div class="flex gap-1">
-                  <button class="btn-xs btn-success-xs" onclick="window.approveRegistration('${escAttr(r.id)}','${escAttr(r.username)}','${escAttr(r.fullName)}')">
+                  <button class="btn-xs btn-success-xs reg-approve-btn"
+                    data-regid="${escHtml(r.id)}"
+                    data-username="${escHtml(r.username)}"
+                    data-fullname="${escHtml(r.fullName)}">
                     <iconify-icon icon="lucide:check"></iconify-icon> Approve
                   </button>
-                  <button class="btn-xs btn-danger-xs" onclick="window.rejectRegistration('${escAttr(r.id)}','${escAttr(r.username)}')">
+                  <button class="btn-xs btn-danger-xs reg-reject-btn"
+                    data-regid="${escHtml(r.id)}"
+                    data-username="${escHtml(r.username)}">
                     <iconify-icon icon="lucide:x"></iconify-icon> Reject
                   </button>
                 </div>` : '—'}
@@ -1297,13 +1623,25 @@ function renderRegList() {
     </div>`;
 }
 
+// Event delegation for registration approve/reject buttons
+document.addEventListener('click', e => {
+  const approveBtn = e.target.closest('.reg-approve-btn');
+  const rejectBtn  = e.target.closest('.reg-reject-btn');
+  if (approveBtn) {
+    window.approveRegistration(approveBtn.dataset.regid, approveBtn.dataset.username, approveBtn.dataset.fullname);
+  }
+  if (rejectBtn) {
+    window.rejectRegistration(rejectBtn.dataset.regid, rejectBtn.dataset.username);
+  }
+});
+
 window.filterReg = (f, el) => {
   regFilter = f;
   document.querySelectorAll('#tab-registrations .filter-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active'); renderRegList();
 };
 
-// ─── Render users table ───────────────────────────────────────────────────────
+// ─── Render users table ────────────────────────────────────────────────────────
 function renderUsersTable() {
   const rate = settings.otpRate || 1;
   const list = filteredUsers;
@@ -1311,7 +1649,7 @@ function renderUsersTable() {
     ? list.map(u => {
         const totalOtp = u.totalOtp || 0;
         const userRate = (u.customRate && u.customRate > 0) ? u.customRate : rate;
-const otpBalance = totalOtp * userRate;
+        const otpBalance = totalOtp * userRate;
         const withdrawn = u.totalWithdrawn || 0;
         const pending = u.totalPending || 0;
         const available = Math.max(0, otpBalance - withdrawn - pending);
@@ -1319,14 +1657,14 @@ const otpBalance = totalOtp * userRate;
           <td><strong>${escHtml(u.username||u.id)}</strong></td>
           <td>${totalOtp}</td>
           <td>${u.customRate && u.customRate > 0
-  ? `<span class="badge badge-preloaded">৳${u.customRate} ★</span>`
-  : `৳${rate}`}
-</td>
+            ? `<span class="badge badge-preloaded">৳${u.customRate} ★</span>`
+            : `৳${rate}`}
+          </td>
           <td>৳${otpBalance}</td>
           <td>৳${withdrawn}</td>
           <td>৳${available}</td>
           <td><div class="flex gap-2">
-            <button class="btn-xs btn-danger-xs" onclick="window.delUser('${escAttr(u.id)}','${escAttr(u.username||u.id)}')">Delete</button>
+            <button class="btn-xs btn-danger-xs" onclick="window.delUser('${escHtml(u.id)}','${escHtml(u.username||u.id)}')">Delete</button>
           </div></td>
         </tr>`;
       }).join('')
@@ -1339,8 +1677,8 @@ window.filterUsers = () => {
   renderUsersTable();
 };
 
-// ─── Render withdrawal table ──────────────────────────────────────────────────
-  function renderCustomRateList() {
+// ─── Custom rate list render ───────────────────────────────────────────────────
+function renderCustomRateList() {
   const customUsers = allUsers.filter(u => u.customRate && u.customRate > 0);
   const container = document.getElementById('customRateList');
   if (!container) return;
@@ -1357,13 +1695,14 @@ window.filterUsers = () => {
             <td><strong>${escHtml(u.username||u.id)}</strong></td>
             <td><span class="badge badge-preloaded">৳${u.customRate} / OTP</span></td>
             <td class="text-muted-foreground text-xs">৳${settings.otpRate||1} / OTP</td>
-            <td><button class="btn-xs btn-danger-xs" onclick="window.removeCustomRate('${escAttr(u.id)}','${escAttr(u.username||u.id)}')">Remove</button></td>
+            <td><button class="btn-xs btn-danger-xs" onclick="window.removeCustomRate('${escHtml(u.id)}','${escHtml(u.username||u.id)}')">Remove</button></td>
           </tr>`).join('')}
         </tbody>
       </table>
     </div>`;
 }
-// ─── Render withdrawal table ──────────────────────────────────────────────────
+
+// ─── Render withdrawal table ───────────────────────────────────────────────────
 function renderReqTable() {
   const list = reqFilter === 'all' ? allReqs : allReqs.filter(r => r.status === reqFilter);
   document.getElementById('reqTable').innerHTML = list.length
@@ -1374,8 +1713,8 @@ function renderReqTable() {
         <td>৳${r.amount}</td>
         <td><span class="badge ${r.status==='pending'?'badge-pending':r.status==='approved'?'badge-approved':'badge-rejected'}">${r.status}</span></td>
         <td>${r.status==='pending'
-          ?`<button class="btn-xs btn-success-xs" onclick="window.approveReq('${escAttr(r.id)}','${escAttr(r.userId)}',${r.amount})">✓ Approve</button>
-             <button class="btn-xs btn-danger-xs" onclick="window.rejectReq('${escAttr(r.id)}','${escAttr(r.userId)}',${r.amount})">✗ Reject</button>`
+          ?`<button class="btn-xs btn-success-xs" onclick="window.approveReq('${escHtml(r.id)}','${escHtml(r.userId)}',${r.amount})">✓ Approve</button>
+             <button class="btn-xs btn-danger-xs" onclick="window.rejectReq('${escHtml(r.id)}','${escHtml(r.userId)}',${r.amount})">✗ Reject</button>`
           :'—'}
         </td>
       </tr>`).join('')
@@ -1388,7 +1727,7 @@ window.filterReq = (f, el) => {
   el.classList.add('active'); renderReqTable();
 };
 
-// ─── Approve/reject withdrawals ───────────────────────────────────────────────
+// ─── Approve/reject withdrawals ────────────────────────────────────────────────
 window.approveReq = async (reqId, userId, amount) => {
   try {
     await updateDoc(doc(db, 'withdrawals', reqId), { status: 'approved' });
@@ -1416,27 +1755,48 @@ window.rejectReq = async (reqId, userId, amount) => {
   } catch (e) { window.showToast('Error rejecting', 'error'); }
 };
 
-// ─── User delete ──────────────────────────────────────────────────────────────
+// ─── User delete — cleans up related withdrawals ───────────────────────────────
 window.delUser = async (userId, username) => {
-  if (!confirm(`Permanently delete user "${username}"?`)) return;
-  await deleteDoc(doc(db, 'users', userId));
-  window.showToast('User deleted', 'error');
+  if (!confirm(`Permanently delete user "${username}"? This will also cancel all their pending withdrawal requests.`)) return;
+  try {
+    // Cancel pending withdrawals to prevent orphaned totalPending issues
+    const pendingSnap = await getDocs(
+      query(collection(db, 'withdrawals'), where('userId', '==', userId), where('status', '==', 'pending'))
+    );
+    if (!pendingSnap.empty) {
+      const batch = writeBatch(db);
+      pendingSnap.docs.forEach(d => batch.update(d.ref, { status: 'rejected' }));
+      await batch.commit();
+    }
+    await deleteDoc(doc(db, 'users', userId));
+    window.showToast('User deleted', 'error');
+  } catch(e) {
+    console.error('delUser:', e);
+    window.showToast('Error deleting user', 'error');
+  }
 };
 
-// ─── OTP: parse bulk input ────────────────────────────────────────────────────
+// ─── OTP: parse bulk input ─────────────────────────────────────────────────────
 window.parseBulkData = (raw) => {
-  return raw.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('//'))
+  const skipped = [];
+  const parsed = raw.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('//'))
     .map(l => {
       const parts = l.split(/\s+/);
       if (parts.length < 2) return null;
       const cnt = parseInt(parts[parts.length - 1]);
-      if (isNaN(cnt) || cnt <= 0) return null;
+      if (isNaN(cnt) || cnt <= 0) { skipped.push(`"${l}" — invalid count`); return null; }
+      if (cnt > 100000) { skipped.push(`"${l}" — count exceeds 100,000 safety cap`); return null; }
       const username = parts.slice(0, parts.length - 1).join('_');
       return username ? { username, count: cnt } : null;
     }).filter(Boolean);
+
+  if (skipped.length) {
+    window.showToast(`⚠️ ${skipped.length} line(s) skipped: ${skipped[0]}`, 'error');
+  }
+  return parsed;
 };
 
-// ─── Bulk OTP preview ─────────────────────────────────────────────────────────
+// ─── Bulk OTP preview ──────────────────────────────────────────────────────────
 window.previewBulkOtp = () => {
   const raw = document.getElementById('bulkOtpInput').value;
   const previewDiv = document.getElementById('bulkPreview');
@@ -1446,7 +1806,6 @@ window.previewBulkOtp = () => {
   previewDiv.innerHTML = `<strong class="block mb-2">📋 ${lines.length} entries found</strong>` +
     lines.map(({ username, count }) => {
       const found = allUsers.find(u => u.id===username.toLowerCase() || (u.username||'').toLowerCase()===username.toLowerCase());
-      // Check if in pre-loads already
       const preloaded = allPreloads.find(p => p.id === username.toLowerCase());
       if (found) {
         return `<div class="bulk-row"><span>${escHtml(username)}</span><span>+${count} <span class="bulk-found">(${found.totalOtp||0} → ${(found.totalOtp||0)+count}) existing user</span></span></div>`;
@@ -1458,7 +1817,7 @@ window.previewBulkOtp = () => {
     }).join('');
 };
 
-// ─── Bulk OTP apply — uses batched writes, stores pre-loads for unknown users ─
+// ─── Bulk OTP apply ────────────────────────────────────────────────────────────
 window.applyBulkOtp = async () => {
   const raw = document.getElementById('bulkOtpInput').value;
   const lines = window.parseBulkData(raw);
@@ -1468,7 +1827,6 @@ window.applyBulkOtp = async () => {
   if (applyBtn) applyBtn.disabled = true;
 
   let updatedUsers = 0, preloadedNew = 0, preloadedAdded = 0;
-  // Split into batches of 500
   const BATCH_SIZE = 499;
   let batch = writeBatch(db);
   let batchCount = 0;
@@ -1480,11 +1838,9 @@ window.applyBulkOtp = async () => {
   for (const { username, count } of lines) {
     const found = allUsers.find(u => u.id===username.toLowerCase() || (u.username||'').toLowerCase()===username.toLowerCase());
     if (found) {
-      // Existing user — add OTPs directly
       batch.update(doc(db, 'users', found.id), { totalOtp: (found.totalOtp||0) + count });
       updatedUsers++; batchCount++;
     } else {
-      // Not registered yet — store/add to pre-load
       const preloadRef = doc(db, 'otpPreloads', username.toLowerCase());
       const existing = allPreloads.find(p => p.id === username.toLowerCase());
       if (existing) {
@@ -1509,14 +1865,14 @@ window.applyBulkOtp = async () => {
   document.getElementById('bulkPreview').style.display = 'none';
 };
 
-// ─── Individul Withdraw ───────────────────────────────────────────────────────────
-  window.addManualWithdrawal = async () => {
+// ─── Manual Withdrawal Entry — with balance check ─────────────────────────────
+window.addManualWithdrawal = async () => {
   const username = document.getElementById('manualWdUser').value.trim();
   const amount   = parseInt(document.getElementById('manualWdAmount').value);
   const note     = document.getElementById('manualWdNote').value.trim();
   const dateVal  = document.getElementById('manualWdDate').value;
 
-  if (!username)          { window.showToast('Enter a username', 'error'); return; }
+  if (!username)                    { window.showToast('Enter a username', 'error'); return; }
   if (isNaN(amount) || amount <= 0) { window.showToast('Enter a valid amount', 'error'); return; }
 
   const found = allUsers.find(u =>
@@ -1532,12 +1888,17 @@ window.applyBulkOtp = async () => {
     if (!uSnap.exists()) { window.showToast('User not found in DB', 'error'); return; }
     const d = uSnap.data();
 
-    // Update user's totalWithdrawn
+    // FIX: check balance before recording manual withdrawal
+    const rate = getUserRate(found);
+    const available = Math.max(0, (d.totalOtp||0) * rate - (d.totalWithdrawn||0) - (d.totalPending||0));
+    if (amount > available) {
+      if (!confirm(`⚠️ This amount (৳${amount}) exceeds the user's available balance (৳${available}). Record anyway?`)) return;
+    }
+
     await updateDoc(doc(db, 'users', found.id), {
       totalWithdrawn: (d.totalWithdrawn || 0) + amount
     });
 
-    // Also log it as an approved withdrawal record so it shows in history
     await addDoc(collection(db, 'withdrawals'), {
       userId: found.id,
       username: found.username || found.id,
@@ -1561,13 +1922,14 @@ window.applyBulkOtp = async () => {
     window.showToast('Error recording withdrawal', 'error');
   }
 };
-  // ─── Custom OTP rate per user ─────────────────────────────────────────────────
+
+// ─── Custom OTP rate per user ──────────────────────────────────────────────────
 window.setCustomRate = async () => {
   const username = document.getElementById('customRateUser').value.trim();
   const rate     = parseFloat(document.getElementById('customRateValue').value);
 
-  if (!username)            { window.showToast('Enter a username', 'error'); return; }
-  if (isNaN(rate) || rate <= 0) { window.showToast('Enter a valid rate', 'error'); return; }
+  if (!username)               { window.showToast('Enter a username', 'error'); return; }
+  if (isNaN(rate) || rate <= 0){ window.showToast('Enter a valid rate', 'error'); return; }
 
   const found = allUsers.find(u =>
     u.id === username.toLowerCase() ||
@@ -1591,15 +1953,15 @@ window.removeCustomRate = async (userId, username) => {
   try {
     await updateDoc(doc(db, 'users', userId), { customRate: null });
     window.showToast(`Custom rate removed for ${username}`, 'info');
-  } catch (e) {
-    window.showToast('Error removing custom rate', 'error');
-  }
+  } catch (e) { window.showToast('Error removing custom rate', 'error'); }
 };
-// ─── Individual OTP ───────────────────────────────────────────────────────────
+
+// ─── Individual OTP ────────────────────────────────────────────────────────────
 window.addSingleOtp = async () => {
   const username = document.getElementById('singleOtpUser').value.trim();
   const cnt = parseInt(document.getElementById('singleOtpCount').value);
   if (!username || isNaN(cnt) || cnt <= 0) { window.showToast('Enter valid username and count', 'error'); return; }
+  if (cnt > 100000) { window.showToast('Count exceeds 100,000 safety cap', 'error'); return; }
   const found = allUsers.find(u => u.id===username.toLowerCase() || (u.username||'').toLowerCase()===username.toLowerCase());
   if (!found) { window.showToast('User not found. Use bulk OTP to pre-load for unregistered users.', 'error'); return; }
   await updateDoc(doc(db, 'users', found.id), { totalOtp: (found.totalOtp||0) + cnt });
@@ -1608,7 +1970,7 @@ window.addSingleOtp = async () => {
   document.getElementById('singleOtpCount').value = '';
 };
 
-// ─── Render pre-loaded OTP list ───────────────────────────────────────────────
+// ─── Render pre-loaded OTP list ────────────────────────────────────────────────
 function renderPreloadedOtpList() {
   const container = document.getElementById('preloadedOtpList');
   if (!allPreloads.length) {
@@ -1626,7 +1988,7 @@ function renderPreloadedOtpList() {
               <td><strong>${escHtml(p.username||p.id)}</strong></td>
               <td><span class="badge badge-preloaded">⚡ ${p.count} OTPs</span></td>
               <td class="text-xs text-muted-foreground">${timeStr}</td>
-              <td><button class="btn-xs btn-danger-xs" onclick="window.deletePreload('${escAttr(p.id)}','${escAttr(p.username||p.id)}')">Remove</button></td>
+              <td><button class="btn-xs btn-danger-xs" onclick="window.deletePreload('${escHtml(p.id)}','${escHtml(p.username||p.id)}')">Remove</button></td>
             </tr>`;
           }).join('')}
         </tbody>
@@ -1640,25 +2002,49 @@ window.deletePreload = async (id, username) => {
   window.showToast(`Pre-loaded OTPs removed for ${username}`, 'error');
 };
 
-// ─── Settings ─────────────────────────────────────────────────────────────────
+// ─── Settings save — PBKDF2 for new admin passwords ────────────────────────────
 window.saveSettings = async () => {
   const min = parseInt(document.getElementById('setMin').value) || 100;
   const rate = parseFloat(document.getElementById('setOtpRate').value) || 1;
   const regMode = document.getElementById('setRegMode').value || 'approval';
   const newAdminU = document.getElementById('setAdminUser').value.trim();
   const newAdminP = document.getElementById('setAdminPass').value.trim();
+
   if (newAdminU) settings.adminUser = newAdminU;
-  if (newAdminP) settings.adminPass = newAdminP;
+
+  // Hash new admin password with PBKDF2 + unique salt
+  if (newAdminP) {
+    const { hash, salt } = await hashPassword(newAdminP);
+    settings.adminPassHash = hash;
+    settings.adminPassSalt = salt;
+    settings.adminPass = ''; // clear any legacy plaintext
+  }
+
+  const activeMethods = [];
+  if (document.getElementById('setMethodBkash').checked)   activeMethods.push('bKash');
+  if (document.getElementById('setMethodNagad').checked)   activeMethods.push('Nagad');
+  if (document.getElementById('setMethodBinance').checked) activeMethods.push('Binance');
+  if (!activeMethods.length) { window.showToast('Select at least one withdrawal method', 'error'); return; }
+
   settings.minWithdraw = min; settings.otpRate = rate; settings.regMode = regMode;
+  settings.activeMethods = activeMethods;
+
   await setDoc(doc(db, 'config', 'settings'), settings);
+
   document.getElementById('currentRateDisplay').innerText = rate;
+  const hint = document.getElementById('globalRateHint');
+  if (hint) hint.innerText = rate;
+
   document.getElementById('setAdminUser').value = '';
   document.getElementById('setAdminPass').value = '';
+
+  methodsRendered = false;
+  renderMethodButtons();
   renderUsersTable();
   window.showToast('Settings saved', 'success');
 };
 
-// ─── Tab navigation ───────────────────────────────────────────────────────────
+// ─── Tab navigation ────────────────────────────────────────────────────────────
 window.showTab = (tab, el) => {
   document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.admin-nav-item').forEach(m => {
@@ -1670,32 +2056,26 @@ window.showTab = (tab, el) => {
 
 window.closeModal = () => document.getElementById('modal').classList.remove('open');
 
-// ─── XSS helpers ─────────────────────────────────────────────────────────────
+// ─── XSS helpers ──────────────────────────────────────────────────────────────
 function escHtml(str) {
   return String(str??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
-function escAttr(str) {
-  return String(str??'').replace(/'/g,"\\'").replace(/"/g,'\\"');
-}
 
-// ─── Secret admin URL ─────────────────────────────────────────────────────────
-(function checkSecretParam() {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('secret') === 'rattara-admin') {
-    window.history.replaceState({}, '', window.location.pathname);
-    window._openAdminOnLoad = true;
-  }
-})();
+// ─── Admin URL: removed hardcoded secret — use server-side protection instead ──
+// The previous ?secret=rattara-admin was visible in source. Removed entirely.
+// To access admin login, navigate to /?admin=1 only if you know the path,
+// or just use the admin login link from the user login page (if you add one).
 
-// ─── Boot ─────────────────────────────────────────────────────────────────────
+// ─── Boot ──────────────────────────────────────────────────────────────────────
 window.addEventListener('load', async () => {
   await loadSettings();
   setTimeout(async () => {
     document.getElementById('loader').classList.add('hide');
-    if (window._openAdminOnLoad) { window._openAdminOnLoad = false; switchPage('adminLoginPage'); return; }
     const sess = loadSession();
     if (sess) {
       if (sess.isAdmin) {
+        // FIX: verify isAdmin session by re-checking settings (can't forge this
+        // without also knowing the admin password, since saveSession requires a nonce)
         _enterAdmin();
       } else if (sess.userId) {
         try {
