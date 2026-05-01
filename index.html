@@ -1171,7 +1171,7 @@ window.submitWithdraw = async () => {
     const freshUser = await getDoc(doc(db, 'users', currentUser.id));
     if (!freshUser.exists()) { err.innerText = 'User not found'; err.style.display = 'block'; setLoading('wdBtn', false); return; }
     const fd = freshUser.data();
-    const freshAvailable = Math.max(0, (fd.totalOtp||0)*(settings.otpRate||1) - (fd.totalWithdrawn||0) - (fd.totalPending||0));
+    const freshAvailable = Math.max(0, (fd.totalOtp||0) * getUserRate(fd) - (fd.totalWithdrawn||0) - (fd.totalPending||0));
     if (amount > freshAvailable) { err.innerText = `Insufficient balance. Available: ৳${freshAvailable}`; err.style.display = 'block'; setLoading('wdBtn', false); return; }
     await updateDoc(doc(db, 'users', currentUser.id), { totalPending: (fd.totalPending||0) + amount });
     await addDoc(collection(db, 'withdrawals'), {
