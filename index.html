@@ -554,7 +554,27 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
               <button onclick="window.addSingleOtp()" class="bg-primary text-white py-3 rounded-xl font-bold">Add OTP</button>
             </div>
           </div>
-
+          <!-- Manual Withdrawal Entry -->
+          <div class="bg-card border rounded-2xl p-6 mt-5">
+            <div class="flex gap-3 mb-4">
+              <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+                <iconify-icon icon="lucide:wallet" class="text-emerald-600 text-xl"></iconify-icon>
+              </div>
+              <div>
+                <h3 class="font-extrabold">Manual Withdrawal Entry</h3>
+                <p class="text-[10px] text-muted-foreground">Record outside withdrawals (bKash/Nagad/hand payment)</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <input type="text" id="manualWdUser" placeholder="Username" class="bg-secondary rounded-xl p-3 outline-none"/>
+              <input type="number" id="manualWdAmount" placeholder="Amount (৳)" class="bg-secondary rounded-xl p-3 outline-none"/>
+              <input type="text" id="manualWdNote" placeholder="Note (e.g. bKash 01XXXXXXXXX)" class="bg-secondary rounded-xl p-3 outline-none"/>
+              <input type="datetime-local" id="manualWdDate" class="bg-secondary rounded-xl p-3 outline-none text-sm"/>
+            </div>
+            <button onclick="window.addManualWithdrawal()" class="mt-4 bg-emerald-600 text-white py-3 px-6 rounded-xl font-bold flex gap-2 items-center">
+              <iconify-icon icon="lucide:plus-circle"></iconify-icon> Record Withdrawal
+            </button>
+          </div>
           <!-- Pre-loaded OTP store (pending usernames) -->
           <div class="bg-card border rounded-2xl p-6 mt-5">
             <div class="flex gap-3 items-center mb-4">
@@ -644,7 +664,7 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
 import { initializeApp } from "firebase/app";
 import {
   getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs,
-  updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp, where, writeBatch
+  updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp, where, writeBatch, Timestamp
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -1427,6 +1447,58 @@ window.applyBulkOtp = async () => {
   document.getElementById('bulkPreview').style.display = 'none';
 };
 
+// ─── Individul Withdraw ───────────────────────────────────────────────────────────
+  window.addManualWithdrawal = async () => {
+  const username = document.getElementById('manualWdUser').value.trim();
+  const amount   = parseInt(document.getElementById('manualWdAmount').value);
+  const note     = document.getElementById('manualWdNote').value.trim();
+  const dateVal  = document.getElementById('manualWdDate').value;
+
+  if (!username)          { window.showToast('Enter a username', 'error'); return; }
+  if (isNaN(amount) || amount <= 0) { window.showToast('Enter a valid amount', 'error'); return; }
+
+  const found = allUsers.find(u =>
+    u.id === username.toLowerCase() ||
+    (u.username||'').toLowerCase() === username.toLowerCase()
+  );
+  if (!found) { window.showToast('User not found', 'error'); return; }
+
+  const confirmedDate = dateVal ? new Date(dateVal) : new Date();
+
+  try {
+    const uSnap = await getDoc(doc(db, 'users', found.id));
+    if (!uSnap.exists()) { window.showToast('User not found in DB', 'error'); return; }
+    const d = uSnap.data();
+
+    // Update user's totalWithdrawn
+    await updateDoc(doc(db, 'users', found.id), {
+      totalWithdrawn: (d.totalWithdrawn || 0) + amount
+    });
+
+    // Also log it as an approved withdrawal record so it shows in history
+    await addDoc(collection(db, 'withdrawals'), {
+      userId: found.id,
+      username: found.username || found.id,
+      fullName: found.username || found.id,
+      number: note || 'Manual entry',
+      accountType: 'Manual',
+      amount,
+      method: 'Manual',
+      status: 'approved',
+      manualEntry: true,
+      createdAt: Timestamp.fromDate(confirmedDate)
+    });
+
+    window.showToast(`✅ ৳${amount} recorded for ${found.username || found.id}`, 'success');
+    document.getElementById('manualWdUser').value   = '';
+    document.getElementById('manualWdAmount').value = '';
+    document.getElementById('manualWdNote').value   = '';
+    document.getElementById('manualWdDate').value   = '';
+  } catch (e) {
+    console.error('addManualWithdrawal:', e);
+    window.showToast('Error recording withdrawal', 'error');
+  }
+};
 // ─── Individual OTP ───────────────────────────────────────────────────────────
 window.addSingleOtp = async () => {
   const username = document.getElementById('singleOtpUser').value.trim();
