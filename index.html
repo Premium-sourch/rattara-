@@ -1010,12 +1010,13 @@ window.submitRegister = async () => {
 
     // Save registration request
     await addDoc(collection(db, 'registrations'), {
-      fullName, username, usernameLower: username.toLowerCase(),
-      telegram, payment: payment || '', referral: referral || '',
-      status: initialStatus,
-      autoApproved: autoApprove,
-      createdAt: serverTimestamp()
-    });
+  fullName, username, usernameLower: username.toLowerCase(),
+  password,
+  telegram, payment: payment || '', referral: referral || '',
+  status: initialStatus,
+  autoApproved: autoApprove,
+  createdAt: serverTimestamp()
+});
 
     // If auto-approve → create user account immediately
     if (autoApprove) {
