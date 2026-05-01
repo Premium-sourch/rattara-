@@ -122,6 +122,7 @@
 .badge-pending { background: #FFFBEB; color: #D97706; border: 1px solid rgba(217,119,6,.2); }
 .badge-approved { background: #ECFDF5; color: #059669; border: 1px solid rgba(5,150,105,.2); }
 .badge-rejected { background: #FEF2F2; color: #EF4444; border: 1px solid rgba(239,68,68,.2); }
+.badge-preloaded { background: #EFF6FF; color: #2563EB; border: 1px solid rgba(37,99,235,.2); }
 
 .table-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid #E2E8F0; background: white;}
 table { width: 100%; border-collapse: collapse; font-size: .82rem; }
@@ -134,12 +135,11 @@ tbody tr:hover { background: #F8FAFC; }
 .filter-btn { padding: 6px 14px; border-radius: 20px; border: 1.5px solid #E2E8F0; background: white; color: #64748B; font-family: inherit; font-size: .75rem; font-weight: 700; cursor: pointer; transition: all .2s; }
 .filter-btn.active { border-color: #2563EB; color: #2563EB; background: #EFF6FF; }
 
-.otp-tag { font-family: monospace; font-size: .85rem; font-weight: 700; color: #D97706; background: #FFFBEB; padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(217,119,6,.2); letter-spacing: .03em;}
-
 .bulk-preview { background: white; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px; margin-top: 12px; max-height: 200px; overflow-y: auto; font-size: .82rem; display: none; }
 .bulk-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid #E2E8F0; }
 .bulk-found { color: #059669; font-weight: 700; }
 .bulk-notfound { color: #94A3B8; }
+.bulk-preloaded { color: #2563EB; font-weight: 700; }
 
 .btn-xs { padding: 5px 10px; font-size: .7rem; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; font-family: inherit; display: inline-flex; align-items: center; gap: 4px; transition: opacity .15s; }
 .btn-xs:disabled { opacity: .5; cursor: not-allowed; }
@@ -156,7 +156,6 @@ tbody tr:hover { background: #F8FAFC; }
 
 button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-events: none; }
 
-/* Notification badge */
 .notif-badge {
   background: #EF4444;
   color: white;
@@ -176,22 +175,25 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
   50% { transform: scale(1.15); }
 }
 
-/* Register page animated background */
 @keyframes float1 { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-20px) rotate(5deg)} }
 @keyframes float2 { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(15px) rotate(-4deg)} }
 .float-1 { animation: float1 6s ease-in-out infinite; }
 .float-2 { animation: float2 5s ease-in-out infinite; }
 
-/* Pending registration pulse */
 .reg-pulse { animation: reg-pulse 2s ease-in-out infinite; }
 @keyframes reg-pulse {
   0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,.3); }
   50% { box-shadow: 0 0 0 8px rgba(245,158,11,0); }
 }
 
-/* Step indicator for register */
 .step-dot { width: 8px; height: 8px; border-radius: 50%; background: #E2E8F0; transition: background .3s; }
 .step-dot.active { background: #2563EB; }
+
+/* Password strength indicator */
+.pw-strength { height: 3px; border-radius: 2px; transition: all .3s; margin-top: 6px; }
+.pw-strength.weak { background: #EF4444; width: 30%; }
+.pw-strength.medium { background: #F59E0B; width: 65%; }
+.pw-strength.strong { background: #10B981; width: 100%; }
 </style>
 </head>
 <body class="bg-background text-foreground min-h-screen">
@@ -227,14 +229,20 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
     <div class="text-center mb-10">
       <div class="w-20 h-20 bg-primary rounded-3xl shadow-2xl shadow-blue-200 flex items-center justify-center mx-auto mb-6"><iconify-icon icon="lucide:zap" class="text-4xl text-white"></iconify-icon></div>
       <h1 class="text-3xl font-extrabold">RatTara</h1>
-      <p class="text-muted-foreground mt-2 font-medium text-sm">Enter your credentials</p>
+      <p class="text-muted-foreground mt-2 font-medium text-sm">Enter your credentials to continue</p>
     </div>
     <div class="bg-card border border-border rounded-[2rem] p-8 shadow-xl">
       <div class="space-y-5">
-        <div><label class="text-[10px] font-bold uppercase tracking-wider ml-1 text-muted-foreground">Username</label><input type="text" id="loginUser" autocomplete="username" class="w-full bg-secondary border-none rounded-2xl py-4 pl-5 pr-4 focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="আপনার username"/></div>
-        <div><label class="text-[10px] font-bold uppercase tracking-wider ml-1 text-muted-foreground">Password / OTP</label><input type="password" id="loginPass" autocomplete="current-password" class="w-full bg-secondary border-none rounded-2xl py-4 pl-5 pr-4 focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="OTP code" onkeydown="if(event.key==='Enter')window.userLogin()"/></div>
+        <div><label class="text-[10px] font-bold uppercase tracking-wider ml-1 text-muted-foreground">Username</label>
+          <input type="text" id="loginUser" autocomplete="username" class="w-full bg-secondary border-none rounded-2xl py-4 pl-5 pr-4 focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="আপনার username"/>
+        </div>
+        <div><label class="text-[10px] font-bold uppercase tracking-wider ml-1 text-muted-foreground">Password</label>
+          <input type="password" id="loginPass" autocomplete="current-password" class="w-full bg-secondary border-none rounded-2xl py-4 pl-5 pr-4 focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="আপনার পাসওয়ার্ড" onkeydown="if(event.key==='Enter')window.userLogin()"/>
+        </div>
         <div class="error-box" id="loginErr"></div>
-        <button id="loginBtn" onclick="window.userLogin()" class="w-full bg-primary text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200 hover:scale-[1.01] transition-all flex items-center justify-center gap-2">Login <iconify-icon icon="lucide:arrow-right"></iconify-icon></button>
+        <button id="loginBtn" onclick="window.userLogin()" class="w-full bg-primary text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200 hover:scale-[1.01] transition-all flex items-center justify-center gap-2">
+          Login <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+        </button>
       </div>
     </div>
     <div class="mt-6 flex flex-col items-center gap-3">
@@ -247,7 +255,6 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
 
 <!-- REGISTRATION PAGE -->
 <div id="registerPage" class="page relative min-h-screen flex items-center justify-center overflow-hidden">
-  <!-- Decorative blobs -->
   <div class="float-1 absolute top-10 left-10 w-40 h-40 bg-blue-100 rounded-full blur-3xl opacity-70 pointer-events-none"></div>
   <div class="float-2 absolute bottom-10 right-10 w-52 h-52 bg-violet-100 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
   <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-50 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
@@ -261,7 +268,6 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
       <p class="text-muted-foreground mt-1 font-medium text-sm">নতুন অ্যাকাউন্ট খুলুন</p>
     </div>
 
-    <!-- Step indicator -->
     <div class="flex items-center justify-center gap-2 mb-6">
       <div class="step-dot active" id="sd1"></div>
       <div class="h-px w-8 bg-border"></div>
@@ -270,7 +276,6 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
       <div class="step-dot" id="sd3"></div>
     </div>
 
-    <!-- Register form card -->
     <div id="regFormCard" class="bg-card border border-border rounded-[2rem] p-8 shadow-xl">
       <div class="space-y-4">
         <div>
@@ -287,11 +292,30 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
           <div id="unTakenMsg" class="hidden mt-2 flex items-center gap-2 bg-red-50 border border-red-100 rounded-xl px-3 py-2 text-xs font-bold text-red-600">
             <iconify-icon icon="lucide:x-circle"></iconify-icon> This username is already taken. Please choose a different one.
           </div>
+          <!-- Pre-loaded OTP notice (shown dynamically) -->
+          <div id="preloadedNotice" class="hidden mt-2 flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-xl px-3 py-2 text-xs font-bold text-blue-700">
+            <iconify-icon icon="lucide:zap"></iconify-icon> OTP already loaded for this username — you'll be auto-approved!
+          </div>
           <div class="mt-2 flex items-start gap-2 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2.5 text-xs font-semibold text-amber-700">
             <iconify-icon icon="lucide:triangle-alert" class="mt-0.5 shrink-0 text-amber-500"></iconify-icon>
-            <span><strong>Important:</strong> Your username here must exactly match your username in your client panel. If they do not match, you may face issues when requesting a withdrawal.</span>
+            <span><strong>Important:</strong> Your username must exactly match your username in your client panel.</span>
           </div>
         </div>
+
+        <!-- Password field — set by user during registration -->
+        <div>
+          <label class="text-[10px] font-bold uppercase tracking-wider ml-1 text-muted-foreground">Password</label>
+          <input type="password" id="regPassword" oninput="window.checkPwStrength()" autocomplete="new-password"
+            class="w-full bg-secondary border-none rounded-2xl py-4 pl-5 pr-4 focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="কমপক্ষে ৬ অক্ষর"/>
+          <div id="pwStrengthBar" class="pw-strength hidden"></div>
+          <div id="pwStrengthLabel" class="text-[10px] font-bold mt-1 ml-1 hidden"></div>
+        </div>
+        <div>
+          <label class="text-[10px] font-bold uppercase tracking-wider ml-1 text-muted-foreground">Confirm Password</label>
+          <input type="password" id="regPasswordConfirm" autocomplete="new-password"
+            class="w-full bg-secondary border-none rounded-2xl py-4 pl-5 pr-4 focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="পাসওয়ার্ড আবার লিখুন"/>
+        </div>
+
         <div>
           <label class="text-[10px] font-bold uppercase tracking-wider ml-1 text-muted-foreground">Telegram Username</label>
           <div class="relative">
@@ -314,13 +338,13 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
       </div>
     </div>
 
-    <!-- Success card (hidden initially) -->
+    <!-- Success card -->
     <div id="regSuccessCard" class="hidden bg-card border border-border rounded-[2rem] p-8 shadow-xl text-center">
       <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
         <iconify-icon icon="lucide:check-circle-2" class="text-4xl text-emerald-600"></iconify-icon>
       </div>
-      <h3 class="text-xl font-extrabold mb-2">Registration Submitted! 🎉</h3>
-      <p class="text-muted-foreground text-sm font-medium mb-4">Your registration request has been sent. Once the Admin approves it, you will receive a notification on your <strong class="text-foreground">Telegram</strong>.</p>
+      <h3 class="text-xl font-extrabold mb-2" id="regSuccessTitle">Registration Submitted! 🎉</h3>
+      <p class="text-muted-foreground text-sm font-medium mb-4" id="regSuccessMsg">Your registration request has been sent. Once the Admin approves it, you will receive a notification on your <strong class="text-foreground">Telegram</strong>.</p>
       <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-5">
         <p class="text-xs font-bold text-muted-foreground uppercase mb-1">Your Username</p>
         <p class="text-lg font-extrabold text-primary" id="regSuccessUsername"></p>
@@ -419,8 +443,7 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
             <span id="regNavBadge" class="notif-badge hidden">0</span>
           </div>
           <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('users',this)"><iconify-icon icon="lucide:users"></iconify-icon>Users</div>
-          <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('otp',this)"><iconify-icon icon="lucide:zap"></iconify-icon>OTP update</div>
-          <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('bulkUser',this)"><iconify-icon icon="lucide:users-round"></iconify-icon>Bulk User</div>
+          <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('otp',this)"><iconify-icon icon="lucide:zap"></iconify-icon>OTP Update</div>
           <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('withdrawals',this)"><iconify-icon icon="lucide:banknote"></iconify-icon>Withdrawals</div>
           <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('settings',this)"><iconify-icon icon="lucide:settings"></iconify-icon>Settings</div>
         </div>
@@ -468,72 +491,81 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
           </div>
         </div>
 
-        <!-- USERS -->
+        <!-- USERS (read-only view — no add/bulk, self-registration only) -->
         <div class="admin-panel" id="tab-users">
           <div class="bg-card border rounded-2xl p-6">
-            <div class="flex gap-3 items-center mb-5">
-              <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center"><iconify-icon icon="lucide:user-plus" class="text-primary text-lg"></iconify-icon></div>
-              <h3 class="font-extrabold">Add new user</h3>
+            <div class="flex gap-3 items-center mb-2">
+              <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center"><iconify-icon icon="lucide:users" class="text-primary text-lg"></iconify-icon></div>
+              <div>
+                <h3 class="font-extrabold">All Users</h3>
+                <p class="text-xs text-muted-foreground">Users self-register — manage OTPs in the OTP Update tab</p>
+              </div>
             </div>
-            <div class="bg-secondary p-4 rounded-2xl flex flex-wrap gap-3 items-end">
-              <input type="text" id="newUser" placeholder="Username" class="flex-1 bg-card border rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-primary"/>
-              <button onclick="window.addUser()" class="bg-primary text-white px-5 py-3 rounded-xl font-bold flex gap-2 items-center"><iconify-icon icon="lucide:plus"></iconify-icon>Add</button>
+            <!-- Search -->
+            <div class="mt-4 mb-4">
+              <input type="text" id="userSearch" oninput="window.filterUsers()" placeholder="Search by username…" class="w-full bg-secondary rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-primary text-sm"/>
             </div>
-            <div class="table-wrap mt-5">
+            <div class="table-wrap">
               <table>
-                <thead><tr><th>Username</th><th>Total OTP</th><th>Rate</th><th>OTP balance</th><th>Withdrawn</th><th>Available</th><th>Login OTP</th><th>Actions</th></tr></thead>
+                <thead><tr><th>Username</th><th>Total OTP</th><th>Rate</th><th>OTP Value</th><th>Withdrawn</th><th>Available</th><th>Actions</th></tr></thead>
                 <tbody id="usersTable"></tbody>
               </table>
             </div>
           </div>
         </div>
 
-        <!-- BULK USER -->
-        <div class="admin-panel" id="tab-bulkUser">
-          <div class="bg-card border rounded-2xl p-6">
-            <div class="flex gap-3 items-center mb-4">
-              <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center"><iconify-icon icon="lucide:users-round" class="text-indigo-600 text-xl"></iconify-icon></div>
-              <div><h3 class="font-extrabold">Bulk User Creation</h3><p class="text-[10px] text-muted-foreground uppercase font-bold">Add multiple users at once</p></div>
-            </div>
-            <div class="bg-amber-50 border border-amber-100 rounded-xl p-3 mb-5 text-sm text-amber-700 flex gap-2 items-start">
-              <iconify-icon icon="lucide:alert-circle" class="mt-0.5 shrink-0"></iconify-icon>
-              Format: one username per line. Each user gets a unique 8-character OTP.
-            </div>
-            <textarea id="bulkUserInput" class="w-full bg-secondary rounded-2xl p-4 min-h-[180px] font-mono text-sm outline-none" placeholder="Rakib123&#10;Tania_RT&#10;Faruk_007&#10;Shakil_Ahmed"></textarea>
-            <div id="bulkUserPreview" class="bulk-preview mt-3"></div>
-            <div class="flex gap-3 mt-4 flex-wrap">
-              <button onclick="window.previewBulkUsers()" class="bg-gray-200 text-gray-800 py-2.5 px-5 rounded-xl font-bold flex gap-1 items-center"><iconify-icon icon="lucide:eye"></iconify-icon> Preview</button>
-              <button onclick="window.applyBulkUsers()" class="bg-indigo-700 text-white py-2.5 px-6 rounded-xl font-bold flex gap-2 items-center"><iconify-icon icon="lucide:save-all"></iconify-icon> Create Bulk Users</button>
-              <button onclick="document.getElementById('bulkUserInput').value='';document.getElementById('bulkUserPreview').style.display='none'" class="bg-secondary border px-5 rounded-xl">Clear</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- OTP UPDATE -->
+        <!-- OTP UPDATE — now with pre-load concept -->
         <div class="admin-panel" id="tab-otp">
+          <!-- Bulk OTP upload (adds to existing users OR stores as pre-load for future registrations) -->
           <div class="bg-card border rounded-2xl p-6">
             <div class="flex gap-3 mb-4">
               <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center"><iconify-icon icon="lucide:zap" class="text-purple-600 text-xl"></iconify-icon></div>
-              <div><h3 class="font-extrabold">Bulk OTP Upload</h3><p class="text-[10px] text-muted-foreground">Username &nbsp; OTP count (space separated)</p></div>
+              <div>
+                <h3 class="font-extrabold">Bulk OTP Upload</h3>
+                <p class="text-[10px] text-muted-foreground">Username &nbsp; OTP count (space separated)</p>
+              </div>
             </div>
-            <div class="bg-blue-50 p-3 rounded-xl text-primary text-sm font-bold flex gap-2 items-center mb-4"><iconify-icon icon="lucide:info"></iconify-icon> Current rate: ৳<span id="currentRateDisplay">1</span> per OTP</div>
-            <textarea id="bulkOtpInput" class="w-full bg-secondary rounded-2xl p-4 min-h-[120px] font-mono text-sm outline-none" placeholder="RT_Rakib 1200&#10;RT_Shakil 875"></textarea>
+            <div class="bg-blue-50 p-3 rounded-xl text-primary text-sm font-bold flex gap-2 items-center mb-3">
+              <iconify-icon icon="lucide:info"></iconify-icon> Current rate: ৳<span id="currentRateDisplay">1</span> per OTP
+            </div>
+            <!-- Pre-load explanation -->
+            <div class="bg-amber-50 border border-amber-100 rounded-xl p-3 mb-4 text-sm text-amber-700 flex gap-2 items-start">
+              <iconify-icon icon="lucide:lightbulb" class="mt-0.5 shrink-0"></iconify-icon>
+              <span>If a username <strong>doesn't have an account yet</strong>, their OTPs will be <strong>stored as a pre-load</strong>. When they register, they'll be <strong>auto-approved</strong> and the OTPs will go straight to their account.</span>
+            </div>
+            <textarea id="bulkOtpInput" class="w-full bg-secondary rounded-2xl p-4 min-h-[120px] font-mono text-sm outline-none" placeholder="RT_Rakib 1200&#10;RT_Shakil 875&#10;RT_NewUser 500"></textarea>
             <div id="bulkPreview" class="bulk-preview mt-3"></div>
-            <div class="flex gap-3 mt-4">
+            <div class="flex gap-3 mt-4 flex-wrap">
               <button onclick="window.previewBulkOtp()" class="bg-gray-200 text-gray-800 py-3 px-5 rounded-xl font-bold flex gap-1 items-center"><iconify-icon icon="lucide:eye"></iconify-icon> Preview</button>
               <button onclick="window.applyBulkOtp()" class="bg-slate-900 text-white py-3 px-6 rounded-xl font-bold">Apply bulk</button>
               <button onclick="document.getElementById('bulkOtpInput').value='';document.getElementById('bulkPreview').style.display='none'" class="bg-secondary border px-6 rounded-xl">Clear</button>
             </div>
           </div>
+
+          <!-- Individual OTP (existing users only) -->
           <div class="bg-card border rounded-2xl p-6 mt-5">
             <div class="flex gap-3 mb-4">
               <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center"><iconify-icon icon="lucide:plus-circle" class="text-primary text-xl"></iconify-icon></div>
-              <div><h3 class="font-extrabold">Individual OTP</h3></div>
+              <div><h3 class="font-extrabold">Individual OTP</h3><p class="text-[10px] text-muted-foreground">Add to existing user account</p></div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <input type="text" id="singleOtpUser" placeholder="Username" class="bg-secondary rounded-xl p-3 outline-none"/>
               <input type="number" id="singleOtpCount" placeholder="OTP count" class="bg-secondary rounded-xl p-3 outline-none"/>
               <button onclick="window.addSingleOtp()" class="bg-primary text-white py-3 rounded-xl font-bold">Add OTP</button>
+            </div>
+          </div>
+
+          <!-- Pre-loaded OTP store (pending usernames) -->
+          <div class="bg-card border rounded-2xl p-6 mt-5">
+            <div class="flex gap-3 items-center mb-4">
+              <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center"><iconify-icon icon="lucide:clock" class="text-indigo-600 text-xl"></iconify-icon></div>
+              <div>
+                <h3 class="font-extrabold">Pre-loaded OTPs</h3>
+                <p class="text-[10px] text-muted-foreground uppercase font-bold">Waiting for these users to register</p>
+              </div>
+            </div>
+            <div id="preloadedOtpList">
+              <div class="text-center py-6 text-muted-foreground text-sm">Loading...</div>
             </div>
           </div>
         </div>
@@ -569,8 +601,8 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
               <div>
                 <label class="text-[10px] font-bold uppercase">Registration Mode</label>
                 <select id="setRegMode" class="w-full bg-secondary rounded-2xl py-3 px-4 outline-none">
-                  <option value="open">Open (Anyone can register)</option>
-                  <option value="approval">Requires Admin Approval</option>
+                  <option value="open">Open (Auto-approve all)</option>
+                  <option value="approval">Requires Admin Approval (unless OTP pre-loaded)</option>
                   <option value="closed">Closed (No new registrations)</option>
                 </select>
               </div>
@@ -612,10 +644,9 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
 import { initializeApp } from "firebase/app";
 import {
   getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs,
-  updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp, where
+  updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp, where, writeBatch
 } from "firebase/firestore";
 
-// ─── Firebase config ───────────────────────────────────────────────────────
 const firebaseConfig = {
   apiKey: "AIzaSyB6DT5aVGDDW7IAPUMVAmQY8u5PMd1ZLe8",
   authDomain: "rattara-c6c23.firebaseapp.com",
@@ -627,7 +658,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ─── State ─────────────────────────────────────────────────────────────────
+// ─── State ──────────────────────────────────────────────────────────────────
 let currentUser = null;
 let isAdmin = false;
 let selectedMethod = 'bKash';
@@ -636,6 +667,7 @@ let regFilter = 'all';
 let allReqs = [];
 let allUsers = [];
 let allRegistrations = [];
+let allPreloads = [];   // pre-loaded OTPs for not-yet-registered users
 let settings = {
   minWithdraw: 100,
   otpRate: 1,
@@ -643,17 +675,14 @@ let settings = {
   adminPass: 'Tania-Rakib-5687',
   regMode: 'approval'
 };
-let unsubAdmin = null, unsubUser = null, unsubReqs = null, unsubRegistrations = null;
-let lastKnownRegCount = -1; // For new registration notification tracking
+let unsubAdmin = null, unsubUser = null, unsubReqs = null, unsubRegistrations = null, unsubPreloads = null;
+let lastKnownRegCount = -1;
+let filteredUsers = [];
 
 const SESSION_KEY = 'rt_session';
-const SESSION_DURATION = 30 * 60 * 1000; // 30 minutes
+const SESSION_DURATION = 30 * 60 * 1000;
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-function genOtp() {
-  return Math.random().toString(36).substring(2, 10).toUpperCase();
-}
-
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 function setLoading(btnId, loading) {
   const btn = document.getElementById(btnId);
   if (!btn) return;
@@ -671,18 +700,13 @@ window.showToast = (msg, type = 'info') => {
 function saveSession(data) {
   sessionStorage.setItem(SESSION_KEY, JSON.stringify({ ...data, ts: Date.now() }));
 }
-
 function loadSession() {
   try {
     const s = JSON.parse(sessionStorage.getItem(SESSION_KEY));
-    if (!s || Date.now() - s.ts > SESSION_DURATION) {
-      sessionStorage.removeItem(SESSION_KEY);
-      return null;
-    }
+    if (!s || Date.now() - s.ts > SESSION_DURATION) { sessionStorage.removeItem(SESSION_KEY); return null; }
     return s;
   } catch { return null; }
 }
-
 function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
 
 function resetSessionTimer() {
@@ -692,17 +716,11 @@ function resetSessionTimer() {
     window.logout();
   }, SESSION_DURATION);
 }
-
 function bindActivityListeners() {
-  ['click', 'keydown', 'mousemove', 'touchstart'].forEach(ev =>
-    document.addEventListener(ev, resetSessionTimer, { passive: true })
-  );
+  ['click', 'keydown'].forEach(ev => document.addEventListener(ev, resetSessionTimer, { passive: true }));
 }
-
 function unbindActivityListeners() {
-  ['click', 'keydown', 'mousemove', 'touchstart'].forEach(ev =>
-    document.removeEventListener(ev, resetSessionTimer)
-  );
+  ['click', 'keydown'].forEach(ev => document.removeEventListener(ev, resetSessionTimer));
 }
 
 function switchPage(id) {
@@ -710,7 +728,24 @@ function switchPage(id) {
   document.getElementById(id)?.classList.add('active');
 }
 
-// ─── Auth ───────────────────────────────────────────────────────────────────
+// ─── Password strength ────────────────────────────────────────────────────────
+window.checkPwStrength = () => {
+  const pw = document.getElementById('regPassword').value;
+  const bar = document.getElementById('pwStrengthBar');
+  const lbl = document.getElementById('pwStrengthLabel');
+  if (!pw) { bar.classList.add('hidden'); lbl.classList.add('hidden'); return; }
+  bar.classList.remove('hidden'); lbl.classList.remove('hidden');
+  bar.className = 'pw-strength';
+  if (pw.length < 6) {
+    bar.classList.add('weak'); lbl.textContent = 'Weak'; lbl.style.color = '#EF4444';
+  } else if (pw.length < 10 || !/[0-9]/.test(pw)) {
+    bar.classList.add('medium'); lbl.textContent = 'Medium'; lbl.style.color = '#F59E0B';
+  } else {
+    bar.classList.add('strong'); lbl.textContent = 'Strong'; lbl.style.color = '#10B981';
+  }
+};
+
+// ─── Settings ────────────────────────────────────────────────────────────────
 async function loadSettings() {
   try {
     const snap = await getDoc(doc(db, 'config', 'settings'));
@@ -725,26 +760,27 @@ async function loadSettings() {
   } catch (e) { console.error('loadSettings:', e); }
 }
 
+// ─── Page navigation ──────────────────────────────────────────────────────────
 window.showAdminLogin = (e) => { e?.preventDefault(); switchPage('adminLoginPage'); };
 window.showUserLogin = (e) => { e?.preventDefault(); switchPage('loginPage'); };
 window.showLogin = (e) => { e?.preventDefault(); switchPage('loginPage'); };
 window.showRegister = (e) => {
   e?.preventDefault();
-  if (settings.regMode === 'closed') {
-    window.showToast('Registration is currently closed.', 'error');
-    return;
-  }
-  // Reset form & step
-  ['regFullName','regUsername','regPhone','regPayment','regReferral'].forEach(id => {
+  if (settings.regMode === 'closed') { window.showToast('Registration is currently closed.', 'error'); return; }
+  ['regFullName','regUsername','regPassword','regPasswordConfirm','regPhone','regPayment','regReferral'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
   document.getElementById('regErr').style.display = 'none';
+  document.getElementById('pwStrengthBar').classList.add('hidden');
+  document.getElementById('pwStrengthLabel').classList.add('hidden');
+  document.getElementById('unTakenMsg').classList.add('hidden');
+  document.getElementById('preloadedNotice').classList.add('hidden');
+  document.getElementById('unCheckIcon').classList.add('hidden');
   document.getElementById('regFormCard').classList.remove('hidden');
   document.getElementById('regSuccessCard').classList.add('hidden');
+  ['sd1','sd2','sd3'].forEach(id => document.getElementById(id).classList.remove('active'));
   document.getElementById('sd1').classList.add('active');
-  document.getElementById('sd2').classList.remove('active');
-  document.getElementById('sd3').classList.remove('active');
   switchPage('registerPage');
 };
 
@@ -752,13 +788,9 @@ window.logout = () => {
   clearSession();
   unbindActivityListeners();
   clearTimeout(window._sessionTimer);
-  if (unsubAdmin) { unsubAdmin(); unsubAdmin = null; }
-  if (unsubUser) { unsubUser(); unsubUser = null; }
-  if (unsubReqs) { unsubReqs(); unsubReqs = null; }
-  if (unsubRegistrations) { unsubRegistrations(); unsubRegistrations = null; }
-  currentUser = null;
-  isAdmin = false;
-  lastKnownRegCount = -1;
+  [unsubAdmin, unsubUser, unsubReqs, unsubRegistrations, unsubPreloads].forEach(u => u && u());
+  unsubAdmin = unsubUser = unsubReqs = unsubRegistrations = unsubPreloads = null;
+  currentUser = null; isAdmin = false; lastKnownRegCount = -1;
   document.getElementById('mainNav').classList.add('hidden');
   switchPage('loginPage');
   document.getElementById('loginUser').value = '';
@@ -766,28 +798,33 @@ window.logout = () => {
   document.getElementById('loginErr').style.display = 'none';
 };
 
+// ─── User Login (password-based) ──────────────────────────────────────────────
 window.userLogin = async () => {
   const u = document.getElementById('loginUser').value.trim();
-  const p = document.getElementById('loginPass').value.trim();
+  const p = document.getElementById('loginPass').value;
   const err = document.getElementById('loginErr');
   err.style.display = 'none';
-  if (!u || !p) { err.innerText = 'Username and OTP required'; err.style.display = 'block'; return; }
+  if (!u || !p) { err.innerText = 'Username and password required'; err.style.display = 'block'; return; }
 
-  if (u === settings.adminUser && p === settings.adminPass) {
-    _enterAdmin();
-    return;
-  }
+  // Admin shortcut
+  if (u === settings.adminUser && p === settings.adminPass) { _enterAdmin(); return; }
 
   setLoading('loginBtn', true);
   try {
     const snap = await getDoc(doc(db, 'users', u.toLowerCase()));
-    if (!snap.exists() || snap.data().otp !== p) {
-      err.innerText = 'Invalid username or OTP';
+    if (!snap.exists()) {
+      err.innerText = 'Invalid username or password';
       err.style.display = 'block';
-      setLoading('loginBtn', false);
-      return;
+      setLoading('loginBtn', false); return;
     }
-    currentUser = { id: u.toLowerCase(), ...snap.data() };
+    const userData = snap.data();
+    // Password is stored as 'password' field on the user document
+    if (userData.password !== p) {
+      err.innerText = 'Invalid username or password';
+      err.style.display = 'block';
+      setLoading('loginBtn', false); return;
+    }
+    currentUser = { id: u.toLowerCase(), ...userData };
     saveSession({ userId: currentUser.id });
     document.getElementById('mainNav').classList.remove('hidden');
     document.getElementById('navBadge').innerText = '👤 ' + (currentUser.username || currentUser.id);
@@ -809,12 +846,8 @@ window.adminLogin = () => {
   const p = document.getElementById('adminPass').value.trim();
   const err = document.getElementById('adminErr');
   err.style.display = 'none';
-  if (u === settings.adminUser && p === settings.adminPass) {
-    _enterAdmin();
-  } else {
-    err.innerText = 'Invalid credentials';
-    err.style.display = 'block';
-  }
+  if (u === settings.adminUser && p === settings.adminPass) { _enterAdmin(); }
+  else { err.innerText = 'Invalid credentials'; err.style.display = 'block'; }
 };
 
 function _enterAdmin() {
@@ -830,407 +863,153 @@ function _enterAdmin() {
   resetSessionTimer();
 }
 
-// ─── USERNAME LIVE CHECK ──────────────────────────────────────────────────────
+// ─── Username live check + pre-load detection ────────────────────────────────
 window.onUsernameInput = () => {
-  // Reset state while typing
   document.getElementById('unTakenMsg').classList.add('hidden');
+  document.getElementById('preloadedNotice').classList.add('hidden');
   const icon = document.getElementById('unCheckIcon');
-  icon.classList.add('hidden');
-  icon.textContent = '';
+  icon.classList.add('hidden'); icon.textContent = '';
 };
 
 window.checkUsernameLive = async () => {
   const val = document.getElementById('regUsername').value.trim();
   const icon = document.getElementById('unCheckIcon');
   const takenMsg = document.getElementById('unTakenMsg');
+  const preloadedNotice = document.getElementById('preloadedNotice');
   takenMsg.classList.add('hidden');
+  preloadedNotice.classList.add('hidden');
   icon.classList.add('hidden');
   if (!val || val.length < 3) return;
 
   try {
-    // Check users collection
+    // Check if already a user
     const userSnap = await getDoc(doc(db, 'users', val.toLowerCase()));
     if (userSnap.exists()) {
       icon.textContent = '❌'; icon.classList.remove('hidden');
-      takenMsg.classList.remove('hidden');
-      return;
+      takenMsg.classList.remove('hidden'); return;
     }
-    // Check pending registrations
-    const regSnap = await getDocs(
-      query(collection(db, 'registrations'), where('usernameLower', '==', val.toLowerCase()))
-    );
-    const activePending = regSnap.docs.find(d => d.data().status === 'pending' || d.data().status === 'approved');
+    // Check pending/approved registrations
+    const regSnap = await getDocs(query(collection(db, 'registrations'), where('usernameLower', '==', val.toLowerCase())));
+    const activePending = regSnap.docs.find(d => ['pending','approved'].includes(d.data().status));
     if (activePending) {
       icon.textContent = '❌'; icon.classList.remove('hidden');
-      takenMsg.classList.remove('hidden');
-      return;
+      takenMsg.classList.remove('hidden'); return;
     }
-    // All clear
-    icon.textContent = '✅'; icon.classList.remove('hidden');
-  } catch (e) { /* silently ignore network issues on live check */ }
+    // Check if OTPs are pre-loaded for this username
+    const preloadSnap = await getDoc(doc(db, 'otpPreloads', val.toLowerCase()));
+    if (preloadSnap.exists()) {
+      icon.textContent = '⚡'; icon.classList.remove('hidden');
+      preloadedNotice.classList.remove('hidden');
+    } else {
+      icon.textContent = '✅'; icon.classList.remove('hidden');
+    }
+  } catch (e) { /* silently ignore */ }
 };
 
-// ─── REGISTRATION SUBMIT ─────────────────────────────────────────────────────
+// ─── Registration ─────────────────────────────────────────────────────────────
 window.submitRegister = async () => {
-  const fullName = document.getElementById('regFullName').value.trim();
-  const username = document.getElementById('regUsername').value.trim();
-  const phone = document.getElementById('regPhone').value.trim();
-  const payment = document.getElementById('regPayment').value.trim();
-  const referral = document.getElementById('regReferral').value.trim();
+  const fullName   = document.getElementById('regFullName').value.trim();
+  const username   = document.getElementById('regUsername').value.trim();
+  const password   = document.getElementById('regPassword').value;
+  const confirmPw  = document.getElementById('regPasswordConfirm').value;
+  const telegram   = document.getElementById('regPhone').value.trim();
+  const payment    = document.getElementById('regPayment').value.trim();
+  const referral   = document.getElementById('regReferral').value.trim();
   const err = document.getElementById('regErr');
   err.style.display = 'none';
 
-  // Block if live check already flagged as taken
   if (!document.getElementById('unTakenMsg').classList.contains('hidden')) {
-    err.innerText = 'This username is already taken. Please choose a different one.';
-    err.style.display = 'block'; return;
+    err.innerText = 'This username is already taken.'; err.style.display = 'block'; return;
   }
-
-  // Validate
-  if (!fullName) { err.innerText = 'Please enter your full name'; err.style.display = 'block'; return; }
-  if (!username) { err.innerText = 'Please enter a username'; err.style.display = 'block'; return; }
+  if (!fullName)  { err.innerText = 'Please enter your full name'; err.style.display = 'block'; return; }
+  if (!username)  { err.innerText = 'Please enter a username'; err.style.display = 'block'; return; }
   if (!/^[a-zA-Z0-9_\-\.]{3,30}$/.test(username)) {
-    err.innerText = 'Username must be 3–30 chars: letters, numbers, _ - .';
-    err.style.display = 'block'; return;
+    err.innerText = 'Username must be 3–30 chars: letters, numbers, _ - .'; err.style.display = 'block'; return;
   }
-  const telegram = document.getElementById('regPhone').value.trim();
-  if (!telegram) {
-    err.innerText = 'Please enter your Telegram username';
-    err.style.display = 'block'; return;
+  if (!password || password.length < 6) {
+    err.innerText = 'Password must be at least 6 characters'; err.style.display = 'block'; return;
   }
+  if (password !== confirmPw) {
+    err.innerText = 'Passwords do not match'; err.style.display = 'block'; return;
+  }
+  if (!telegram) { err.innerText = 'Please enter your Telegram username'; err.style.display = 'block'; return; }
 
-  // Update step indicator
-  document.getElementById('sd1').classList.add('active');
   document.getElementById('sd2').classList.add('active');
-
   setLoading('regBtn', true);
   try {
-    // Check if username already exists in users collection
+    // Final duplicate check
     const userSnap = await getDoc(doc(db, 'users', username.toLowerCase()));
     if (userSnap.exists()) {
-      err.innerText = 'This username is already taken. Please choose another.';
-      err.style.display = 'block';
+      err.innerText = 'This username is already taken.'; err.style.display = 'block';
       setLoading('regBtn', false); return;
     }
-
-    // Check if already has a pending/approved registration
-    const existingRegs = await getDocs(
-      query(collection(db, 'registrations'), where('usernameLower', '==', username.toLowerCase()))
-    );
+    const existingRegs = await getDocs(query(collection(db, 'registrations'), where('usernameLower', '==', username.toLowerCase())));
     if (!existingRegs.empty) {
-      const existing = existingRegs.docs[0].data();
-      if (existing.status === 'pending') {
-        err.innerText = 'A request with this username already exists. Please wait for Admin approval.';
-        err.style.display = 'block';
-        setLoading('regBtn', false); return;
-      }
-      if (existing.status === 'approved') {
-        err.innerText = 'This username has already been approved.';
-        err.style.display = 'block';
-        setLoading('regBtn', false); return;
-      }
+      const ex = existingRegs.docs[0].data();
+      if (ex.status === 'pending') { err.innerText = 'A request with this username already exists.'; err.style.display = 'block'; setLoading('regBtn', false); return; }
+      if (ex.status === 'approved') { err.innerText = 'This username has already been approved.'; err.style.display = 'block'; setLoading('regBtn', false); return; }
     }
 
+    // Check for pre-loaded OTPs
+    const preloadSnap = await getDoc(doc(db, 'otpPreloads', username.toLowerCase()));
+    const hasPreload = preloadSnap.exists();
+    const preloadedOtpCount = hasPreload ? (preloadSnap.data().count || 0) : 0;
+
     const regMode = settings.regMode || 'approval';
-    const initialStatus = regMode === 'open' ? 'approved' : 'pending';
+    // Auto-approve if: regMode is 'open' OR OTPs are pre-loaded for this username
+    const autoApprove = regMode === 'open' || hasPreload;
+    const initialStatus = autoApprove ? 'approved' : 'pending';
 
     // Save registration request
     await addDoc(collection(db, 'registrations'), {
-      fullName,
-      username,
-      usernameLower: username.toLowerCase(),
-      telegram: telegram,
-      payment: payment || '',
-      referral: referral || '',
+      fullName, username, usernameLower: username.toLowerCase(),
+      telegram, payment: payment || '', referral: referral || '',
       status: initialStatus,
+      autoApproved: autoApprove,
       createdAt: serverTimestamp()
     });
 
-    // If open mode, auto-create the user account immediately
-    if (regMode === 'open') {
-      const otp = genOtp();
+    // If auto-approve → create user account immediately
+    if (autoApprove) {
       await setDoc(doc(db, 'users', username.toLowerCase()), {
-        username, totalOtp: 0, totalWithdrawn: 0, totalPending: 0,
-        otp, createdAt: serverTimestamp()
+        username,
+        password,           // user-chosen password
+        totalOtp: preloadedOtpCount,   // apply pre-loaded OTPs right away
+        totalWithdrawn: 0,
+        totalPending: 0,
+        createdAt: serverTimestamp()
       });
+      // Remove the pre-load entry since it's been consumed
+      if (hasPreload) {
+        await deleteDoc(doc(db, 'otpPreloads', username.toLowerCase()));
+      }
     }
 
-    // Update step indicator to done
-    document.getElementById('sd2').classList.add('active');
     document.getElementById('sd3').classList.add('active');
-
-    // Show success card
     document.getElementById('regFormCard').classList.add('hidden');
     document.getElementById('regSuccessCard').classList.remove('hidden');
     document.getElementById('regSuccessUsername').innerText = username;
 
+    if (autoApprove) {
+      document.getElementById('regSuccessTitle').innerText = 'Account Created! 🎉';
+      document.getElementById('regSuccessMsg').innerHTML = hasPreload
+        ? `Your account is <strong>ready to use</strong>! Your pre-loaded <strong>${preloadedOtpCount} OTPs</strong> have been added to your account. Login now with your password.`
+        : `Your account has been <strong>auto-approved</strong>. Login now with your password.`;
+    } else {
+      document.getElementById('regSuccessTitle').innerText = 'Registration Submitted! 🎉';
+      document.getElementById('regSuccessMsg').innerHTML = `Your request has been sent. Once approved, you will get a notification on <strong>Telegram</strong>.`;
+    }
+
   } catch (e) {
     console.error('submitRegister:', e);
-    err.innerText = 'Connection error. Please try again.';
-    err.style.display = 'block';
+    err.innerText = 'Connection error. Please try again.'; err.style.display = 'block';
   }
   setLoading('regBtn', false);
 };
 
-// ─── Dashboard stats ────────────────────────────────────────────────────────
-function calcAvailable(user) {
-  const totalOtp = user.totalOtp || 0;
-  const rate = settings.otpRate || 1;
-  const otpBalance = totalOtp * rate;
-  const withdrawn = user.totalWithdrawn || 0;
-  const pending = user.totalPending || 0;
-  return Math.max(0, otpBalance - withdrawn - pending);
-}
-
-function updateDashStats() {
-  if (!currentUser) return;
-  const totalOtp = currentUser.totalOtp || 0;
-  const rate = settings.otpRate || 1;
-  const otpBalance = totalOtp * rate;
-  const withdrawn = currentUser.totalWithdrawn || 0;
-  const available = calcAvailable(currentUser);
-  document.getElementById('dashTotalOtp').innerText = totalOtp;
-  document.getElementById('dashOtpBalance').innerText = '৳' + otpBalance;
-  document.getElementById('dashWithdrawn').innerText = '৳' + withdrawn;
-  document.getElementById('dashBalance').innerText = available;
-  document.getElementById('dashBalanceMin').innerText = `Min withdraw ৳${settings.minWithdraw}`;
-}
-
-// ─── User live listeners ────────────────────────────────────────────────────
-function startUserLiveListeners() {
-  if (!currentUser) return;
-  if (unsubUser) unsubUser();
-  unsubUser = onSnapshot(doc(db, 'users', currentUser.id), snap => {
-    if (snap.exists()) {
-      currentUser = { id: currentUser.id, ...snap.data() };
-      updateDashStats();
-    }
-  });
-  if (unsubReqs) unsubReqs();
-  unsubReqs = onSnapshot(
-    query(collection(db, 'withdrawals'), orderBy('createdAt', 'desc')),
-    snap => {
-      const mine = snap.docs.filter(d => d.data().userId === currentUser.id);
-      const container = document.getElementById('myRequests');
-      if (!mine.length) {
-        container.innerHTML = '<div class="text-center py-6 text-muted-foreground">No requests yet</div>';
-        return;
-      }
-      container.innerHTML = mine.map(d => {
-        const r = d.data();
-        const badge = r.status === 'pending' ? 'badge-pending' : r.status === 'approved' ? 'badge-approved' : 'badge-rejected';
-        const label = r.status === 'pending' ? '⏳ Pending' : r.status === 'approved' ? '✅ Approved' : '❌ Rejected';
-        return `<div class="req-item"><div><div class="font-bold">৳${r.amount} — ${r.method}</div><div class="text-xs text-muted-foreground">${r.number} • ${r.fullName}</div></div><span class="badge ${badge}">${label}</span></div>`;
-      }).join('');
-    }
-  );
-}
-
-// ─── Withdrawal submit ───────────────────────────────────────────────────────
-window.selectMethod = (el, method) => {
-  document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  selectedMethod = method;
-  document.getElementById('wdNumber').placeholder = method === 'Binance' ? 'Binance UID or Email' : method === 'bKash' ? 'bKash number (01X...)' : 'Nagad number (01X...)';
-};
-
-window.submitWithdraw = async () => {
-  const fullName = document.getElementById('wdName').value.trim();
-  const number = document.getElementById('wdNumber').value.trim();
-  const accountType = document.getElementById('wdAccType').value;
-  const amount = parseInt(document.getElementById('wdAmount').value);
-  const err = document.getElementById('wdErr');
-  err.style.display = 'none';
-
-  if (!fullName || !number) { err.innerText = 'Name & account number/ID required'; err.style.display = 'block'; return; }
-  if (selectedMethod === 'bKash' || selectedMethod === 'Nagad') {
-    if (!/^01[3-9]\d{8}$/.test(number)) { err.innerText = 'Valid BD number required for bKash/Nagad (01X-XXXXXXXX)'; err.style.display = 'block'; return; }
-  }
-
-  const available = calcAvailable(currentUser);
-  if (isNaN(amount) || amount < settings.minWithdraw) {
-    err.innerText = `Minimum withdrawal is ৳${settings.minWithdraw}`;
-    err.style.display = 'block'; return;
-  }
-  if (amount > available) {
-    err.innerText = `Insufficient balance. Available: ৳${available}`;
-    err.style.display = 'block'; return;
-  }
-
-  setLoading('wdBtn', true);
-  try {
-    const pendingSnap = await getDocs(
-      query(collection(db, 'withdrawals'),
-        where('userId', '==', currentUser.id),
-        where('status', '==', 'pending'))
-    );
-    if (!pendingSnap.empty) {
-      err.innerText = 'You already have a pending request. Wait for it to be processed.';
-      err.style.display = 'block';
-      setLoading('wdBtn', false); return;
-    }
-
-    const freshUser = await getDoc(doc(db, 'users', currentUser.id));
-    if (!freshUser.exists()) { err.innerText = 'User not found'; err.style.display = 'block'; setLoading('wdBtn', false); return; }
-    const freshData = freshUser.data();
-    const freshAvailable = Math.max(0, (freshData.totalOtp || 0) * (settings.otpRate || 1) - (freshData.totalWithdrawn || 0) - (freshData.totalPending || 0));
-    if (amount > freshAvailable) {
-      err.innerText = `Insufficient balance. Available: ৳${freshAvailable}`;
-      err.style.display = 'block'; setLoading('wdBtn', false); return;
-    }
-
-    await updateDoc(doc(db, 'users', currentUser.id), { totalPending: (freshData.totalPending || 0) + amount });
-
-    await addDoc(collection(db, 'withdrawals'), {
-      userId: currentUser.id,
-      username: currentUser.username || currentUser.id,
-      fullName, number, accountType, amount,
-      method: selectedMethod,
-      status: 'pending',
-      createdAt: serverTimestamp()
-    });
-
-    window.showToast('Withdrawal request submitted successfully', 'success');
-    document.getElementById('wdName').value = '';
-    document.getElementById('wdNumber').value = '';
-    document.getElementById('wdAmount').value = '';
-  } catch (e) {
-    console.error('submitWithdraw:', e);
-    err.innerText = 'Error submitting request. Please try again.';
-    err.style.display = 'block';
-  }
-  setLoading('wdBtn', false);
-};
-
-// ─── Admin live listeners ────────────────────────────────────────────────────
-function startAdminLiveListeners() {
-  // Users
-  if (unsubUser) unsubUser();
-  unsubUser = onSnapshot(collection(db, 'users'), snap => {
-    allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderUsersTable();
-    document.getElementById('st-users').innerText = allUsers.length;
-  });
-
-  // Withdrawals
-  if (unsubReqs) unsubReqs();
-  unsubReqs = onSnapshot(
-    query(collection(db, 'withdrawals'), orderBy('createdAt', 'desc')),
-    snap => {
-      allReqs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      const approved = allReqs.filter(r => r.status === 'approved');
-      const totalPaid = approved.reduce((s, r) => s + (r.amount || 0), 0);
-      document.getElementById('st-approved').innerText = approved.length;
-      document.getElementById('st-paid').innerText = '৳' + totalPaid;
-      renderReqTable();
-      document.getElementById('recentList').innerHTML = allReqs.slice(0, 5).map(r =>
-        `<div class="req-item"><div><strong>${r.username}</strong> — ৳${r.amount} (${r.method})<div class="text-xs text-muted-foreground">${r.number}</div></div><span class="badge ${r.status === 'pending' ? 'badge-pending' : r.status === 'approved' ? 'badge-approved' : 'badge-rejected'}">${r.status}</span></div>`
-      ).join('') || '<div class="text-center text-muted-foreground py-4">No requests</div>';
-    }
-  );
-
-  // Registrations — with real-time notification
-  if (unsubRegistrations) unsubRegistrations();
-  unsubRegistrations = onSnapshot(
-    query(collection(db, 'registrations'), orderBy('createdAt', 'desc')),
-    snap => {
-      allRegistrations = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      const pendingRegs = allRegistrations.filter(r => r.status === 'pending');
-      const pendingCount = pendingRegs.length;
-
-      // Update overview stat
-      document.getElementById('st-regs').childNodes[0].textContent = pendingCount + ' ';
-      const stRegsBadge = document.getElementById('st-regs-badge');
-      if (pendingCount > 0) { stRegsBadge.classList.remove('hidden'); }
-      else { stRegsBadge.classList.add('hidden'); }
-
-      // Update nav badge
-      const navBadge = document.getElementById('regNavBadge');
-      if (pendingCount > 0) {
-        navBadge.classList.remove('hidden');
-        navBadge.textContent = pendingCount;
-      } else {
-        navBadge.classList.add('hidden');
-      }
-
-      // Fire notification toast if new registrations arrived
-      if (lastKnownRegCount >= 0 && pendingCount > lastKnownRegCount) {
-        const diff = pendingCount - lastKnownRegCount;
-        window.showToast(`🔔 ${diff} new registration request${diff > 1 ? 's' : ''}!`, 'info');
-        // Browser notification (if permission granted)
-        if (Notification.permission === 'granted') {
-          new Notification('RatTara — New Registration', {
-            body: `${diff} new user registration request${diff > 1 ? 's' : ''} waiting for approval.`,
-            icon: ''
-          });
-        }
-      }
-      lastKnownRegCount = pendingCount;
-
-      renderRegList();
-    }
-  );
-
-  // Request browser notification permission
-  if ('Notification' in window && Notification.permission === 'default') {
-    Notification.requestPermission();
-  }
-}
-
-// ─── Render registrations ─────────────────────────────────────────────────────
-function renderRegList() {
-  const list = regFilter === 'all' ? allRegistrations : allRegistrations.filter(r => r.status === regFilter);
-  const container = document.getElementById('regList');
-  if (!list.length) {
-    container.innerHTML = '<div class="text-center py-8 text-muted-foreground">No registrations found</div>';
-    return;
-  }
-  container.innerHTML = list.map(r => {
-    const isPending = r.status === 'pending';
-    const badgeCls = r.status === 'pending' ? 'badge-pending' : r.status === 'approved' ? 'badge-approved' : 'badge-rejected';
-    const statusLabel = r.status === 'pending' ? '⏳ Pending' : r.status === 'approved' ? '✅ Approved' : '❌ Rejected';
-    const timeStr = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleString('en-BD') : '—';
-    return `
-      <div class="border ${isPending ? 'border-amber-200 reg-pulse' : 'border-border'} rounded-2xl p-4 mb-3 bg-card">
-        <div class="flex items-start justify-between gap-3 flex-wrap">
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 flex-wrap mb-1">
-              <span class="font-extrabold text-base">${escHtml(r.username)}</span>
-              <span class="badge ${badgeCls}">${statusLabel}</span>
-            </div>
-            <div class="text-sm text-muted-foreground space-y-0.5">
-              <div><span class="font-bold text-foreground">নাম:</span> ${escHtml(r.fullName)}</div>
-              <div><span class="font-bold text-foreground">Telegram:</span> @${escHtml(r.telegram || r.phone || '—')}</div>
-              ${r.payment ? `<div><span class="font-bold text-foreground">Payment:</span> ${escHtml(r.payment)}</div>` : ''}
-              ${r.referral ? `<div><span class="font-bold text-foreground">Referral:</span> ${escHtml(r.referral)}</div>` : ''}
-              <div class="text-xs mt-1 text-muted-foreground">${timeStr}</div>
-            </div>
-          </div>
-          ${isPending ? `
-          <div class="flex flex-col gap-2 shrink-0">
-            <button class="btn-xs btn-success-xs" onclick="window.approveRegistration('${escAttr(r.id)}','${escAttr(r.username)}','${escAttr(r.fullName)}')">
-              <iconify-icon icon="lucide:check"></iconify-icon> Approve
-            </button>
-            <button class="btn-xs btn-danger-xs" onclick="window.rejectRegistration('${escAttr(r.id)}','${escAttr(r.username)}')">
-              <iconify-icon icon="lucide:x"></iconify-icon> Reject
-            </button>
-          </div>` : ''}
-        </div>
-      </div>`;
-  }).join('');
-}
-
-window.filterReg = (f, el) => {
-  regFilter = f;
-  document.querySelectorAll('#tab-registrations .filter-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  renderRegList();
-};
-
-// ─── Approve registration ─────────────────────────────────────────────────────
+// ─── Admin: approve registration (creates user with password from registration) ──
 window.approveRegistration = async (regId, username, fullName) => {
   try {
-    // Check if user already exists
     const userRef = doc(db, 'users', username.toLowerCase());
     const existing = await getDoc(userRef);
     if (existing.exists()) {
@@ -1238,18 +1017,25 @@ window.approveRegistration = async (regId, username, fullName) => {
       await updateDoc(doc(db, 'registrations', regId), { status: 'approved' });
       return;
     }
+    // Get password from registration record
+    const regSnap = await getDoc(doc(db, 'registrations', regId));
+    const regData = regSnap.exists() ? regSnap.data() : {};
 
-    const otp = genOtp();
+    // Check for pre-loaded OTPs that may have arrived since registration
+    const preloadSnap = await getDoc(doc(db, 'otpPreloads', username.toLowerCase()));
+    const preloadedOtpCount = preloadSnap.exists() ? (preloadSnap.data().count || 0) : 0;
+
     await setDoc(userRef, {
       username,
-      totalOtp: 0,
+      password: regData.password || '',
+      totalOtp: preloadedOtpCount,
       totalWithdrawn: 0,
       totalPending: 0,
-      otp,
       createdAt: serverTimestamp()
     });
+    if (preloadSnap.exists()) await deleteDoc(doc(db, 'otpPreloads', username.toLowerCase()));
     await updateDoc(doc(db, 'registrations', regId), { status: 'approved', approvedAt: serverTimestamp() });
-    window.showToast(`✅ ${username} approved! Login OTP: ${otp}`, 'success');
+    window.showToast(`✅ ${username} approved!${preloadedOtpCount ? ' ' + preloadedOtpCount + ' pre-loaded OTPs applied.' : ''}`, 'success');
   } catch (e) {
     console.error('approveRegistration:', e);
     window.showToast('Error approving registration', 'error');
@@ -1261,51 +1047,242 @@ window.rejectRegistration = async (regId, username) => {
   try {
     await updateDoc(doc(db, 'registrations', regId), { status: 'rejected', rejectedAt: serverTimestamp() });
     window.showToast(`Registration rejected for ${username}`, 'error');
-  } catch (e) {
-    console.error('rejectRegistration:', e);
-    window.showToast('Error rejecting registration', 'error');
-  }
+  } catch (e) { window.showToast('Error rejecting registration', 'error'); }
 };
 
+// ─── Dashboard stats ──────────────────────────────────────────────────────────
+function calcAvailable(user) {
+  const totalOtp = user.totalOtp || 0;
+  const rate = settings.otpRate || 1;
+  const otpBalance = totalOtp * rate;
+  return Math.max(0, otpBalance - (user.totalWithdrawn || 0) - (user.totalPending || 0));
+}
+
+function updateDashStats() {
+  if (!currentUser) return;
+  const totalOtp = currentUser.totalOtp || 0;
+  const rate = settings.otpRate || 1;
+  const otpBalance = totalOtp * rate;
+  document.getElementById('dashTotalOtp').innerText = totalOtp;
+  document.getElementById('dashOtpBalance').innerText = '৳' + otpBalance;
+  document.getElementById('dashWithdrawn').innerText = '৳' + (currentUser.totalWithdrawn || 0);
+  document.getElementById('dashBalance').innerText = calcAvailable(currentUser);
+  document.getElementById('dashBalanceMin').innerText = `Min withdraw ৳${settings.minWithdraw}`;
+}
+
+// ─── User live listeners ──────────────────────────────────────────────────────
+function startUserLiveListeners() {
+  if (!currentUser) return;
+  if (unsubUser) unsubUser();
+  unsubUser = onSnapshot(doc(db, 'users', currentUser.id), snap => {
+    if (snap.exists()) { currentUser = { id: currentUser.id, ...snap.data() }; updateDashStats(); }
+  });
+  if (unsubReqs) unsubReqs();
+  unsubReqs = onSnapshot(query(collection(db, 'withdrawals'), orderBy('createdAt', 'desc')), snap => {
+    const mine = snap.docs.filter(d => d.data().userId === currentUser.id);
+    const container = document.getElementById('myRequests');
+    if (!mine.length) { container.innerHTML = '<div class="text-center py-6 text-muted-foreground">No requests yet</div>'; return; }
+    container.innerHTML = mine.map(d => {
+      const r = d.data();
+      const badge = r.status === 'pending' ? 'badge-pending' : r.status === 'approved' ? 'badge-approved' : 'badge-rejected';
+      const label = r.status === 'pending' ? '⏳ Pending' : r.status === 'approved' ? '✅ Approved' : '❌ Rejected';
+      return `<div class="req-item"><div><div class="font-bold">৳${r.amount} — ${r.method}</div><div class="text-xs text-muted-foreground">${r.number} • ${r.fullName}</div></div><span class="badge ${badge}">${label}</span></div>`;
+    }).join('');
+  });
+}
+
+// ─── Withdrawal submit ────────────────────────────────────────────────────────
+window.selectMethod = (el, method) => {
+  document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active'); selectedMethod = method;
+  document.getElementById('wdNumber').placeholder = method === 'Binance' ? 'Binance UID or Email' : method === 'bKash' ? 'bKash number (01X...)' : 'Nagad number (01X...)';
+};
+
+window.submitWithdraw = async () => {
+  const fullName = document.getElementById('wdName').value.trim();
+  const number = document.getElementById('wdNumber').value.trim();
+  const accountType = document.getElementById('wdAccType').value;
+  const amount = parseInt(document.getElementById('wdAmount').value);
+  const err = document.getElementById('wdErr');
+  err.style.display = 'none';
+  if (!fullName || !number) { err.innerText = 'Name & account number/ID required'; err.style.display = 'block'; return; }
+  if (selectedMethod === 'bKash' || selectedMethod === 'Nagad') {
+    if (!/^01[3-9]\d{8}$/.test(number)) { err.innerText = 'Valid BD number required (01X-XXXXXXXX)'; err.style.display = 'block'; return; }
+  }
+  const available = calcAvailable(currentUser);
+  if (isNaN(amount) || amount < settings.minWithdraw) { err.innerText = `Minimum withdrawal is ৳${settings.minWithdraw}`; err.style.display = 'block'; return; }
+  if (amount > available) { err.innerText = `Insufficient balance. Available: ৳${available}`; err.style.display = 'block'; return; }
+  setLoading('wdBtn', true);
+  try {
+    const pendingSnap = await getDocs(query(collection(db, 'withdrawals'), where('userId','==',currentUser.id), where('status','==','pending')));
+    if (!pendingSnap.empty) { err.innerText = 'You already have a pending request.'; err.style.display = 'block'; setLoading('wdBtn', false); return; }
+    const freshUser = await getDoc(doc(db, 'users', currentUser.id));
+    if (!freshUser.exists()) { err.innerText = 'User not found'; err.style.display = 'block'; setLoading('wdBtn', false); return; }
+    const fd = freshUser.data();
+    const freshAvailable = Math.max(0, (fd.totalOtp||0)*(settings.otpRate||1) - (fd.totalWithdrawn||0) - (fd.totalPending||0));
+    if (amount > freshAvailable) { err.innerText = `Insufficient balance. Available: ৳${freshAvailable}`; err.style.display = 'block'; setLoading('wdBtn', false); return; }
+    await updateDoc(doc(db, 'users', currentUser.id), { totalPending: (fd.totalPending||0) + amount });
+    await addDoc(collection(db, 'withdrawals'), {
+      userId: currentUser.id, username: currentUser.username || currentUser.id,
+      fullName, number, accountType, amount, method: selectedMethod,
+      status: 'pending', createdAt: serverTimestamp()
+    });
+    window.showToast('Withdrawal request submitted!', 'success');
+    document.getElementById('wdName').value = '';
+    document.getElementById('wdNumber').value = '';
+    document.getElementById('wdAmount').value = '';
+  } catch (e) { console.error('submitWithdraw:', e); err.innerText = 'Error submitting. Try again.'; err.style.display = 'block'; }
+  setLoading('wdBtn', false);
+};
+
+// ─── Admin live listeners ─────────────────────────────────────────────────────
+function startAdminLiveListeners() {
+  // Users
+  if (unsubUser) unsubUser();
+  unsubUser = onSnapshot(collection(db, 'users'), snap => {
+    allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    filteredUsers = allUsers;
+    renderUsersTable();
+    document.getElementById('st-users').innerText = allUsers.length;
+  });
+
+  // Withdrawals
+  if (unsubReqs) unsubReqs();
+  unsubReqs = onSnapshot(query(collection(db, 'withdrawals'), orderBy('createdAt','desc')), snap => {
+    allReqs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const approved = allReqs.filter(r => r.status === 'approved');
+    const totalPaid = approved.reduce((s,r) => s + (r.amount||0), 0);
+    document.getElementById('st-approved').innerText = approved.length;
+    document.getElementById('st-paid').innerText = '৳' + totalPaid;
+    renderReqTable();
+    document.getElementById('recentList').innerHTML = allReqs.slice(0,5).map(r =>
+      `<div class="req-item"><div><strong>${r.username}</strong> — ৳${r.amount} (${r.method})<div class="text-xs text-muted-foreground">${r.number}</div></div><span class="badge ${r.status==='pending'?'badge-pending':r.status==='approved'?'badge-approved':'badge-rejected'}">${r.status}</span></div>`
+    ).join('') || '<div class="text-center text-muted-foreground py-4">No requests</div>';
+  });
+
+  // Registrations
+  if (unsubRegistrations) unsubRegistrations();
+  unsubRegistrations = onSnapshot(query(collection(db,'registrations'), orderBy('createdAt','desc')), snap => {
+    allRegistrations = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const pendingCount = allRegistrations.filter(r => r.status === 'pending').length;
+    document.getElementById('st-regs').childNodes[0].textContent = pendingCount + ' ';
+    const badge = document.getElementById('st-regs-badge');
+    pendingCount > 0 ? badge.classList.remove('hidden') : badge.classList.add('hidden');
+    const navBadge = document.getElementById('regNavBadge');
+    if (pendingCount > 0) { navBadge.classList.remove('hidden'); navBadge.textContent = pendingCount; }
+    else { navBadge.classList.add('hidden'); }
+    if (lastKnownRegCount >= 0 && pendingCount > lastKnownRegCount) {
+      const diff = pendingCount - lastKnownRegCount;
+      window.showToast(`🔔 ${diff} new registration request${diff>1?'s':''}!`, 'info');
+      if (Notification.permission === 'granted') new Notification('RatTara — New Registration', { body: `${diff} new user registration request${diff>1?'s':''} waiting for approval.` });
+    }
+    lastKnownRegCount = pendingCount;
+    renderRegList();
+  });
+
+  // Pre-loaded OTPs (stored for unregistered usernames)
+  if (unsubPreloads) unsubPreloads();
+  unsubPreloads = onSnapshot(collection(db, 'otpPreloads'), snap => {
+    allPreloads = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderPreloadedOtpList();
+  });
+
+  if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+}
+
+// ─── Render registrations ─────────────────────────────────────────────────────
+function renderRegList() {
+  const list = regFilter === 'all' ? allRegistrations : allRegistrations.filter(r => r.status === regFilter);
+  const container = document.getElementById('regList');
+  if (!list.length) { container.innerHTML = '<div class="text-center py-8 text-muted-foreground">No registrations found</div>'; return; }
+  container.innerHTML = list.map(r => {
+    const isPending = r.status === 'pending';
+    const badgeCls = r.status==='pending'?'badge-pending':r.status==='approved'?'badge-approved':'badge-rejected';
+    const statusLabel = r.status==='pending'?'⏳ Pending':r.status==='approved'?'✅ Approved':'❌ Rejected';
+    const timeStr = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleString('en-BD') : '—';
+    const autoLabel = r.autoApproved ? `<span class="badge badge-preloaded ml-1">⚡ Auto-approved</span>` : '';
+    return `
+      <div class="border ${isPending?'border-amber-200 reg-pulse':'border-border'} rounded-2xl p-4 mb-3 bg-card">
+        <div class="flex items-start justify-between gap-3 flex-wrap">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap mb-1">
+              <span class="font-extrabold text-base">${escHtml(r.username)}</span>
+              <span class="badge ${badgeCls}">${statusLabel}</span>${autoLabel}
+            </div>
+            <div class="text-sm text-muted-foreground space-y-0.5">
+              <div><span class="font-bold text-foreground">নাম:</span> ${escHtml(r.fullName)}</div>
+              <div><span class="font-bold text-foreground">Telegram:</span> @${escHtml(r.telegram||r.phone||'—')}</div>
+              ${r.payment?`<div><span class="font-bold text-foreground">Payment:</span> ${escHtml(r.payment)}</div>`:''}
+              ${r.referral?`<div><span class="font-bold text-foreground">Referral:</span> ${escHtml(r.referral)}</div>`:''}
+              <div class="text-xs mt-1">${timeStr}</div>
+            </div>
+          </div>
+          ${isPending?`
+          <div class="flex flex-col gap-2 shrink-0">
+            <button class="btn-xs btn-success-xs" onclick="window.approveRegistration('${escAttr(r.id)}','${escAttr(r.username)}','${escAttr(r.fullName)}')">
+              <iconify-icon icon="lucide:check"></iconify-icon> Approve
+            </button>
+            <button class="btn-xs btn-danger-xs" onclick="window.rejectRegistration('${escAttr(r.id)}','${escAttr(r.username)}')">
+              <iconify-icon icon="lucide:x"></iconify-icon> Reject
+            </button>
+          </div>`:''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+window.filterReg = (f, el) => {
+  regFilter = f;
+  document.querySelectorAll('#tab-registrations .filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active'); renderRegList();
+};
+
+// ─── Render users table ───────────────────────────────────────────────────────
 function renderUsersTable() {
   const rate = settings.otpRate || 1;
-  document.getElementById('usersTable').innerHTML = allUsers.length
-    ? allUsers.map(u => {
+  const list = filteredUsers;
+  document.getElementById('usersTable').innerHTML = list.length
+    ? list.map(u => {
         const totalOtp = u.totalOtp || 0;
         const otpBalance = totalOtp * rate;
         const withdrawn = u.totalWithdrawn || 0;
         const pending = u.totalPending || 0;
         const available = Math.max(0, otpBalance - withdrawn - pending);
         return `<tr>
-          <td><strong>${escHtml(u.username || u.id)}</strong></td>
+          <td><strong>${escHtml(u.username||u.id)}</strong></td>
           <td>${totalOtp}</td>
           <td>৳${rate}</td>
           <td>৳${otpBalance}</td>
           <td>৳${withdrawn}</td>
           <td>৳${available}</td>
-          <td><span class="otp-tag">${escHtml(u.otp || '—')}</span></td>
           <td><div class="flex gap-2">
-            <button class="btn-xs btn-gold-xs" onclick="window.newOtp('${escAttr(u.id)}')">🔑 New OTP</button>
-            <button class="btn-xs btn-danger-xs" onclick="window.delUser('${escAttr(u.id)}', '${escAttr(u.username || u.id)}')">Delete</button>
+            <button class="btn-xs btn-danger-xs" onclick="window.delUser('${escAttr(u.id)}','${escAttr(u.username||u.id)}')">Delete</button>
           </div></td>
         </tr>`;
       }).join('')
-    : '<tr><td colspan="8" class="text-center py-6">No users yet</td></tr>';
+    : '<tr><td colspan="7" class="text-center py-6">No users yet</td></tr>';
 }
 
+window.filterUsers = () => {
+  const q = document.getElementById('userSearch').value.toLowerCase();
+  filteredUsers = q ? allUsers.filter(u => (u.username||u.id).toLowerCase().includes(q)) : allUsers;
+  renderUsersTable();
+};
+
+// ─── Render withdrawal table ──────────────────────────────────────────────────
 function renderReqTable() {
   const list = reqFilter === 'all' ? allReqs : allReqs.filter(r => r.status === reqFilter);
   document.getElementById('reqTable').innerHTML = list.length
     ? list.map(r => `<tr>
         <td><strong>${escHtml(r.username)}</strong></td>
         <td>${escHtml(r.method)}</td>
-        <td>${escHtml(r.number)}<br><span class="text-xs text-muted-foreground">${escHtml(r.accountType || '')}</span></td>
+        <td>${escHtml(r.number)}<br><span class="text-xs text-muted-foreground">${escHtml(r.accountType||'')}</span></td>
         <td>৳${r.amount}</td>
-        <td><span class="badge ${r.status === 'pending' ? 'badge-pending' : r.status === 'approved' ? 'badge-approved' : 'badge-rejected'}">${r.status}</span></td>
-        <td>${r.status === 'pending'
-          ? `<button class="btn-xs btn-success-xs" onclick="window.approveReq('${escAttr(r.id)}','${escAttr(r.userId)}',${r.amount})">✓ Approve</button>
+        <td><span class="badge ${r.status==='pending'?'badge-pending':r.status==='approved'?'badge-approved':'badge-rejected'}">${r.status}</span></td>
+        <td>${r.status==='pending'
+          ?`<button class="btn-xs btn-success-xs" onclick="window.approveReq('${escAttr(r.id)}','${escAttr(r.userId)}',${r.amount})">✓ Approve</button>
              <button class="btn-xs btn-danger-xs" onclick="window.rejectReq('${escAttr(r.id)}','${escAttr(r.userId)}',${r.amount})">✗ Reject</button>`
-          : '—'}
+          :'—'}
         </td>
       </tr>`).join('')
     : '<tr><td colspan="6" class="text-center py-6">No requests</td></tr>';
@@ -1314,11 +1291,10 @@ function renderReqTable() {
 window.filterReq = (f, el) => {
   reqFilter = f;
   document.querySelectorAll('#tab-withdrawals .filter-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  renderReqTable();
+  el.classList.add('active'); renderReqTable();
 };
 
-// ─── Approve / reject withdrawals ─────────────────────────────────────────────
+// ─── Approve/reject withdrawals ───────────────────────────────────────────────
 window.approveReq = async (reqId, userId, amount) => {
   try {
     await updateDoc(doc(db, 'withdrawals', reqId), { status: 'approved' });
@@ -1326,15 +1302,12 @@ window.approveReq = async (reqId, userId, amount) => {
     if (uSnap.exists()) {
       const d = uSnap.data();
       await updateDoc(doc(db, 'users', userId), {
-        totalWithdrawn: (d.totalWithdrawn || 0) + amount,
-        totalPending: Math.max(0, (d.totalPending || 0) - amount)
+        totalWithdrawn: (d.totalWithdrawn||0) + amount,
+        totalPending: Math.max(0, (d.totalPending||0) - amount)
       });
     }
     window.showToast('Request approved ✓', 'success');
-  } catch (e) {
-    console.error('approveReq:', e);
-    window.showToast('Error approving request', 'error');
-  }
+  } catch (e) { window.showToast('Error approving', 'error'); }
 };
 
 window.rejectReq = async (reqId, userId, amount) => {
@@ -1343,63 +1316,33 @@ window.rejectReq = async (reqId, userId, amount) => {
     const uSnap = await getDoc(doc(db, 'users', userId));
     if (uSnap.exists()) {
       const d = uSnap.data();
-      await updateDoc(doc(db, 'users', userId), {
-        totalPending: Math.max(0, (d.totalPending || 0) - amount)
-      });
+      await updateDoc(doc(db, 'users', userId), { totalPending: Math.max(0, (d.totalPending||0) - amount) });
     }
     window.showToast('Request rejected', 'error');
-  } catch (e) {
-    console.error('rejectReq:', e);
-    window.showToast('Error rejecting request', 'error');
-  }
+  } catch (e) { window.showToast('Error rejecting', 'error'); }
 };
 
-// ─── User management ─────────────────────────────────────────────────────────
-window.addUser = async () => {
-  const username = document.getElementById('newUser').value.trim();
-  if (!username) return;
-  if (!/^[a-zA-Z0-9_\-\.]{3,30}$/.test(username)) {
-    window.showToast('Username must be 3–30 chars: letters, numbers, _ - .', 'error');
-    return;
-  }
-  const otp = genOtp();
-  const ref = doc(db, 'users', username.toLowerCase());
-  if ((await getDoc(ref)).exists()) { window.showToast('User already exists', 'error'); return; }
-  await setDoc(ref, { username, totalOtp: 0, totalWithdrawn: 0, totalPending: 0, otp, createdAt: serverTimestamp() });
-  window.showToast(`User added. Login OTP: ${otp}`, 'info');
-  document.getElementById('newUser').value = '';
-};
-
-window.newOtp = async (userId) => {
-  const otp = genOtp();
-  await updateDoc(doc(db, 'users', userId), { otp });
-  window.showToast(`New Login OTP: ${otp}`, 'info');
-};
-
+// ─── User delete ──────────────────────────────────────────────────────────────
 window.delUser = async (userId, username) => {
-  if (!confirm(`Permanently delete user "${username}"? This cannot be undone.`)) return;
+  if (!confirm(`Permanently delete user "${username}"?`)) return;
   await deleteDoc(doc(db, 'users', userId));
   window.showToast('User deleted', 'error');
 };
 
-// ─── OTP bulk ─────────────────────────────────────────────────────────────────
+// ─── OTP: parse bulk input ────────────────────────────────────────────────────
 window.parseBulkData = (raw) => {
-  return raw.split('\n')
-    .map(l => l.trim())
-    .filter(l => l && !l.startsWith('//'))
+  return raw.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('//'))
     .map(l => {
       const parts = l.split(/\s+/);
       if (parts.length < 2) return null;
-      const countStr = parts[parts.length - 1];
-      const cnt = parseInt(countStr);
+      const cnt = parseInt(parts[parts.length - 1]);
       if (isNaN(cnt) || cnt <= 0) return null;
       const username = parts.slice(0, parts.length - 1).join('_');
-      if (!username) return null;
-      return { username, count: cnt };
-    })
-    .filter(Boolean);
+      return username ? { username, count: cnt } : null;
+    }).filter(Boolean);
 };
 
+// ─── Bulk OTP preview ─────────────────────────────────────────────────────────
 window.previewBulkOtp = () => {
   const raw = document.getElementById('bulkOtpInput').value;
   const previewDiv = document.getElementById('bulkPreview');
@@ -1408,88 +1351,113 @@ window.previewBulkOtp = () => {
   previewDiv.style.display = 'block';
   previewDiv.innerHTML = `<strong class="block mb-2">📋 ${lines.length} entries found</strong>` +
     lines.map(({ username, count }) => {
-      const found = allUsers.find(u =>
-        u.id === username.toLowerCase() ||
-        (u.username || '').toLowerCase() === username.toLowerCase()
-      );
-      const curOtp = found ? (found.totalOtp || 0) : 0;
-      return `<div class="bulk-row">
-        <span>${escHtml(username)}</span>
-        <span>+${count} ${found
-          ? `<span class="bulk-found">(${curOtp} → ${curOtp + count})</span>`
-          : '<span class="bulk-notfound">(user not found)</span>'}</span>
-      </div>`;
+      const found = allUsers.find(u => u.id===username.toLowerCase() || (u.username||'').toLowerCase()===username.toLowerCase());
+      // Check if in pre-loads already
+      const preloaded = allPreloads.find(p => p.id === username.toLowerCase());
+      if (found) {
+        return `<div class="bulk-row"><span>${escHtml(username)}</span><span>+${count} <span class="bulk-found">(${found.totalOtp||0} → ${(found.totalOtp||0)+count}) existing user</span></span></div>`;
+      } else if (preloaded) {
+        return `<div class="bulk-row"><span>${escHtml(username)}</span><span>+${count} <span class="bulk-preloaded">(pre-load: ${preloaded.count||0} → ${(preloaded.count||0)+count})</span></span></div>`;
+      } else {
+        return `<div class="bulk-row"><span>${escHtml(username)}</span><span>+${count} <span class="bulk-preloaded">⚡ will be pre-loaded (not yet registered)</span></span></div>`;
+      }
     }).join('');
 };
 
+// ─── Bulk OTP apply — uses batched writes, stores pre-loads for unknown users ─
 window.applyBulkOtp = async () => {
   const raw = document.getElementById('bulkOtpInput').value;
   const lines = window.parseBulkData(raw);
   if (!lines.length) { window.showToast('No valid data found', 'error'); return; }
-  let updated = 0, notFound = 0;
+
+  const applyBtn = document.querySelector('#tab-otp .bg-slate-900');
+  if (applyBtn) applyBtn.disabled = true;
+
+  let updatedUsers = 0, preloadedNew = 0, preloadedAdded = 0;
+  // Split into batches of 500
+  const BATCH_SIZE = 499;
+  let batch = writeBatch(db);
+  let batchCount = 0;
+
+  const flushBatch = async () => {
+    if (batchCount > 0) { await batch.commit(); batch = writeBatch(db); batchCount = 0; }
+  };
+
   for (const { username, count } of lines) {
-    const found = allUsers.find(u =>
-      u.id === username.toLowerCase() ||
-      (u.username || '').toLowerCase() === username.toLowerCase()
-    );
-    if (!found) { notFound++; continue; }
-    await updateDoc(doc(db, 'users', found.id), { totalOtp: (found.totalOtp || 0) + count });
-    updated++;
+    const found = allUsers.find(u => u.id===username.toLowerCase() || (u.username||'').toLowerCase()===username.toLowerCase());
+    if (found) {
+      // Existing user — add OTPs directly
+      batch.update(doc(db, 'users', found.id), { totalOtp: (found.totalOtp||0) + count });
+      updatedUsers++; batchCount++;
+    } else {
+      // Not registered yet — store/add to pre-load
+      const preloadRef = doc(db, 'otpPreloads', username.toLowerCase());
+      const existing = allPreloads.find(p => p.id === username.toLowerCase());
+      if (existing) {
+        batch.update(preloadRef, { count: (existing.count||0) + count, username, updatedAt: serverTimestamp() });
+        preloadedAdded++;
+      } else {
+        batch.set(preloadRef, { username, usernameLower: username.toLowerCase(), count, createdAt: serverTimestamp() });
+        preloadedNew++;
+      }
+      batchCount++;
+    }
+    if (batchCount >= BATCH_SIZE) await flushBatch();
   }
-  window.showToast(`✅ ${updated} updated, ${notFound} not found`, updated > 0 ? 'success' : 'error');
+  await flushBatch();
+
+  if (applyBtn) applyBtn.disabled = false;
+  const msg = [`✅ ${updatedUsers} user${updatedUsers!==1?'s':''} updated`];
+  if (preloadedNew) msg.push(`⚡ ${preloadedNew} new pre-loaded`);
+  if (preloadedAdded) msg.push(`+${preloadedAdded} pre-load updated`);
+  window.showToast(msg.join(' · '), 'success');
   document.getElementById('bulkOtpInput').value = '';
   document.getElementById('bulkPreview').style.display = 'none';
 };
 
+// ─── Individual OTP ───────────────────────────────────────────────────────────
 window.addSingleOtp = async () => {
   const username = document.getElementById('singleOtpUser').value.trim();
   const cnt = parseInt(document.getElementById('singleOtpCount').value);
   if (!username || isNaN(cnt) || cnt <= 0) { window.showToast('Enter valid username and count', 'error'); return; }
-  const found = allUsers.find(u =>
-    u.id === username.toLowerCase() ||
-    (u.username || '').toLowerCase() === username.toLowerCase()
-  );
-  if (!found) { window.showToast('User not found', 'error'); return; }
-  await updateDoc(doc(db, 'users', found.id), { totalOtp: (found.totalOtp || 0) + cnt });
+  const found = allUsers.find(u => u.id===username.toLowerCase() || (u.username||'').toLowerCase()===username.toLowerCase());
+  if (!found) { window.showToast('User not found. Use bulk OTP to pre-load for unregistered users.', 'error'); return; }
+  await updateDoc(doc(db, 'users', found.id), { totalOtp: (found.totalOtp||0) + cnt });
   window.showToast(`${found.username}: +${cnt} OTP added`, 'success');
   document.getElementById('singleOtpUser').value = '';
   document.getElementById('singleOtpCount').value = '';
 };
 
-// ─── Bulk user creation ───────────────────────────────────────────────────────
-window.previewBulkUsers = () => {
-  const raw = document.getElementById('bulkUserInput').value.trim();
-  const previewDiv = document.getElementById('bulkUserPreview');
-  if (!raw) { previewDiv.style.display = 'none'; return; }
-  const usernames = [...new Set(raw.split('\n').map(l => l.trim()).filter(l => l.length > 0))];
-  const existingIds = allUsers.map(u => (u.username || u.id).toLowerCase());
-  previewDiv.style.display = 'block';
-  previewDiv.innerHTML = `<div class="font-bold mb-2">📋 ${usernames.length} total, ${usernames.filter(u => !existingIds.includes(u.toLowerCase())).length} will be created</div>` +
-    usernames.map(u => {
-      const exists = existingIds.includes(u.toLowerCase());
-      return `<div class="bulk-row"><span>${escHtml(u)}</span><span class="${exists ? 'bulk-notfound' : 'bulk-found'}">${exists ? '⛔ already exists' : '✅ will be created'}</span></div>`;
-    }).join('');
-};
-
-window.applyBulkUsers = async () => {
-  const raw = document.getElementById('bulkUserInput').value.trim();
-  if (!raw) { window.showToast('Enter usernames first', 'error'); return; }
-  const usernames = [...new Set(raw.split('\n').map(l => l.trim()).filter(l => l.length > 0))];
-  const existingIds = allUsers.map(u => (u.username || u.id).toLowerCase());
-  const toCreate = usernames.filter(u => !existingIds.includes(u.toLowerCase()));
-  if (!toCreate.length) { window.showToast('No new users to add — all already exist', 'info'); return; }
-  let created = 0;
-  for (const uname of toCreate) {
-    const otp = genOtp();
-    const ref = doc(db, 'users', uname.toLowerCase());
-    if (!(await getDoc(ref)).exists()) {
-      await setDoc(ref, { username: uname, totalOtp: 0, totalWithdrawn: 0, totalPending: 0, otp, createdAt: serverTimestamp() });
-      created++;
-    }
+// ─── Render pre-loaded OTP list ───────────────────────────────────────────────
+function renderPreloadedOtpList() {
+  const container = document.getElementById('preloadedOtpList');
+  if (!allPreloads.length) {
+    container.innerHTML = '<div class="text-center py-4 text-muted-foreground text-sm">No pre-loaded OTPs — all usernames are registered users.</div>';
+    return;
   }
-  window.showToast(`✅ ${created} new users created with random OTP`, 'success');
-  document.getElementById('bulkUserInput').value = '';
-  document.getElementById('bulkUserPreview').style.display = 'none';
+  container.innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Username</th><th>Pre-loaded OTPs</th><th>Created</th><th>Action</th></tr></thead>
+        <tbody>
+          ${allPreloads.map(p => {
+            const timeStr = p.createdAt?.toDate ? p.createdAt.toDate().toLocaleString('en-BD') : '—';
+            return `<tr>
+              <td><strong>${escHtml(p.username||p.id)}</strong></td>
+              <td><span class="badge badge-preloaded">⚡ ${p.count} OTPs</span></td>
+              <td class="text-xs text-muted-foreground">${timeStr}</td>
+              <td><button class="btn-xs btn-danger-xs" onclick="window.deletePreload('${escAttr(p.id)}','${escAttr(p.username||p.id)}')">Remove</button></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+window.deletePreload = async (id, username) => {
+  if (!confirm(`Remove pre-loaded OTPs for "${username}"?`)) return;
+  await deleteDoc(doc(db, 'otpPreloads', id));
+  window.showToast(`Pre-loaded OTPs removed for ${username}`, 'error');
 };
 
 // ─── Settings ─────────────────────────────────────────────────────────────────
@@ -1501,65 +1469,50 @@ window.saveSettings = async () => {
   const newAdminP = document.getElementById('setAdminPass').value.trim();
   if (newAdminU) settings.adminUser = newAdminU;
   if (newAdminP) settings.adminPass = newAdminP;
-  settings.minWithdraw = min;
-  settings.otpRate = rate;
-  settings.regMode = regMode;
+  settings.minWithdraw = min; settings.otpRate = rate; settings.regMode = regMode;
   await setDoc(doc(db, 'config', 'settings'), settings);
   document.getElementById('currentRateDisplay').innerText = rate;
   document.getElementById('setAdminUser').value = '';
   document.getElementById('setAdminPass').value = '';
   renderUsersTable();
-  window.showToast('Settings saved successfully', 'success');
+  window.showToast('Settings saved', 'success');
 };
 
 // ─── Tab navigation ───────────────────────────────────────────────────────────
 window.showTab = (tab, el) => {
   document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.admin-nav-item').forEach(m => {
-    m.classList.remove('bg-white/10', 'text-white');
-    m.classList.add('text-white/50');
+    m.classList.remove('bg-white/10','text-white'); m.classList.add('text-white/50');
   });
   document.getElementById('tab-' + tab).classList.add('active');
-  el.classList.remove('text-white/50');
-  el.classList.add('bg-white/10', 'text-white');
+  el.classList.remove('text-white/50'); el.classList.add('bg-white/10','text-white');
 };
 
 window.closeModal = () => document.getElementById('modal').classList.remove('open');
 
-// ─── XSS-safe helpers ─────────────────────────────────────────────────────────
+// ─── XSS helpers ─────────────────────────────────────────────────────────────
 function escHtml(str) {
-  return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  return String(str??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 function escAttr(str) {
-  return String(str ?? '').replace(/'/g, "\\'").replace(/"/g, '\\"');
+  return String(str??'').replace(/'/g,"\\'").replace(/"/g,'\\"');
 }
 
-// ─── Boot ─────────────────────────────────────────────────────────────────────
-// ─── SECRET ADMIN URL ────────────────────────────────────────────────────────
-// Visit the page with ?secret=rattara-admin to open admin login
-// e.g. https://yoursite.com/index.html?secret=rattara-admin
+// ─── Secret admin URL ─────────────────────────────────────────────────────────
 (function checkSecretParam() {
   const params = new URLSearchParams(window.location.search);
   if (params.get('secret') === 'rattara-admin') {
-    // Clean the URL so the secret doesn't stay visible
     window.history.replaceState({}, '', window.location.pathname);
-    // Will be handled after load
     window._openAdminOnLoad = true;
   }
 })();
 
+// ─── Boot ─────────────────────────────────────────────────────────────────────
 window.addEventListener('load', async () => {
   await loadSettings();
   setTimeout(async () => {
     document.getElementById('loader').classList.add('hide');
-    // Secret URL triggered admin login
-    if (window._openAdminOnLoad) {
-      window._openAdminOnLoad = false;
-      document.getElementById('loader').classList.add('hide');
-      switchPage('adminLoginPage');
-      return;
-    }
-
+    if (window._openAdminOnLoad) { window._openAdminOnLoad = false; switchPage('adminLoginPage'); return; }
     const sess = loadSession();
     if (sess) {
       if (sess.isAdmin) {
@@ -1570,8 +1523,8 @@ window.addEventListener('load', async () => {
           if (snap.exists()) {
             currentUser = { id: sess.userId, ...snap.data() };
             document.getElementById('mainNav').classList.remove('hidden');
-            document.getElementById('navBadge').innerText = '👤 ' + (currentUser.username || currentUser.id);
-            document.getElementById('dashName').innerText = currentUser.username || currentUser.id;
+            document.getElementById('navBadge').innerText = '👤 ' + (currentUser.username||currentUser.id);
+            document.getElementById('dashName').innerText = currentUser.username||currentUser.id;
             switchPage('dashPage');
             updateDashStats();
             startUserLiveListeners();
