@@ -554,6 +554,32 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
               <button onclick="window.addSingleOtp()" class="bg-primary text-white py-3 rounded-xl font-bold">Add OTP</button>
             </div>
           </div>
+          <!-- Custom OTP Rate (per user) -->
+          <div class="bg-card border rounded-2xl p-6 mt-5">
+            <div class="flex gap-3 mb-4">
+              <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
+                <iconify-icon icon="lucide:badge-percent" class="text-orange-500 text-xl"></iconify-icon>
+              </div>
+              <div>
+                <h3 class="font-extrabold">Custom OTP Rate</h3>
+                <p class="text-[10px] text-muted-foreground">Override global rate for a specific user</p>
+              </div>
+            </div>
+            <div class="bg-orange-50 border border-orange-100 rounded-xl p-3 mb-4 text-sm text-orange-700 flex gap-2 items-start">
+              <iconify-icon icon="lucide:info" class="mt-0.5 shrink-0"></iconify-icon>
+              <span>Global rate is <strong>৳<span id="globalRateHint">1</span></strong> per OTP. Users with a custom rate will use their own rate instead.</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <input type="text" id="customRateUser" placeholder="Username" class="bg-secondary rounded-xl p-3 outline-none"/>
+              <input type="number" step="0.5" id="customRateValue" placeholder="Rate (৳ per OTP)" class="bg-secondary rounded-xl p-3 outline-none"/>
+              <button onclick="window.setCustomRate()" class="bg-orange-500 text-white py-3 rounded-xl font-bold flex gap-2 items-center justify-center">
+                <iconify-icon icon="lucide:save"></iconify-icon> Set Rate
+              </button>
+            </div>
+          
+            <!-- List of users with custom rates -->
+            <div id="customRateList" class="mt-4"></div>
+          </div>
           <!-- Manual Withdrawal Entry -->
           <div class="bg-card border rounded-2xl p-6 mt-5">
             <div class="flex gap-3 mb-4">
@@ -774,6 +800,8 @@ async function loadSettings() {
     document.getElementById('setMin').value = settings.minWithdraw;
     document.getElementById('setOtpRate').value = settings.otpRate || 1;
     document.getElementById('currentRateDisplay').innerText = settings.otpRate || 1;
+    const hint = document.getElementById('globalRateHint');
+if (hint) hint.innerText = settings.otpRate || 1;
     if (document.getElementById('setRegMode')) {
       document.getElementById('setRegMode').value = settings.regMode || 'approval';
     }
@@ -1071,9 +1099,13 @@ window.rejectRegistration = async (regId, username) => {
 };
 
 // ─── Dashboard stats ──────────────────────────────────────────────────────────
+function getUserRate(user) {
+  return (user.customRate && user.customRate > 0) ? user.customRate : (settings.otpRate || 1);
+}
+
 function calcAvailable(user) {
   const totalOtp = user.totalOtp || 0;
-  const rate = settings.otpRate || 1;
+  const rate = getUserRate(user);
   const otpBalance = totalOtp * rate;
   return Math.max(0, otpBalance - (user.totalWithdrawn || 0) - (user.totalPending || 0));
 }
@@ -1081,7 +1113,7 @@ function calcAvailable(user) {
 function updateDashStats() {
   if (!currentUser) return;
   const totalOtp = currentUser.totalOtp || 0;
-  const rate = settings.otpRate || 1;
+  const rate = getUserRate(currentUser);
   const otpBalance = totalOtp * rate;
   document.getElementById('dashTotalOtp').innerText = totalOtp;
   document.getElementById('dashOtpBalance').innerText = '৳' + otpBalance;
@@ -1163,6 +1195,7 @@ function startAdminLiveListeners() {
     allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     filteredUsers = allUsers;
     renderUsersTable();
+    renderCustomRateList();
     document.getElementById('st-users').innerText = allUsers.length;
   });
 
@@ -1276,14 +1309,18 @@ function renderUsersTable() {
   document.getElementById('usersTable').innerHTML = list.length
     ? list.map(u => {
         const totalOtp = u.totalOtp || 0;
-        const otpBalance = totalOtp * rate;
+        const userRate = (u.customRate && u.customRate > 0) ? u.customRate : rate;
+const otpBalance = totalOtp * userRate;
         const withdrawn = u.totalWithdrawn || 0;
         const pending = u.totalPending || 0;
         const available = Math.max(0, otpBalance - withdrawn - pending);
         return `<tr>
           <td><strong>${escHtml(u.username||u.id)}</strong></td>
           <td>${totalOtp}</td>
-          <td>৳${rate}</td>
+          <td>${u.customRate && u.customRate > 0
+  ? `<span class="badge badge-preloaded">৳${u.customRate} ★</span>`
+  : `৳${rate}`}
+</td>
           <td>৳${otpBalance}</td>
           <td>৳${withdrawn}</td>
           <td>৳${available}</td>
@@ -1301,6 +1338,30 @@ window.filterUsers = () => {
   renderUsersTable();
 };
 
+// ─── Render withdrawal table ──────────────────────────────────────────────────
+  function renderCustomRateList() {
+  const customUsers = allUsers.filter(u => u.customRate && u.customRate > 0);
+  const container = document.getElementById('customRateList');
+  if (!container) return;
+  if (!customUsers.length) {
+    container.innerHTML = '<div class="text-center py-3 text-muted-foreground text-sm">No custom rates set yet.</div>';
+    return;
+  }
+  container.innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Username</th><th>Custom Rate</th><th>Global Rate</th><th>Action</th></tr></thead>
+        <tbody>
+          ${customUsers.map(u => `<tr>
+            <td><strong>${escHtml(u.username||u.id)}</strong></td>
+            <td><span class="badge badge-preloaded">৳${u.customRate} / OTP</span></td>
+            <td class="text-muted-foreground text-xs">৳${settings.otpRate||1} / OTP</td>
+            <td><button class="btn-xs btn-danger-xs" onclick="window.removeCustomRate('${escAttr(u.id)}','${escAttr(u.username||u.id)}')">Remove</button></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
 // ─── Render withdrawal table ──────────────────────────────────────────────────
 function renderReqTable() {
   const list = reqFilter === 'all' ? allReqs : allReqs.filter(r => r.status === reqFilter);
@@ -1497,6 +1558,40 @@ window.applyBulkOtp = async () => {
   } catch (e) {
     console.error('addManualWithdrawal:', e);
     window.showToast('Error recording withdrawal', 'error');
+  }
+};
+  // ─── Custom OTP rate per user ─────────────────────────────────────────────────
+window.setCustomRate = async () => {
+  const username = document.getElementById('customRateUser').value.trim();
+  const rate     = parseFloat(document.getElementById('customRateValue').value);
+
+  if (!username)            { window.showToast('Enter a username', 'error'); return; }
+  if (isNaN(rate) || rate <= 0) { window.showToast('Enter a valid rate', 'error'); return; }
+
+  const found = allUsers.find(u =>
+    u.id === username.toLowerCase() ||
+    (u.username||'').toLowerCase() === username.toLowerCase()
+  );
+  if (!found) { window.showToast('User not found', 'error'); return; }
+
+  try {
+    await updateDoc(doc(db, 'users', found.id), { customRate: rate });
+    window.showToast(`✅ Custom rate ৳${rate}/OTP set for ${found.username || found.id}`, 'success');
+    document.getElementById('customRateUser').value  = '';
+    document.getElementById('customRateValue').value = '';
+  } catch (e) {
+    console.error('setCustomRate:', e);
+    window.showToast('Error setting custom rate', 'error');
+  }
+};
+
+window.removeCustomRate = async (userId, username) => {
+  if (!confirm(`Remove custom rate for "${username}"? They will use the global rate.`)) return;
+  try {
+    await updateDoc(doc(db, 'users', userId), { customRate: null });
+    window.showToast(`Custom rate removed for ${username}`, 'info');
+  } catch (e) {
+    window.showToast('Error removing custom rate', 'error');
   }
 };
 // ─── Individual OTP ───────────────────────────────────────────────────────────
