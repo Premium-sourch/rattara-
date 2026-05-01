@@ -1279,7 +1279,7 @@ window.submitRegister = async () => {
   const err = document.getElementById('regErr');
   err.style.display = 'none';
 
-  iif (!document.getElementById('unTakenMsg').classList.contains('hidden')) {
+  if (!document.getElementById('unTakenMsg').classList.contains('hidden')) {
     err.innerText = 'This username is already taken.'; err.style.display = 'block'; return;
   }
   // Allow recycled usernames — recycledUserNotice showing is NOT a block
