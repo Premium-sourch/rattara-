@@ -40,7 +40,7 @@
 
 .page { display: none; }
 .page.active { display: block; }
-#loginPage.active, #adminLoginPage.active {
+#loginPage.active, #adminLoginPage.active, #registerPage.active {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -103,6 +103,14 @@
   margin-top: 8px; display: none;
 }
 
+.success-box {
+  background: #ECFDF5; color: #059669;
+  border: 1px solid rgba(5,150,105,.2);
+  border-radius: 12px; padding: 10px 14px;
+  font-size: .85rem; font-weight: 600;
+  margin-top: 8px; display: none;
+}
+
 .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.4); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 200; padding: 20px; }
 .modal-bg.open { display: flex; }
 
@@ -147,6 +155,43 @@ tbody tr:hover { background: #F8FAFC; }
 .method-btn.active { border-color: #2563EB; background: #EFF6FF; color: #2563EB; }
 
 button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-events: none; }
+
+/* Notification badge */
+.notif-badge {
+  background: #EF4444;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: .6rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  animation: pulse-badge 1.5s ease-in-out infinite;
+}
+@keyframes pulse-badge {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+/* Register page animated background */
+@keyframes float1 { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-20px) rotate(5deg)} }
+@keyframes float2 { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(15px) rotate(-4deg)} }
+.float-1 { animation: float1 6s ease-in-out infinite; }
+.float-2 { animation: float2 5s ease-in-out infinite; }
+
+/* Pending registration pulse */
+.reg-pulse { animation: reg-pulse 2s ease-in-out infinite; }
+@keyframes reg-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(245,158,11,.3); }
+  50% { box-shadow: 0 0 0 8px rgba(245,158,11,0); }
+}
+
+/* Step indicator for register */
+.step-dot { width: 8px; height: 8px; border-radius: 50%; background: #E2E8F0; transition: background .3s; }
+.step-dot.active { background: #2563EB; }
 </style>
 </head>
 <body class="bg-background text-foreground min-h-screen">
@@ -192,7 +237,104 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
         <button id="loginBtn" onclick="window.userLogin()" class="w-full bg-primary text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200 hover:scale-[1.01] transition-all flex items-center justify-center gap-2">Login <iconify-icon icon="lucide:arrow-right"></iconify-icon></button>
       </div>
     </div>
-    <div class="mt-8 text-center"><a href="#" onclick="window.showAdminLogin(event)" class="text-sm font-bold text-primary flex items-center justify-center gap-2"><iconify-icon icon="lucide:shield-check"></iconify-icon> Admin Panel</a></div>
+    <div class="mt-6 flex flex-col items-center gap-3">
+      <a href="#" onclick="window.showRegister(event)" class="text-sm font-bold text-primary flex items-center gap-2 bg-blue-50 border border-blue-100 px-5 py-2.5 rounded-xl hover:bg-primary hover:text-white transition-all">
+        <iconify-icon icon="lucide:user-plus"></iconify-icon> Create New Account
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTRATION PAGE -->
+<div id="registerPage" class="page relative min-h-screen flex items-center justify-center overflow-hidden">
+  <!-- Decorative blobs -->
+  <div class="float-1 absolute top-10 left-10 w-40 h-40 bg-blue-100 rounded-full blur-3xl opacity-70 pointer-events-none"></div>
+  <div class="float-2 absolute bottom-10 right-10 w-52 h-52 bg-violet-100 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-50 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+
+  <div class="w-full max-w-sm mx-auto px-6 relative z-10 py-10">
+    <div class="text-center mb-8">
+      <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-violet-600 rounded-3xl shadow-2xl shadow-blue-200 flex items-center justify-center mx-auto mb-5">
+        <iconify-icon icon="lucide:user-plus" class="text-4xl text-white"></iconify-icon>
+      </div>
+      <h1 class="text-3xl font-extrabold">নিবন্ধন করুন</h1>
+      <p class="text-muted-foreground mt-1 font-medium text-sm">নতুন অ্যাকাউন্ট খুলুন</p>
+    </div>
+
+    <!-- Step indicator -->
+    <div class="flex items-center justify-center gap-2 mb-6">
+      <div class="step-dot active" id="sd1"></div>
+      <div class="h-px w-8 bg-border"></div>
+      <div class="step-dot" id="sd2"></div>
+      <div class="h-px w-8 bg-border"></div>
+      <div class="step-dot" id="sd3"></div>
+    </div>
+
+    <!-- Register form card -->
+    <div id="regFormCard" class="bg-card border border-border rounded-[2rem] p-8 shadow-xl">
+      <div class="space-y-4">
+        <div>
+          <label class="text-[10px] font-bold uppercase tracking-wider ml-1 text-muted-foreground">পূর্ণ নাম</label>
+          <input type="text" id="regFullName" class="w-full bg-secondary border-none rounded-2xl py-4 pl-5 pr-4 focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="আপনার পূর্ণ নাম"/>
+        </div>
+        <div>
+          <label class="text-[10px] font-bold uppercase tracking-wider ml-1 text-muted-foreground">Username</label>
+          <div class="relative">
+            <input type="text" id="regUsername" oninput="window.onUsernameInput()" onblur="window.checkUsernameLive()"
+              class="w-full bg-secondary border-none rounded-2xl py-4 pl-5 pr-10 focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="e.g. RT_YourName"/>
+            <span id="unCheckIcon" class="absolute right-4 top-1/2 -translate-y-1/2 text-lg hidden"></span>
+          </div>
+          <div id="unTakenMsg" class="hidden mt-2 flex items-center gap-2 bg-red-50 border border-red-100 rounded-xl px-3 py-2 text-xs font-bold text-red-600">
+            <iconify-icon icon="lucide:x-circle"></iconify-icon> This username is already taken. Please choose a different one.
+          </div>
+          <div class="mt-2 flex items-start gap-2 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2.5 text-xs font-semibold text-amber-700">
+            <iconify-icon icon="lucide:triangle-alert" class="mt-0.5 shrink-0 text-amber-500"></iconify-icon>
+            <span><strong>Important:</strong> Your username here must exactly match your username in your client panel. If they do not match, you may face issues when requesting a withdrawal.</span>
+          </div>
+        </div>
+        <div>
+          <label class="text-[10px] font-bold uppercase tracking-wider ml-1 text-muted-foreground">Telegram Username</label>
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold text-sm">@</span>
+            <input type="text" id="regPhone" class="w-full bg-secondary border-none rounded-2xl py-4 pl-8 pr-4 focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="your_telegram"/>
+          </div>
+        </div>
+        <div>
+          <label class="text-[10px] font-bold uppercase tracking-wider ml-1 text-muted-foreground">Payment Account (optional)</label>
+          <input type="text" id="regPayment" class="w-full bg-secondary border-none rounded-2xl py-4 pl-5 pr-4 focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="bKash / Nagad / Binance UID"/>
+        </div>
+        <div>
+          <label class="text-[10px] font-bold uppercase tracking-wider ml-1 text-muted-foreground">রেফারেল (ঐচ্ছিক)</label>
+          <input type="text" id="regReferral" class="w-full bg-secondary border-none rounded-2xl py-4 pl-5 pr-4 focus:ring-2 focus:ring-primary outline-none text-sm font-medium" placeholder="Referral username"/>
+        </div>
+        <div class="error-box" id="regErr"></div>
+        <button id="regBtn" onclick="window.submitRegister()" class="w-full bg-gradient-to-r from-blue-600 to-violet-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200 hover:scale-[1.01] transition-all flex items-center justify-center gap-2">
+          আবেদন পাঠান <iconify-icon icon="lucide:send"></iconify-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Success card (hidden initially) -->
+    <div id="regSuccessCard" class="hidden bg-card border border-border rounded-[2rem] p-8 shadow-xl text-center">
+      <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <iconify-icon icon="lucide:check-circle-2" class="text-4xl text-emerald-600"></iconify-icon>
+      </div>
+      <h3 class="text-xl font-extrabold mb-2">Registration Submitted! 🎉</h3>
+      <p class="text-muted-foreground text-sm font-medium mb-4">Your registration request has been sent. Once the Admin approves it, you will receive a notification on your <strong class="text-foreground">Telegram</strong>.</p>
+      <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-5">
+        <p class="text-xs font-bold text-muted-foreground uppercase mb-1">Your Username</p>
+        <p class="text-lg font-extrabold text-primary" id="regSuccessUsername"></p>
+      </div>
+      <button onclick="window.showLogin()" class="w-full bg-primary text-white font-bold py-3 rounded-2xl flex items-center justify-center gap-2">
+        <iconify-icon icon="lucide:log-in"></iconify-icon> Go to Login
+      </button>
+    </div>
+
+    <div class="mt-6 text-center">
+      <a href="#" onclick="window.showLogin(event)" class="text-sm text-muted-foreground flex items-center justify-center gap-2">
+        <iconify-icon icon="lucide:arrow-left"></iconify-icon> Login পেজে ফিরে যান
+      </a>
+    </div>
   </div>
 </div>
 
@@ -247,7 +389,7 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
       </div>
       <div class="space-y-4">
         <input type="text" id="wdName" class="w-full bg-secondary rounded-2xl py-3.5 px-4 outline-none focus:ring-2 focus:ring-primary" placeholder="পূর্ণ নাম"/>
-        <input type="text" id="wdNumber" class="w-full bg-secondary rounded-2xl py-3.5 px-4 outline-none" placeholder="01XXXXXXXXX"/>
+        <input type="text" id="wdNumber" class="w-full bg-secondary rounded-2xl py-3.5 px-4 outline-none" placeholder="Account number / Binance UID"/>
         <select id="wdAccType" class="w-full bg-secondary rounded-2xl py-3.5 px-4 outline-none"><option>Personal</option><option>Agent</option><option>Merchant</option></select>
         <input type="number" id="wdAmount" class="w-full bg-secondary rounded-2xl py-3.5 px-4 outline-none" placeholder="Amount (৳)" min="100"/>
         <div class="error-box" id="wdErr"></div>
@@ -272,6 +414,10 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
       <div class="admin-nav-sidebar">
         <div class="bg-slate-900 rounded-[1.5rem] p-3 space-y-1">
           <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white bg-white/10" onclick="window.showTab('overview',this)"><iconify-icon icon="lucide:pie-chart"></iconify-icon>Overview</div>
+          <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('registrations',this)">
+            <iconify-icon icon="lucide:user-check"></iconify-icon>Registrations
+            <span id="regNavBadge" class="notif-badge hidden">0</span>
+          </div>
           <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('users',this)"><iconify-icon icon="lucide:users"></iconify-icon>Users</div>
           <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('otp',this)"><iconify-icon icon="lucide:zap"></iconify-icon>OTP update</div>
           <div class="admin-nav-item flex items-center gap-3 px-4 py-3 rounded-2xl cursor-pointer text-sm font-bold text-white/50 hover:bg-white/10" onclick="window.showTab('bulkUser',this)"><iconify-icon icon="lucide:users-round"></iconify-icon>Bulk User</div>
@@ -285,11 +431,41 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
         <div class="admin-panel active" id="tab-overview">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div class="bg-card border rounded-2xl p-5"><div class="w-10 h-10 bg-blue-50 rounded-xl mb-3 flex items-center justify-center"><iconify-icon icon="lucide:users" class="text-primary text-xl"></iconify-icon></div><div class="text-2xl font-extrabold" id="st-users">0</div><div class="text-xs font-bold uppercase text-muted-foreground">Total users</div></div>
-            <div class="bg-card border rounded-2xl p-5"><div class="w-10 h-10 bg-amber-50 rounded-xl mb-3 flex items-center justify-center"><iconify-icon icon="lucide:clock" class="text-amber-500 text-xl"></iconify-icon></div><div class="text-2xl font-extrabold text-amber-500" id="st-pending">0</div><div class="text-xs font-bold uppercase">Pending</div></div>
-            <div class="bg-card border rounded-2xl p-5"><div class="w-10 h-10 bg-emerald-50 rounded-xl mb-3 flex items-center justify-center"><iconify-icon icon="lucide:check-circle" class="text-tertiary text-xl"></iconify-icon></div><div class="text-2xl font-extrabold text-tertiary" id="st-approved">0</div><div class="text-xs font-bold uppercase">Approved</div></div>
+            <div class="bg-card border rounded-2xl p-5 cursor-pointer hover:border-amber-300 transition-all" onclick="window.showTab('registrations', document.querySelectorAll('.admin-nav-item')[1])">
+              <div class="w-10 h-10 bg-amber-50 rounded-xl mb-3 flex items-center justify-center"><iconify-icon icon="lucide:user-check" class="text-amber-500 text-xl"></iconify-icon></div>
+              <div class="text-2xl font-extrabold text-amber-500 flex items-center gap-2" id="st-regs">0 <span id="st-regs-badge" class="hidden notif-badge">!</span></div>
+              <div class="text-xs font-bold uppercase">Pending Reg.</div>
+            </div>
+            <div class="bg-card border rounded-2xl p-5"><div class="w-10 h-10 bg-emerald-50 rounded-xl mb-3 flex items-center justify-center"><iconify-icon icon="lucide:check-circle" class="text-tertiary text-xl"></iconify-icon></div><div class="text-2xl font-extrabold text-tertiary" id="st-approved">0</div><div class="text-xs font-bold uppercase">Approved WD</div></div>
             <div class="bg-card border rounded-2xl p-5"><div class="w-10 h-10 bg-blue-50 rounded-xl mb-3 flex items-center justify-center"><iconify-icon icon="lucide:wallet" class="text-primary text-xl"></iconify-icon></div><div class="text-2xl font-extrabold text-primary" id="st-paid">৳0</div><div class="text-xs font-bold uppercase">Total paid</div></div>
           </div>
           <div class="bg-card border rounded-2xl p-6 mt-4"><h3 class="font-extrabold mb-4">Recent requests</h3><div id="recentList"></div></div>
+        </div>
+
+        <!-- REGISTRATIONS TAB -->
+        <div class="admin-panel" id="tab-registrations">
+          <div class="bg-card border rounded-2xl p-6">
+            <div class="flex justify-between flex-wrap items-center mb-5 gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+                  <iconify-icon icon="lucide:user-check" class="text-amber-600 text-xl"></iconify-icon>
+                </div>
+                <div>
+                  <h3 class="font-extrabold">Registration Requests</h3>
+                  <p class="text-xs text-muted-foreground">Approve or reject new user registrations</p>
+                </div>
+              </div>
+              <div class="flex gap-2 flex-wrap">
+                <button class="filter-btn active" onclick="window.filterReg('all',this)">All</button>
+                <button class="filter-btn" onclick="window.filterReg('pending',this)">Pending</button>
+                <button class="filter-btn" onclick="window.filterReg('approved',this)">Approved</button>
+                <button class="filter-btn" onclick="window.filterReg('rejected',this)">Rejected</button>
+              </div>
+            </div>
+            <div id="regList">
+              <div class="text-center py-8 text-muted-foreground">Loading...</div>
+            </div>
+          </div>
         </div>
 
         <!-- USERS -->
@@ -390,6 +566,14 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
             <div class="max-w-md space-y-4">
               <div><label class="text-[10px] font-bold uppercase">Min withdrawal (৳)</label><input type="number" id="setMin" value="100" class="w-full bg-secondary rounded-2xl py-3 px-4 outline-none"/></div>
               <div><label class="text-[10px] font-bold uppercase">OTP Rate (৳ per OTP)</label><input type="number" step="0.5" id="setOtpRate" value="1" class="w-full bg-secondary rounded-2xl py-3 px-4 outline-none"/></div>
+              <div>
+                <label class="text-[10px] font-bold uppercase">Registration Mode</label>
+                <select id="setRegMode" class="w-full bg-secondary rounded-2xl py-3 px-4 outline-none">
+                  <option value="open">Open (Anyone can register)</option>
+                  <option value="approval">Requires Admin Approval</option>
+                  <option value="closed">Closed (No new registrations)</option>
+                </select>
+              </div>
               <div class="border-t border-border pt-4 mt-4">
                 <p class="text-xs text-muted-foreground mb-3 font-bold">⚠️ Change admin credentials — leave blank to keep current</p>
                 <div class="space-y-3">
@@ -448,10 +632,19 @@ let currentUser = null;
 let isAdmin = false;
 let selectedMethod = 'bKash';
 let reqFilter = 'all';
+let regFilter = 'all';
 let allReqs = [];
 let allUsers = [];
-let settings = { minWithdraw: 100, otpRate: 1, adminUser: 'admin', adminPass: 'Tania-Rakib-5687' };
-let unsubAdmin = null, unsubUser = null, unsubReqs = null;
+let allRegistrations = [];
+let settings = {
+  minWithdraw: 100,
+  otpRate: 1,
+  adminUser: 'admin',
+  adminPass: 'Tania-Rakib-5687',
+  regMode: 'approval'
+};
+let unsubAdmin = null, unsubUser = null, unsubReqs = null, unsubRegistrations = null;
+let lastKnownRegCount = -1; // For new registration notification tracking
 
 const SESSION_KEY = 'rt_session';
 const SESSION_DURATION = 30 * 60 * 1000; // 30 minutes
@@ -492,7 +685,6 @@ function loadSession() {
 
 function clearSession() { sessionStorage.removeItem(SESSION_KEY); }
 
-// Reset session timer on any user activity
 function resetSessionTimer() {
   clearTimeout(window._sessionTimer);
   window._sessionTimer = setTimeout(() => {
@@ -527,11 +719,34 @@ async function loadSettings() {
     document.getElementById('setMin').value = settings.minWithdraw;
     document.getElementById('setOtpRate').value = settings.otpRate || 1;
     document.getElementById('currentRateDisplay').innerText = settings.otpRate || 1;
+    if (document.getElementById('setRegMode')) {
+      document.getElementById('setRegMode').value = settings.regMode || 'approval';
+    }
   } catch (e) { console.error('loadSettings:', e); }
 }
 
 window.showAdminLogin = (e) => { e?.preventDefault(); switchPage('adminLoginPage'); };
 window.showUserLogin = (e) => { e?.preventDefault(); switchPage('loginPage'); };
+window.showLogin = (e) => { e?.preventDefault(); switchPage('loginPage'); };
+window.showRegister = (e) => {
+  e?.preventDefault();
+  if (settings.regMode === 'closed') {
+    window.showToast('Registration is currently closed.', 'error');
+    return;
+  }
+  // Reset form & step
+  ['regFullName','regUsername','regPhone','regPayment','regReferral'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('regErr').style.display = 'none';
+  document.getElementById('regFormCard').classList.remove('hidden');
+  document.getElementById('regSuccessCard').classList.add('hidden');
+  document.getElementById('sd1').classList.add('active');
+  document.getElementById('sd2').classList.remove('active');
+  document.getElementById('sd3').classList.remove('active');
+  switchPage('registerPage');
+};
 
 window.logout = () => {
   clearSession();
@@ -540,8 +755,10 @@ window.logout = () => {
   if (unsubAdmin) { unsubAdmin(); unsubAdmin = null; }
   if (unsubUser) { unsubUser(); unsubUser = null; }
   if (unsubReqs) { unsubReqs(); unsubReqs = null; }
+  if (unsubRegistrations) { unsubRegistrations(); unsubRegistrations = null; }
   currentUser = null;
   isAdmin = false;
+  lastKnownRegCount = -1;
   document.getElementById('mainNav').classList.add('hidden');
   switchPage('loginPage');
   document.getElementById('loginUser').value = '';
@@ -556,7 +773,6 @@ window.userLogin = async () => {
   err.style.display = 'none';
   if (!u || !p) { err.innerText = 'Username and OTP required'; err.style.display = 'block'; return; }
 
-  // Admin shortcut via user login
   if (u === settings.adminUser && p === settings.adminPass) {
     _enterAdmin();
     return;
@@ -613,6 +829,148 @@ function _enterAdmin() {
   bindActivityListeners();
   resetSessionTimer();
 }
+
+// ─── USERNAME LIVE CHECK ──────────────────────────────────────────────────────
+window.onUsernameInput = () => {
+  // Reset state while typing
+  document.getElementById('unTakenMsg').classList.add('hidden');
+  const icon = document.getElementById('unCheckIcon');
+  icon.classList.add('hidden');
+  icon.textContent = '';
+};
+
+window.checkUsernameLive = async () => {
+  const val = document.getElementById('regUsername').value.trim();
+  const icon = document.getElementById('unCheckIcon');
+  const takenMsg = document.getElementById('unTakenMsg');
+  takenMsg.classList.add('hidden');
+  icon.classList.add('hidden');
+  if (!val || val.length < 3) return;
+
+  try {
+    // Check users collection
+    const userSnap = await getDoc(doc(db, 'users', val.toLowerCase()));
+    if (userSnap.exists()) {
+      icon.textContent = '❌'; icon.classList.remove('hidden');
+      takenMsg.classList.remove('hidden');
+      return;
+    }
+    // Check pending registrations
+    const regSnap = await getDocs(
+      query(collection(db, 'registrations'), where('usernameLower', '==', val.toLowerCase()))
+    );
+    const activePending = regSnap.docs.find(d => d.data().status === 'pending' || d.data().status === 'approved');
+    if (activePending) {
+      icon.textContent = '❌'; icon.classList.remove('hidden');
+      takenMsg.classList.remove('hidden');
+      return;
+    }
+    // All clear
+    icon.textContent = '✅'; icon.classList.remove('hidden');
+  } catch (e) { /* silently ignore network issues on live check */ }
+};
+
+// ─── REGISTRATION SUBMIT ─────────────────────────────────────────────────────
+window.submitRegister = async () => {
+  const fullName = document.getElementById('regFullName').value.trim();
+  const username = document.getElementById('regUsername').value.trim();
+  const phone = document.getElementById('regPhone').value.trim();
+  const payment = document.getElementById('regPayment').value.trim();
+  const referral = document.getElementById('regReferral').value.trim();
+  const err = document.getElementById('regErr');
+  err.style.display = 'none';
+
+  // Block if live check already flagged as taken
+  if (!document.getElementById('unTakenMsg').classList.contains('hidden')) {
+    err.innerText = 'This username is already taken. Please choose a different one.';
+    err.style.display = 'block'; return;
+  }
+
+  // Validate
+  if (!fullName) { err.innerText = 'Please enter your full name'; err.style.display = 'block'; return; }
+  if (!username) { err.innerText = 'Please enter a username'; err.style.display = 'block'; return; }
+  if (!/^[a-zA-Z0-9_\-\.]{3,30}$/.test(username)) {
+    err.innerText = 'Username must be 3–30 chars: letters, numbers, _ - .';
+    err.style.display = 'block'; return;
+  }
+  const telegram = document.getElementById('regPhone').value.trim();
+  if (!telegram) {
+    err.innerText = 'Please enter your Telegram username';
+    err.style.display = 'block'; return;
+  }
+
+  // Update step indicator
+  document.getElementById('sd1').classList.add('active');
+  document.getElementById('sd2').classList.add('active');
+
+  setLoading('regBtn', true);
+  try {
+    // Check if username already exists in users collection
+    const userSnap = await getDoc(doc(db, 'users', username.toLowerCase()));
+    if (userSnap.exists()) {
+      err.innerText = 'This username is already taken. Please choose another.';
+      err.style.display = 'block';
+      setLoading('regBtn', false); return;
+    }
+
+    // Check if already has a pending/approved registration
+    const existingRegs = await getDocs(
+      query(collection(db, 'registrations'), where('usernameLower', '==', username.toLowerCase()))
+    );
+    if (!existingRegs.empty) {
+      const existing = existingRegs.docs[0].data();
+      if (existing.status === 'pending') {
+        err.innerText = 'A request with this username already exists. Please wait for Admin approval.';
+        err.style.display = 'block';
+        setLoading('regBtn', false); return;
+      }
+      if (existing.status === 'approved') {
+        err.innerText = 'This username has already been approved.';
+        err.style.display = 'block';
+        setLoading('regBtn', false); return;
+      }
+    }
+
+    const regMode = settings.regMode || 'approval';
+    const initialStatus = regMode === 'open' ? 'approved' : 'pending';
+
+    // Save registration request
+    await addDoc(collection(db, 'registrations'), {
+      fullName,
+      username,
+      usernameLower: username.toLowerCase(),
+      telegram: telegram,
+      payment: payment || '',
+      referral: referral || '',
+      status: initialStatus,
+      createdAt: serverTimestamp()
+    });
+
+    // If open mode, auto-create the user account immediately
+    if (regMode === 'open') {
+      const otp = genOtp();
+      await setDoc(doc(db, 'users', username.toLowerCase()), {
+        username, totalOtp: 0, totalWithdrawn: 0, totalPending: 0,
+        otp, createdAt: serverTimestamp()
+      });
+    }
+
+    // Update step indicator to done
+    document.getElementById('sd2').classList.add('active');
+    document.getElementById('sd3').classList.add('active');
+
+    // Show success card
+    document.getElementById('regFormCard').classList.add('hidden');
+    document.getElementById('regSuccessCard').classList.remove('hidden');
+    document.getElementById('regSuccessUsername').innerText = username;
+
+  } catch (e) {
+    console.error('submitRegister:', e);
+    err.innerText = 'Connection error. Please try again.';
+    err.style.display = 'block';
+  }
+  setLoading('regBtn', false);
+};
 
 // ─── Dashboard stats ────────────────────────────────────────────────────────
 function calcAvailable(user) {
@@ -673,7 +1031,7 @@ window.selectMethod = (el, method) => {
   document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   selectedMethod = method;
-  document.getElementById('wdNumber').placeholder = method === 'Binance' ? 'UID or Email' : '01XXXXXXXXX';
+  document.getElementById('wdNumber').placeholder = method === 'Binance' ? 'Binance UID or Email' : method === 'bKash' ? 'bKash number (01X...)' : 'Nagad number (01X...)';
 };
 
 window.submitWithdraw = async () => {
@@ -684,8 +1042,10 @@ window.submitWithdraw = async () => {
   const err = document.getElementById('wdErr');
   err.style.display = 'none';
 
-  if (!fullName || !number) { err.innerText = 'Name & Number required'; err.style.display = 'block'; return; }
-  if (selectedMethod !== 'Binance' && !/^01[3-9]\d{8}$/.test(number)) { err.innerText = 'Valid BD number required (01X-XXXXXXXX)'; err.style.display = 'block'; return; }
+  if (!fullName || !number) { err.innerText = 'Name & account number/ID required'; err.style.display = 'block'; return; }
+  if (selectedMethod === 'bKash' || selectedMethod === 'Nagad') {
+    if (!/^01[3-9]\d{8}$/.test(number)) { err.innerText = 'Valid BD number required for bKash/Nagad (01X-XXXXXXXX)'; err.style.display = 'block'; return; }
+  }
 
   const available = calcAvailable(currentUser);
   if (isNaN(amount) || amount < settings.minWithdraw) {
@@ -699,7 +1059,6 @@ window.submitWithdraw = async () => {
 
   setLoading('wdBtn', true);
   try {
-    // Re-check for pending requests server-side
     const pendingSnap = await getDocs(
       query(collection(db, 'withdrawals'),
         where('userId', '==', currentUser.id),
@@ -711,7 +1070,6 @@ window.submitWithdraw = async () => {
       setLoading('wdBtn', false); return;
     }
 
-    // Re-read current user balance from Firestore to prevent race conditions
     const freshUser = await getDoc(doc(db, 'users', currentUser.id));
     if (!freshUser.exists()) { err.innerText = 'User not found'; err.style.display = 'block'; setLoading('wdBtn', false); return; }
     const freshData = freshUser.data();
@@ -721,7 +1079,6 @@ window.submitWithdraw = async () => {
       err.style.display = 'block'; setLoading('wdBtn', false); return;
     }
 
-    // Reserve pending amount on user doc to prevent over-withdrawal
     await updateDoc(doc(db, 'users', currentUser.id), { totalPending: (freshData.totalPending || 0) + amount });
 
     await addDoc(collection(db, 'withdrawals'), {
@@ -747,21 +1104,22 @@ window.submitWithdraw = async () => {
 
 // ─── Admin live listeners ────────────────────────────────────────────────────
 function startAdminLiveListeners() {
+  // Users
   if (unsubUser) unsubUser();
   unsubUser = onSnapshot(collection(db, 'users'), snap => {
     allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderUsersTable();
     document.getElementById('st-users').innerText = allUsers.length;
   });
+
+  // Withdrawals
   if (unsubReqs) unsubReqs();
   unsubReqs = onSnapshot(
     query(collection(db, 'withdrawals'), orderBy('createdAt', 'desc')),
     snap => {
       allReqs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      const pending = allReqs.filter(r => r.status === 'pending');
       const approved = allReqs.filter(r => r.status === 'approved');
       const totalPaid = approved.reduce((s, r) => s + (r.amount || 0), 0);
-      document.getElementById('st-pending').innerText = pending.length;
       document.getElementById('st-approved').innerText = approved.length;
       document.getElementById('st-paid').innerText = '৳' + totalPaid;
       renderReqTable();
@@ -770,7 +1128,144 @@ function startAdminLiveListeners() {
       ).join('') || '<div class="text-center text-muted-foreground py-4">No requests</div>';
     }
   );
+
+  // Registrations — with real-time notification
+  if (unsubRegistrations) unsubRegistrations();
+  unsubRegistrations = onSnapshot(
+    query(collection(db, 'registrations'), orderBy('createdAt', 'desc')),
+    snap => {
+      allRegistrations = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const pendingRegs = allRegistrations.filter(r => r.status === 'pending');
+      const pendingCount = pendingRegs.length;
+
+      // Update overview stat
+      document.getElementById('st-regs').childNodes[0].textContent = pendingCount + ' ';
+      const stRegsBadge = document.getElementById('st-regs-badge');
+      if (pendingCount > 0) { stRegsBadge.classList.remove('hidden'); }
+      else { stRegsBadge.classList.add('hidden'); }
+
+      // Update nav badge
+      const navBadge = document.getElementById('regNavBadge');
+      if (pendingCount > 0) {
+        navBadge.classList.remove('hidden');
+        navBadge.textContent = pendingCount;
+      } else {
+        navBadge.classList.add('hidden');
+      }
+
+      // Fire notification toast if new registrations arrived
+      if (lastKnownRegCount >= 0 && pendingCount > lastKnownRegCount) {
+        const diff = pendingCount - lastKnownRegCount;
+        window.showToast(`🔔 ${diff} new registration request${diff > 1 ? 's' : ''}!`, 'info');
+        // Browser notification (if permission granted)
+        if (Notification.permission === 'granted') {
+          new Notification('RatTara — New Registration', {
+            body: `${diff} new user registration request${diff > 1 ? 's' : ''} waiting for approval.`,
+            icon: ''
+          });
+        }
+      }
+      lastKnownRegCount = pendingCount;
+
+      renderRegList();
+    }
+  );
+
+  // Request browser notification permission
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
 }
+
+// ─── Render registrations ─────────────────────────────────────────────────────
+function renderRegList() {
+  const list = regFilter === 'all' ? allRegistrations : allRegistrations.filter(r => r.status === regFilter);
+  const container = document.getElementById('regList');
+  if (!list.length) {
+    container.innerHTML = '<div class="text-center py-8 text-muted-foreground">No registrations found</div>';
+    return;
+  }
+  container.innerHTML = list.map(r => {
+    const isPending = r.status === 'pending';
+    const badgeCls = r.status === 'pending' ? 'badge-pending' : r.status === 'approved' ? 'badge-approved' : 'badge-rejected';
+    const statusLabel = r.status === 'pending' ? '⏳ Pending' : r.status === 'approved' ? '✅ Approved' : '❌ Rejected';
+    const timeStr = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleString('en-BD') : '—';
+    return `
+      <div class="border ${isPending ? 'border-amber-200 reg-pulse' : 'border-border'} rounded-2xl p-4 mb-3 bg-card">
+        <div class="flex items-start justify-between gap-3 flex-wrap">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap mb-1">
+              <span class="font-extrabold text-base">${escHtml(r.username)}</span>
+              <span class="badge ${badgeCls}">${statusLabel}</span>
+            </div>
+            <div class="text-sm text-muted-foreground space-y-0.5">
+              <div><span class="font-bold text-foreground">নাম:</span> ${escHtml(r.fullName)}</div>
+              <div><span class="font-bold text-foreground">Telegram:</span> @${escHtml(r.telegram || r.phone || '—')}</div>
+              ${r.payment ? `<div><span class="font-bold text-foreground">Payment:</span> ${escHtml(r.payment)}</div>` : ''}
+              ${r.referral ? `<div><span class="font-bold text-foreground">Referral:</span> ${escHtml(r.referral)}</div>` : ''}
+              <div class="text-xs mt-1 text-muted-foreground">${timeStr}</div>
+            </div>
+          </div>
+          ${isPending ? `
+          <div class="flex flex-col gap-2 shrink-0">
+            <button class="btn-xs btn-success-xs" onclick="window.approveRegistration('${escAttr(r.id)}','${escAttr(r.username)}','${escAttr(r.fullName)}')">
+              <iconify-icon icon="lucide:check"></iconify-icon> Approve
+            </button>
+            <button class="btn-xs btn-danger-xs" onclick="window.rejectRegistration('${escAttr(r.id)}','${escAttr(r.username)}')">
+              <iconify-icon icon="lucide:x"></iconify-icon> Reject
+            </button>
+          </div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+window.filterReg = (f, el) => {
+  regFilter = f;
+  document.querySelectorAll('#tab-registrations .filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderRegList();
+};
+
+// ─── Approve registration ─────────────────────────────────────────────────────
+window.approveRegistration = async (regId, username, fullName) => {
+  try {
+    // Check if user already exists
+    const userRef = doc(db, 'users', username.toLowerCase());
+    const existing = await getDoc(userRef);
+    if (existing.exists()) {
+      window.showToast('User already exists', 'error');
+      await updateDoc(doc(db, 'registrations', regId), { status: 'approved' });
+      return;
+    }
+
+    const otp = genOtp();
+    await setDoc(userRef, {
+      username,
+      totalOtp: 0,
+      totalWithdrawn: 0,
+      totalPending: 0,
+      otp,
+      createdAt: serverTimestamp()
+    });
+    await updateDoc(doc(db, 'registrations', regId), { status: 'approved', approvedAt: serverTimestamp() });
+    window.showToast(`✅ ${username} approved! Login OTP: ${otp}`, 'success');
+  } catch (e) {
+    console.error('approveRegistration:', e);
+    window.showToast('Error approving registration', 'error');
+  }
+};
+
+window.rejectRegistration = async (regId, username) => {
+  if (!confirm(`Reject registration for "${username}"?`)) return;
+  try {
+    await updateDoc(doc(db, 'registrations', regId), { status: 'rejected', rejectedAt: serverTimestamp() });
+    window.showToast(`Registration rejected for ${username}`, 'error');
+  } catch (e) {
+    console.error('rejectRegistration:', e);
+    window.showToast('Error rejecting registration', 'error');
+  }
+};
 
 function renderUsersTable() {
   const rate = settings.otpRate || 1;
@@ -818,12 +1313,12 @@ function renderReqTable() {
 
 window.filterReq = (f, el) => {
   reqFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#tab-withdrawals .filter-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   renderReqTable();
 };
 
-// ─── Approve / reject (with pending balance reconciliation) ─────────────────
+// ─── Approve / reject withdrawals ─────────────────────────────────────────────
 window.approveReq = async (reqId, userId, amount) => {
   try {
     await updateDoc(doc(db, 'withdrawals', reqId), { status: 'approved' });
@@ -848,7 +1343,6 @@ window.rejectReq = async (reqId, userId, amount) => {
     const uSnap = await getDoc(doc(db, 'users', userId));
     if (uSnap.exists()) {
       const d = uSnap.data();
-      // Release the reserved pending amount back to user
       await updateDoc(doc(db, 'users', userId), {
         totalPending: Math.max(0, (d.totalPending || 0) - amount)
       });
@@ -888,7 +1382,7 @@ window.delUser = async (userId, username) => {
   window.showToast('User deleted', 'error');
 };
 
-// ─── OTP bulk parse (fixed: username is everything before the last token) ────
+// ─── OTP bulk ─────────────────────────────────────────────────────────────────
 window.parseBulkData = (raw) => {
   return raw.split('\n')
     .map(l => l.trim())
@@ -899,7 +1393,6 @@ window.parseBulkData = (raw) => {
       const countStr = parts[parts.length - 1];
       const cnt = parseInt(countStr);
       if (isNaN(cnt) || cnt <= 0) return null;
-      // Everything before the last token is the username
       const username = parts.slice(0, parts.length - 1).join('_');
       if (!username) return null;
       return { username, count: cnt };
@@ -907,7 +1400,6 @@ window.parseBulkData = (raw) => {
     .filter(Boolean);
 };
 
-// ─── Bulk OTP preview (was missing for OTP tab) ───────────────────────────
 window.previewBulkOtp = () => {
   const raw = document.getElementById('bulkOtpInput').value;
   const previewDiv = document.getElementById('bulkPreview');
@@ -1004,13 +1496,14 @@ window.applyBulkUsers = async () => {
 window.saveSettings = async () => {
   const min = parseInt(document.getElementById('setMin').value) || 100;
   const rate = parseFloat(document.getElementById('setOtpRate').value) || 1;
+  const regMode = document.getElementById('setRegMode').value || 'approval';
   const newAdminU = document.getElementById('setAdminUser').value.trim();
   const newAdminP = document.getElementById('setAdminPass').value.trim();
-  // Only update if non-empty — prevent accidental lockout
   if (newAdminU) settings.adminUser = newAdminU;
   if (newAdminP) settings.adminPass = newAdminP;
   settings.minWithdraw = min;
   settings.otpRate = rate;
+  settings.regMode = regMode;
   await setDoc(doc(db, 'config', 'settings'), settings);
   document.getElementById('currentRateDisplay').innerText = rate;
   document.getElementById('setAdminUser').value = '';
@@ -1042,10 +1535,31 @@ function escAttr(str) {
 }
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
+// ─── SECRET ADMIN URL ────────────────────────────────────────────────────────
+// Visit the page with ?secret=rattara-admin to open admin login
+// e.g. https://yoursite.com/index.html?secret=rattara-admin
+(function checkSecretParam() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('secret') === 'rattara-admin') {
+    // Clean the URL so the secret doesn't stay visible
+    window.history.replaceState({}, '', window.location.pathname);
+    // Will be handled after load
+    window._openAdminOnLoad = true;
+  }
+})();
+
 window.addEventListener('load', async () => {
   await loadSettings();
   setTimeout(async () => {
     document.getElementById('loader').classList.add('hide');
+    // Secret URL triggered admin login
+    if (window._openAdminOnLoad) {
+      window._openAdminOnLoad = false;
+      document.getElementById('loader').classList.add('hide');
+      switchPage('adminLoginPage');
+      return;
+    }
+
     const sess = loadSession();
     if (sess) {
       if (sess.isAdmin) {
