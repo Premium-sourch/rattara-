@@ -48,17 +48,15 @@
 }
 
 /* ── ADMIN LAYOUT ── */
-/* Mobile: stacked (default) */
 #adminPage .admin-layout {
   display: flex;
   flex-direction: column;
   gap: 0;
 }
 
-/* Mobile top navbar */
 #adminPage .admin-nav-sidebar {
   position: sticky;
-  top: 57px; /* height of mainNav */
+  top: 57px;
   z-index: 40;
   background: #0F172A;
   border-radius: 0;
@@ -70,7 +68,7 @@
   scrollbar-width: none;
   gap: 2px;
   padding: 8px 12px;
-  margin: -24px -20px 16px -20px; /* bleed to edges */
+  margin: -24px -20px 16px -20px;
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 #adminPage .admin-nav-sidebar::-webkit-scrollbar { display: none; }
@@ -99,7 +97,6 @@
   color: rgba(255,255,255,0.85);
 }
 
-/* Desktop: side-by-side grid */
 @media (min-width: 900px) {
   #adminPage .admin-layout {
     display: grid;
@@ -363,7 +360,6 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
           <div id="preloadedNotice" class="hidden mt-2 flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-xl px-3 py-2 text-xs font-bold text-blue-700">
             <iconify-icon icon="lucide:zap"></iconify-icon> OTP already loaded for this username — you'll be auto-approved!
           </div>
-          <!-- NEW: notice when username was previously deleted and has OTP balance -->
           <div id="recycledUserNotice" class="hidden mt-2 bg-purple-50 border border-purple-100 rounded-xl px-3 py-2 text-xs font-bold text-purple-700">
             <div class="flex items-center gap-2 mb-1"><iconify-icon icon="lucide:history"></iconify-icon> <span>This username was previously used.</span></div>
             <div id="recycledUserDetail" class="text-purple-600 font-semibold"></div>
@@ -409,7 +405,6 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
       </div>
     </div>
 
-    <!-- Success card -->
     <div id="regSuccessCard" class="hidden bg-card border border-border rounded-[2rem] p-8 shadow-xl text-center">
       <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
         <iconify-icon icon="lucide:check-circle-2" class="text-4xl text-emerald-600"></iconify-icon>
@@ -502,7 +497,6 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
       <div><h2 class="text-xl font-extrabold">Admin Control</h2><p class="text-xs text-muted-foreground">Withdrawal & user management</p></div>
     </div>
     <div class="admin-layout">
-      <!-- NAV: horizontal on mobile, sidebar on desktop -->
       <div class="admin-nav-sidebar" id="adminNavSidebar">
         <div class="admin-nav-item active-tab" onclick="window.showTab('overview',this)">
           <iconify-icon icon="lucide:pie-chart"></iconify-icon><span>Overview</span>
@@ -1201,7 +1195,7 @@ function _enterAdmin() {
   resetSessionTimer();
 }
 
-// ─── Username live check + pre-load + recycled user detection ──────────────────
+// ─── Username live check ───────────────────────────────────────────────────────
 window.onUsernameInput = () => {
   document.getElementById('unTakenMsg').classList.add('hidden');
   document.getElementById('preloadedNotice').classList.add('hidden');
@@ -1210,7 +1204,7 @@ window.onUsernameInput = () => {
   icon.classList.add('hidden'); icon.textContent = '';
 };
 
-  window.checkUsernameLive = async () => {
+window.checkUsernameLive = async () => {
   const val = document.getElementById('regUsername').value.trim();
   const icon = document.getElementById('unCheckIcon');
   const takenMsg = document.getElementById('unTakenMsg');
@@ -1224,14 +1218,12 @@ window.onUsernameInput = () => {
   if (!val || val.length < 3) return;
 
   try {
-    // 1. Check active user (genuinely taken)
     const userSnap = await getDoc(doc(db, 'users', val.toLowerCase()));
     if (userSnap.exists()) {
       icon.textContent = '❌'; icon.classList.remove('hidden');
       takenMsg.classList.remove('hidden'); return;
     }
 
-    // 2. Check ONLY pending/approved registrations — ignore rejected ones
     const regSnap = await getDocs(query(
       collection(db, 'registrations'),
       where('usernameLower', '==', val.toLowerCase())
@@ -1243,7 +1235,6 @@ window.onUsernameInput = () => {
       takenMsg.classList.remove('hidden'); return;
     }
 
-    // 3. Check deleted user record — show warning but ALLOW registration
     const deletedSnap = await getDoc(doc(db, 'deletedUsers', val.toLowerCase()));
     if (deletedSnap.exists()) {
       const dd = deletedSnap.data();
@@ -1256,7 +1247,6 @@ window.onUsernameInput = () => {
       return;
     }
 
-    // 4. Check preload
     const preloadSnap = await getDoc(doc(db, 'otpPreloads', val.toLowerCase()));
     if (preloadSnap.exists()) {
       icon.textContent = '⚡'; icon.classList.remove('hidden');
@@ -1282,7 +1272,6 @@ window.submitRegister = async () => {
   if (!document.getElementById('unTakenMsg').classList.contains('hidden')) {
     err.innerText = 'This username is already taken.'; err.style.display = 'block'; return;
   }
-  // Allow recycled usernames — recycledUserNotice showing is NOT a block
   if (!fullName)  { err.innerText = 'Please enter your full name'; err.style.display = 'block'; return; }
   if (!username)  { err.innerText = 'Please enter a username'; err.style.display = 'block'; return; }
   if (!/^[a-zA-Z0-9_\-\.]{3,30}$/.test(username)) {
@@ -1308,7 +1297,6 @@ window.submitRegister = async () => {
       setLoading('regBtn', false); return;
     }
 
-    // Check only non-rejected registrations to allow re-registration after rejection
     const existingRegs = await getDocs(query(
       collection(db, 'registrations'),
       where('usernameLower', '==', username.toLowerCase())
@@ -1326,11 +1314,9 @@ window.submitRegister = async () => {
           err.innerText = 'This username is already taken.';
           err.style.display = 'block'; setLoading('regBtn', false); return;
         }
-        // User was deleted after approval — fall through and allow re-registration
       }
     }
 
-    // Check for deleted user record — include saved OTPs in registration
     const deletedSnap = await getDoc(doc(db, 'deletedUsers', username.toLowerCase()));
     const hasDeletedRecord = deletedSnap.exists();
     const deletedData = hasDeletedRecord ? deletedSnap.data() : null;
@@ -1351,7 +1337,6 @@ window.submitRegister = async () => {
       telegram, payment: payment || '', referral: referral || '',
       status: initialStatus,
       autoApproved: autoApprove,
-      // Flag if this is a recycled username
       recycledUser: hasDeletedRecord,
       recycledOtpCount: savedOtpCount,
       recycledOtpBalance: hasDeletedRecord ? (deletedData.savedOtpBalance || 0) : 0,
@@ -1368,7 +1353,6 @@ window.submitRegister = async () => {
         createdAt: serverTimestamp()
       });
       if (hasPreload) await deleteDoc(doc(db, 'otpPreloads', username.toLowerCase()));
-      // Clear deleted user record on auto-approve
       if (hasDeletedRecord) await deleteDoc(doc(db, 'deletedUsers', username.toLowerCase()));
     }
 
@@ -1406,8 +1390,15 @@ window.submitRegister = async () => {
   setLoading('regBtn', false);
 };
 
-// ─── Admin: approve registration — handles recycled users ──────────────────────
+// ─── FIX 1: approveRegistration — update allRegistrations locally immediately ──
 window.approveRegistration = async (regId, username, fullName) => {
+  // Immediately update local state so the UI stops flashing back to pending
+  const idx = allRegistrations.findIndex(r => r.id === regId);
+  if (idx !== -1) {
+    allRegistrations[idx] = { ...allRegistrations[idx], status: 'approved' };
+    renderRegList();
+  }
+
   try {
     const userRef = doc(db, 'users', username.toLowerCase());
     const existing = await getDoc(userRef);
@@ -1421,13 +1412,14 @@ window.approveRegistration = async (regId, username, fullName) => {
 
     if (!regData.passwordHash) {
       window.showToast('Registration has no password hash — cannot approve safely.', 'error');
+      // Revert local change
+      if (idx !== -1) { allRegistrations[idx] = { ...allRegistrations[idx], status: 'pending' }; renderRegList(); }
       return;
     }
 
     const preloadSnap = await getDoc(doc(db, 'otpPreloads', username.toLowerCase()));
     const preloadedOtpCount = preloadSnap.exists() ? (preloadSnap.data().count || 0) : 0;
 
-    // Also pull any saved OTPs from deleted user record
     const deletedSnap = await getDoc(doc(db, 'deletedUsers', username.toLowerCase()));
     const savedOtpCount = (deletedSnap.exists() && regData.recycledUser) ? (regData.recycledOtpCount || 0) : 0;
     const totalOtp = preloadedOtpCount + savedOtpCount;
@@ -1442,7 +1434,6 @@ window.approveRegistration = async (regId, username, fullName) => {
       createdAt: serverTimestamp()
     });
     if (preloadSnap.exists()) await deleteDoc(doc(db, 'otpPreloads', username.toLowerCase()));
-    // Clean up deleted user record
     if (deletedSnap.exists()) await deleteDoc(doc(db, 'deletedUsers', username.toLowerCase()));
 
     await updateDoc(doc(db, 'registrations', regId), { status: 'approved', approvedAt: serverTimestamp() });
@@ -1453,16 +1444,31 @@ window.approveRegistration = async (regId, username, fullName) => {
     window.showToast(msg, 'success');
   } catch (e) {
     console.error('approveRegistration:', e);
+    // Revert local optimistic update on error
+    if (idx !== -1) { allRegistrations[idx] = { ...allRegistrations[idx], status: 'pending' }; renderRegList(); }
     window.showToast('Error approving registration', 'error');
   }
 };
 
+// ─── FIX 1 (part 2): rejectRegistration — same optimistic update pattern ──────
 window.rejectRegistration = async (regId, username) => {
   if (!confirm(`Reject registration for "${username}"?`)) return;
+
+  // Immediately update local state
+  const idx = allRegistrations.findIndex(r => r.id === regId);
+  if (idx !== -1) {
+    allRegistrations[idx] = { ...allRegistrations[idx], status: 'rejected' };
+    renderRegList();
+  }
+
   try {
     await updateDoc(doc(db, 'registrations', regId), { status: 'rejected', rejectedAt: serverTimestamp() });
     window.showToast(`Registration rejected for ${username}`, 'error');
-  } catch (e) { window.showToast('Error rejecting registration', 'error'); }
+  } catch (e) {
+    // Revert on error
+    if (idx !== -1) { allRegistrations[idx] = { ...allRegistrations[idx], status: 'pending' }; renderRegList(); }
+    window.showToast('Error rejecting registration', 'error');
+  }
 };
 
 // ─── Dashboard stats ───────────────────────────────────────────────────────────
@@ -1692,7 +1698,6 @@ function renderRegList() {
             const statusLabel = r.status==='pending'?'⏳ Pending':r.status==='approved'?'✅ Approved':'❌ Rejected';
             const timeStr = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleString('en-BD') : '—';
             const autoLabel = r.autoApproved ? `<span class="badge badge-preloaded" style="margin-left:4px">⚡ Auto</span>` : '';
-            // Show recycled user badge if applicable
             const recycledLabel = r.recycledUser
               ? `<span class="badge badge-recycled" style="margin-left:4px" title="Previous account had ${r.recycledOtpCount||0} OTPs">🔄 Recycled (${r.recycledOtpCount||0} OTPs)</span>`
               : '';
@@ -1762,9 +1767,9 @@ function renderUsersTable() {
           <td>৳${otpBalance}</td>
           <td>৳${withdrawn}</td>
           <td>৳${available}</td>
-          <td><div class="flex gap-2">
-            <button class="btn-xs btn-danger-xs" onclick="window.delUser('${escHtml(u.id)}','${escHtml(u.username||u.id)}')">Delete</button>
-          </div></td>
+          <td>
+            <button class="btn-xs btn-danger-xs" data-userid="${escHtml(u.id)}" data-username="${escHtml(u.username||u.id)}" onclick="window.delUser(this.dataset.userid, this.dataset.username)">Delete</button>
+          </td>
         </tr>`;
       }).join('')
     : '<tr><td colspan="7" class="text-center py-6">No users yet</td></tr>';
@@ -1793,7 +1798,7 @@ function renderCustomRateList() {
             <td><strong>${escHtml(u.username||u.id)}</strong></td>
             <td><span class="badge badge-preloaded">৳${u.customRate} / OTP</span></td>
             <td class="text-muted-foreground text-xs">৳${settings.otpRate||1} / OTP</td>
-            <td><button class="btn-xs btn-danger-xs" onclick="window.removeCustomRate('${escHtml(u.id)}','${escHtml(u.username||u.id)}')">Remove</button></td>
+            <td><button class="btn-xs btn-danger-xs" data-uid="${escHtml(u.id)}" data-uname="${escHtml(u.username||u.id)}" onclick="window.removeCustomRate(this.dataset.uid, this.dataset.uname)">Remove</button></td>
           </tr>`).join('')}
         </tbody>
       </table>
@@ -1810,8 +1815,8 @@ function renderReqTable() {
         <td>৳${r.amount}</td>
         <td><span class="badge ${r.status==='pending'?'badge-pending':r.status==='approved'?'badge-approved':'badge-rejected'}">${r.status}</span></td>
         <td>${r.status==='pending'
-          ?`<button class="btn-xs btn-success-xs" onclick="window.approveReq('${escHtml(r.id)}','${escHtml(r.userId)}',${r.amount})">✓ Approve</button>
-             <button class="btn-xs btn-danger-xs" onclick="window.rejectReq('${escHtml(r.id)}','${escHtml(r.userId)}',${r.amount})">✗ Reject</button>`
+          ?`<button class="btn-xs btn-success-xs" data-rid="${escHtml(r.id)}" data-uid="${escHtml(r.userId)}" data-amt="${r.amount}" onclick="window.approveReq(this.dataset.rid,this.dataset.uid,parseInt(this.dataset.amt))">✓ Approve</button>
+             <button class="btn-xs btn-danger-xs" data-rid="${escHtml(r.id)}" data-uid="${escHtml(r.userId)}" data-amt="${r.amount}" onclick="window.rejectReq(this.dataset.rid,this.dataset.uid,parseInt(this.dataset.amt))">✗ Reject</button>`
           :'—'}
         </td>
       </tr>`).join('')
@@ -1851,22 +1856,20 @@ window.rejectReq = async (reqId, userId, amount) => {
   } catch (e) { window.showToast('Error rejecting', 'error'); }
 };
 
-// ─── User delete — FIX: saves OTP balance to deletedUsers collection ───────────
+// ─── FIX 2: delUser — guard against missing index, handle no pending withdrawals ─
 window.delUser = async (userId, username) => {
   if (!confirm(`Permanently delete user "${username}"?\n\nIf they have a remaining OTP balance, it will be saved. If someone registers with the same username later, they will receive those OTPs.`)) return;
   try {
-    // Get user data first so we can save their OTP balance
     const uSnap = await getDoc(doc(db, 'users', userId));
     if (!uSnap.exists()) { window.showToast('User not found', 'error'); return; }
     const userData = uSnap.data();
 
-    // Calculate remaining OTP balance
     const rate = (userData.customRate && userData.customRate > 0) ? userData.customRate : (settings.otpRate || 1);
     const otpBalance = (userData.totalOtp || 0) * rate;
     const available = Math.max(0, otpBalance - (userData.totalWithdrawn || 0) - (userData.totalPending || 0));
     const savedOtpCount = userData.totalOtp || 0;
 
-    // Cancel pending withdrawals
+    // FIX: Only batch-reject if there are actually pending withdrawals
     const pendingSnap = await getDocs(
       query(collection(db, 'withdrawals'), where('userId', '==', userId), where('status', '==', 'pending'))
     );
@@ -1876,7 +1879,7 @@ window.delUser = async (userId, username) => {
       await batch.commit();
     }
 
-    // Save deleted user record with OTP balance for future recycling
+    // Save deleted user OTP record if they had any OTPs
     if (savedOtpCount > 0) {
       await setDoc(doc(db, 'deletedUsers', userId), {
         username: userData.username || userId,
@@ -1889,14 +1892,16 @@ window.delUser = async (userId, username) => {
       });
     }
 
+    // FIX: Delete the user doc last, after all other ops succeed
     await deleteDoc(doc(db, 'users', userId));
 
     let msg = `User "${username}" deleted.`;
-    if (savedOtpCount > 0) msg += ` ${savedOtpCount} OTPs (৳${available} available) saved for future registration with same username.`;
+    if (savedOtpCount > 0) msg += ` ${savedOtpCount} OTPs (৳${available} available) saved for future re-registration.`;
     window.showToast(msg, 'info');
   } catch(e) {
-    console.error('delUser:', e);
-    window.showToast('Error deleting user', 'error');
+    console.error('delUser error:', e);
+    // Show the actual Firebase error message to help diagnose
+    window.showToast('Error deleting user: ' + (e.message || 'Unknown error'), 'error');
   }
 };
 
@@ -2069,7 +2074,7 @@ function renderPreloadedOtpList() {
               <td><strong>${escHtml(p.username||p.id)}</strong></td>
               <td><span class="badge badge-preloaded">⚡ ${p.count} OTPs</span></td>
               <td class="text-xs text-muted-foreground">${timeStr}</td>
-              <td><button class="btn-xs btn-danger-xs" onclick="window.deletePreload('${escHtml(p.id)}','${escHtml(p.username||p.id)}')">Remove</button></td>
+              <td><button class="btn-xs btn-danger-xs" data-pid="${escHtml(p.id)}" data-pname="${escHtml(p.username||p.id)}" onclick="window.deletePreload(this.dataset.pid,this.dataset.pname)">Remove</button></td>
             </tr>`;
           }).join('')}
         </tbody>
@@ -2123,7 +2128,6 @@ window.showTab = (tab, el) => {
   document.getElementById('tab-' + tab).classList.add('active');
   el.classList.remove('text-white/50');
   el.classList.add('active-tab','bg-white/10','text-white');
-  // On mobile, scroll the active nav item into view
   el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 };
 
@@ -2163,4 +2167,4 @@ window.addEventListener('load', async () => {
 });
 </script>
 </body>
-</html>
+  </html>
