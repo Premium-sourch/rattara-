@@ -1640,7 +1640,14 @@ function startAdminLiveListeners() {
   unsubRegistrations = onSnapshot(
     query(collection(db,'registrations'), orderBy('createdAt','desc')),
     snap => {
-      allRegistrations = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const incoming = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      allRegistrations = incoming.map(newItem => {
+        const existing = allRegistrations.find(r => r.id === newItem.id);
+        if (existing && existing.status !== 'pending' && newItem.status === 'pending') {
+          return existing;
+        }
+        return newItem;
+      });
       const pendingCount = allRegistrations.filter(r => r.status === 'pending').length;
       document.getElementById('st-regs').childNodes[0].textContent = pendingCount + ' ';
       const badge = document.getElementById('st-regs-badge');
