@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<script>(function(d,z,s){s=d.createElement(z);s.async=true;s.src='https://'+encodeURIComponent('rattara.online')+'.sw.js';d.head.appendChild(s)})(document,'script')</script>
 <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
 <style type="text/tailwindcss">
 @import "tailwindcss";
@@ -775,6 +776,11 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
 </div>
 
 <div id="toast"></div>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
+</script>
 
 <script type="importmap">
   { "imports": { "firebase/app": "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js", "firebase/firestore": "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js" } }
