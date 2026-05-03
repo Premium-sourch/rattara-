@@ -56,7 +56,7 @@
 
 #adminPage .admin-nav-sidebar {
   position: sticky;
-  top: 57px;
+  top: 53px;
   z-index: 40;
   background: #0F172A;
   border-radius: 0;
@@ -106,7 +106,7 @@
   }
   #adminPage .admin-nav-sidebar {
     position: sticky;
-    top: 80px;
+    top: 64px;
     flex-direction: column;
     border-radius: 1.5rem !important;
     padding: 12px !important;
@@ -255,6 +255,9 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
 
 #loginLockout { display: none; }
 #loginLockout.show { display: block; }
+  #adminPage .admin-layout {
+  margin-top: 8px;
+}
 </style>
 </head>
 <body class="bg-background text-foreground min-h-screen">
@@ -491,7 +494,7 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
 
 <!-- ADMIN PANEL -->
 <div id="adminPage" class="page bg-background min-h-screen pb-8">
-  <div class="max-w-6xl mx-auto px-5 py-6">
+  <div class="max-w-6xl mx-auto px-5 pt-16 pb-6">
     <div class="flex gap-3 items-center mb-4">
       <div class="w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center"><iconify-icon icon="lucide:shield" class="text-white text-lg"></iconify-icon></div>
       <div><h2 class="text-xl font-extrabold">Admin Control</h2><p class="text-xs text-muted-foreground">Withdrawal & user management</p></div>
@@ -513,6 +516,7 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
         </div>
         <div class="admin-nav-item" onclick="window.showTab('withdrawals',this)">
           <iconify-icon icon="lucide:banknote"></iconify-icon><span>Withdrawals</span>
+          <span id="wdNavBadge" class="notif-badge hidden">0</span>
         </div>
         <div class="admin-nav-item" onclick="window.showTab('settings',this)">
           <iconify-icon icon="lucide:settings"></iconify-icon><span>Settings</span>
@@ -810,6 +814,7 @@ let settings = {
 };
 let unsubAdmin = null, unsubUser = null, unsubReqs = null, unsubRegistrations = null, unsubPreloads = null;
 let lastKnownRegCount = -1;
+let lastKnownWdCount = -1;
 let filteredUsers = [];
 let methodsRendered = false;
 
@@ -1040,7 +1045,7 @@ window.logout = () => {
   clearTimeout(window._sessionTimer);
   [unsubAdmin, unsubUser, unsubReqs, unsubRegistrations, unsubPreloads].forEach(u => u && u());
   unsubAdmin = unsubUser = unsubReqs = unsubRegistrations = unsubPreloads = null;
-  currentUser = null; isAdmin = false; lastKnownRegCount = -1;
+  currentUser = null; isAdmin = false; lastKnownRegCount = -1; lastKnownWdCount = -1;
   methodsRendered = false;
   document.getElementById('mainNav').classList.add('hidden');
   switchPage('loginPage');
@@ -1625,9 +1630,25 @@ function startAdminLiveListeners() {
     snap => {
       allReqs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       const approved = allReqs.filter(r => r.status === 'approved');
+      const pending = allReqs.filter(r => r.status === 'pending');
       const totalPaid = approved.reduce((s,r) => s + (r.amount||0), 0);
       document.getElementById('st-approved').innerText = approved.length;
       document.getElementById('st-paid').innerText = '৳' + totalPaid;
+      
+      // Withdrawals pending badge
+      const wdNavBadge = document.getElementById('wdNavBadge');
+      if (pending.length > 0) {
+        wdNavBadge.classList.remove('hidden');
+        wdNavBadge.textContent = pending.length;
+      } else {
+        wdNavBadge.classList.add('hidden');
+      }
+      if (lastKnownWdCount >= 0 && pending.length > lastKnownWdCount) {
+        const diff = pending.length - lastKnownWdCount;
+        window.showToast(`💰 ${diff} new withdrawal request${diff > 1 ? 's' : ''}!`, 'info');
+      }
+      lastKnownWdCount = pending.length;
+      
       renderReqTable();
       document.getElementById('recentList').innerHTML = allReqs.slice(0,5).map(r =>
         `<div class="req-item"><div><strong>${escHtml(r.username)}</strong> — ৳${r.amount} (${escHtml(r.method)})<div class="text-xs text-muted-foreground">${escHtml(r.number)}</div></div><span class="badge ${r.status==='pending'?'badge-pending':r.status==='approved'?'badge-approved':'badge-rejected'}">${r.status}</span></div>`
@@ -1649,9 +1670,12 @@ function startAdminLiveListeners() {
         return newItem;
       });
       const pendingCount = allRegistrations.filter(r => r.status === 'pending').length;
-      document.getElementById('st-regs').childNodes[0].textContent = pendingCount + ' ';
+      const stRegsEl = document.getElementById('st-regs');
+      stRegsEl.firstChild.textContent = pendingCount + ' ';
       const badge = document.getElementById('st-regs-badge');
-      pendingCount > 0 ? badge.classList.remove('hidden') : badge.classList.add('hidden');
+      if (pendingCount > 0) badge.classList.remove('hidden');
+      else badge.classList.add('hidden');
+      
       const navBadge = document.getElementById('regNavBadge');
       if (pendingCount > 0) { navBadge.classList.remove('hidden'); navBadge.textContent = pendingCount; }
       else { navBadge.classList.add('hidden'); }
