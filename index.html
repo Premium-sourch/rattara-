@@ -68,7 +68,7 @@
   scrollbar-width: none;
   gap: 2px;
   padding: 8px 12px;
-  margin: -24px -20px 16px -20px;
+  margin: 0px -20px 16px -20px;
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 #adminPage .admin-nav-sidebar::-webkit-scrollbar { display: none; }
@@ -255,8 +255,8 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
 
 #loginLockout { display: none; }
 #loginLockout.show { display: block; }
-  #adminPage .admin-layout {
-  margin-top: 8px;
+ #adminPage .admin-layout {
+  margin-top: 0px;
 }
 </style>
 </head>
@@ -494,10 +494,13 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
 
 <!-- ADMIN PANEL -->
 <div id="adminPage" class="page bg-background min-h-screen pb-8">
-  <div class="max-w-6xl mx-auto px-5 pt-16 pb-6">
-    <div class="flex gap-3 items-center mb-4">
-      <div class="w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center"><iconify-icon icon="lucide:shield" class="text-white text-lg"></iconify-icon></div>
-      <div><h2 class="text-xl font-extrabold">Admin Control</h2><p class="text-xs text-muted-foreground">Withdrawal & user management</p></div>
+  <div class="max-w-6xl mx-auto px-5 pt-6 pb-6">
+    <div class="flex gap-3 items-center justify-center mb-6 bg-card border border-border rounded-2xl py-4 px-5 shadow-sm">
+      <div class="w-10 h-10 bg-slate-900 rounded-2xl flex items-center justify-center shrink-0"><iconify-icon icon="lucide:shield" class="text-white text-lg"></iconify-icon></div>
+      <div class="text-center">
+        <h2 class="text-xl font-extrabold">Admin Control</h2>
+        <p class="text-xs text-muted-foreground">Withdrawal & user management</p>
+      </div>
     </div>
     <div class="admin-layout">
       <div class="admin-nav-sidebar" id="adminNavSidebar">
