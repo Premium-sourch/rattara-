@@ -1807,7 +1807,9 @@ window.submitWithdraw = async () => {
   if (selectedMethod === 'bKash' || selectedMethod === 'Nagad') {
     if (!/^01[3-9]\d{8}$/.test(number)) { err.innerText = 'Valid BD number required (01X-XXXXXXXX)'; err.style.display = 'block'; return; }
   }
-  if (isNaN(amount) || amount < settings.minWithdraw) { err.innerText = `Minimum withdrawal is ৳${settings.minWithdraw}`; err.style.display = 'block'; return; }
+  if (isNaN(amount) || amount <= 0) { err.innerText = 'Please enter a withdrawal amount'; err.style.display = 'block'; return; }
+	if (amount % 10 !== 0) { err.innerText = 'Amount must end in 0 (e.g. 100, 110, 150, 200, 500...)'; err.style.display = 'block'; return; }
+	if (amount < settings.minWithdraw) { err.innerText = `Minimum withdrawal is ৳${settings.minWithdraw}`; err.style.display = 'block'; return; }
 
   setLoading('wdBtn', true);
   try {
