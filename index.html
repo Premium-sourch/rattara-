@@ -2304,10 +2304,7 @@ window.applyBulkOtp = async () => {
     const found = allUsers.find(u => u.id===username.toLowerCase() || (u.username||'').toLowerCase()===username.toLowerCase());
     if (found) {
       batch.update(doc(db, 'users', found.id), { totalOtp: (found.totalOtp||0) + count });
-	const today = new Date().toISOString().slice(0,10);
-	const logRef = doc(collection(db, 'otpLogs'));
-	batch.set(logRef, { userId: found.id, username: found.username||found.id, count, date: today, addedAt: serverTimestamp() });
-	updatedUsers++; batchCount += 2;
+      updatedUsers++; batchCount++;
     } else {
       const preloadRef = doc(db, 'otpPreloads', username.toLowerCase());
       const existing = allPreloads.find(p => p.id === username.toLowerCase());
@@ -2324,6 +2321,20 @@ window.applyBulkOtp = async () => {
   }
   await flushBatch();
   if (applyBtn) applyBtn.disabled = false;
+  // Write otpLogs separately after batch — non-blocking
+  const today = new Date().toISOString().slice(0,10);
+  for (const { username, count } of lines) {
+    const found = allUsers.find(u => u.id===username.toLowerCase() || (u.username||'').toLowerCase()===username.toLowerCase());
+    if (found) {
+      addDoc(collection(db, 'otpLogs'), {
+        userId: found.id,
+        username: found.username||found.id,
+        count,
+        date: today,
+        addedAt: serverTimestamp()
+      }).catch(e => console.warn('otpLog write failed for', found.id, e));
+    }
+  }
   const msg = [`✅ ${updatedUsers} user${updatedUsers!==1?'s':''} updated`];
   if (preloadedNew) msg.push(`⚡ ${preloadedNew} new pre-loaded`);
   if (preloadedAdded) msg.push(`+${preloadedAdded} pre-load updated`);
