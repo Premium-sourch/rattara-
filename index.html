@@ -521,14 +521,15 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
   <!-- LEADERBOARD TAB -->
 <div id="dashLeaderboard" class="hidden space-y-4">
   <div class="flex gap-2">
-    <button onclick="window.setLbPeriod('daily',this)" id="lbBtnDaily" class="flex-1 py-2.5 rounded-2xl text-xs font-extrabold bg-primary text-white lbPeriodBtn">📅 Daily</button>
-    <button onclick="window.setLbPeriod('weekly',this)" id="lbBtnWeekly" class="flex-1 py-2.5 rounded-2xl text-xs font-extrabold bg-secondary text-muted-foreground border border-border lbPeriodBtn">📆 Weekly</button>
-  </div>
+  <button onclick="window.setLbPeriod('daily',this)" id="lbBtnDaily" class="flex-1 py-2.5 rounded-2xl text-xs font-extrabold bg-primary text-white lbPeriodBtn">📅 Daily</button>
+  <button onclick="window.setLbPeriod('weekly',this)" id="lbBtnWeekly" class="flex-1 py-2.5 rounded-2xl text-xs font-extrabold bg-secondary text-muted-foreground border border-border lbPeriodBtn">📆 This Week</button>
+  <button onclick="window.setLbPeriod('lastweek',this)" id="lbBtnLastWeek" class="flex-1 py-2.5 rounded-2xl text-xs font-extrabold bg-secondary text-muted-foreground border border-border lbPeriodBtn">⏮ Last Week</button>
+</div>
   <div id="lbDatePickerRow" class="flex items-center gap-2 bg-card border border-border rounded-2xl px-4 py-3">
     <iconify-icon icon="lucide:calendar" class="text-primary shrink-0"></iconify-icon>
     <div class="flex-1">
       <div class="text-[10px] font-extrabold uppercase text-muted-foreground mb-1">Select Date</div>
-      <input type="date" id="lbDatePicker" class="date-input w-full" onchange="loadLeaderboard()"/>
+      <input type="date" id="lbDatePicker" class="date-input w-full" onchange="window.loadLeaderboard()"/>
     </div>
     <button onclick="document.getElementById('lbDatePicker').value=window.todayStr();loadLeaderboard();" class="text-[10px] bg-secondary border border-border font-bold px-2 py-1 rounded-lg">Today</button>
   </div>
@@ -2594,19 +2595,24 @@ function getDateRange(period) {
   const pad = n => String(n).padStart(2,'0');
   const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
   if (period === 'daily') {
-    // Use date picker value if available, otherwise today
     const pickerVal = document.getElementById('lbDatePicker')?.value;
     const s = pickerVal || fmt(now);
     return [s, s];
   }
-  // Weekly: Friday to Thursday
-  // getDay(): 0=Sun,1=Mon,2=Tue,3=Wed,4=Thu,5=Fri,6=Sat
-  const day = now.getDay(); // 0-6
-  // Days since last Friday
-  const daysSinceFriday = (day + 2) % 7; // Fri=0, Sat=1, Sun=2, Mon=3, Tue=4, Wed=5, Thu=6
-  const friday = new Date(now); friday.setDate(now.getDate() - daysSinceFriday);
-  const thursday = new Date(friday); thursday.setDate(friday.getDate() + 6);
-  return [fmt(friday), fmt(thursday)];
+  // Days since last Friday (Fri=0, Sat=1, Sun=2, Mon=3, Tue=4, Wed=5, Thu=6)
+  const day = now.getDay();
+  const daysSinceFriday = (day + 2) % 7;
+  const thisFriday = new Date(now); thisFriday.setDate(now.getDate() - daysSinceFriday);
+  if (period === 'weekly') {
+    const thursday = new Date(thisFriday); thursday.setDate(thisFriday.getDate() + 6);
+    return [fmt(thisFriday), fmt(thursday)];
+  }
+  if (period === 'lastweek') {
+    const lastFriday = new Date(thisFriday); lastFriday.setDate(thisFriday.getDate() - 7);
+    const lastThursday = new Date(lastFriday); lastThursday.setDate(lastFriday.getDate() + 6);
+    return [fmt(lastFriday), fmt(lastThursday)];
+  }
+  return [fmt(now), fmt(now)];
 }
 
 function getDistribKey(period) {
@@ -2617,11 +2623,14 @@ function getDistribKey(period) {
     const s = pickerVal || now.toISOString().slice(0,10);
     return `daily_${s.replace(/-/g,'_')}`;
   }
-  // Weekly key based on Friday start
   const day = now.getDay();
   const daysSinceFriday = (day + 2) % 7;
-  const friday = new Date(now); friday.setDate(now.getDate() - daysSinceFriday);
-  return `weekly_fri_${friday.getFullYear()}_${pad(friday.getMonth()+1)}_${pad(friday.getDate())}`;
+  const thisFriday = new Date(now); thisFriday.setDate(now.getDate() - daysSinceFriday);
+  if (period === 'lastweek') {
+    const lastFriday = new Date(thisFriday); lastFriday.setDate(thisFriday.getDate() - 7);
+    return `weekly_fri_${lastFriday.getFullYear()}_${pad(lastFriday.getMonth()+1)}_${pad(lastFriday.getDate())}`;
+  }
+  return `weekly_fri_${thisFriday.getFullYear()}_${pad(thisFriday.getMonth()+1)}_${pad(thisFriday.getDate())}`;
 }
 
 function renderDistributeList() {
@@ -2820,14 +2829,23 @@ window.setLbPeriod = (period, el) => {
   document.querySelectorAll('.lbPeriodBtn').forEach(b => {
     b.className = `flex-1 py-2.5 rounded-2xl text-xs font-extrabold ${b === el ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground border border-border'} lbPeriodBtn`;
   });
-  // Show/hide date picker based on period
+  // Show date picker only for daily
   const pickerRow = document.getElementById('lbDatePickerRow');
   if (pickerRow) pickerRow.style.display = period === 'daily' ? 'flex' : 'none';
-  document.getElementById('lbPeriodLabel').innerText = (period === 'daily' ? 'Daily' : 'Weekly') + ' Top Users';
-  loadLeaderboard();
+  // Update label with date range for weekly periods
+  const labelEl = document.getElementById('lbPeriodLabel');
+  if (period === 'daily') {
+    labelEl.innerHTML = 'Daily Top Users';
+  } else {
+    const [start, end] = getDateRange(period);
+    const fmtLabel = d => new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    const title = period === 'lastweek' ? 'Last Week Top Users' : 'This Week Top Users';
+    labelEl.innerHTML = `${title}<br><span style="font-size:9px;font-weight:600;opacity:0.6;">${fmtLabel(start)} — ${fmtLabel(end)}</span>`;
+  }
+  window.loadLeaderboard();
 };
 
-async function loadLeaderboard() {
+window.loadLeaderboard = async function() {
   try {
     await loadPrizeSettingsForUser();
     const [startDate, endDate] = getDateRange(lbPeriod);
@@ -2852,7 +2870,7 @@ async function loadLeaderboard() {
 
 function renderLeaderboard() {
   const rate = settings.otpRate || 1;
-  const prizes = prizeSettings[lbPeriod] || [0,0,0,0,0];
+  const prizes = prizeSettings[lbPeriod === 'lastweek' ? 'weekly' : lbPeriod] || [0,0,0,0,0];
   const distribKey = getDistribKey(lbPeriod);
 
   const sorted = [...lbAllUsers]
