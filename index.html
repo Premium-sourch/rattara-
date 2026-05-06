@@ -2796,6 +2796,9 @@ async function loadPrizeSettingsForUser() {
   } catch(e) {}
 }
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+window.todayStr = () => new Date().toISOString().slice(0, 10);
+
 // ─── Leaderboard (user side) ───────────────────────────────────────────────────
 let lbPeriod = 'daily';
 let lbAllUsers = [];
