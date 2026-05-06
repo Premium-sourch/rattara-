@@ -518,15 +518,21 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
   </div>
   <!-- END WITHDRAWAL CONTENT -->
 
-  <!-- LEADERBOARD CONTENT -->
-  <div id="dashLeaderboard" class="hidden space-y-4">
-
-    <div class="flex gap-2">
-      <button onclick="window.setLbPeriod('daily',this)" id="lbBtnDaily" class="flex-1 py-2.5 rounded-2xl text-xs font-extrabold bg-primary text-white lbPeriodBtn">📅 Daily</button>
-      <button onclick="window.setLbPeriod('weekly',this)" id="lbBtnWeekly" class="flex-1 py-2.5 rounded-2xl text-xs font-extrabold bg-secondary text-muted-foreground border border-border lbPeriodBtn">📆 Weekly</button>
+  <!-- LEADERBOARD TAB -->
+<div id="dashLeaderboard" class="hidden space-y-4">
+  <div class="flex gap-2">
+    <button onclick="window.setLbPeriod('daily',this)" id="lbBtnDaily" class="flex-1 py-2.5 rounded-2xl text-xs font-extrabold bg-primary text-white lbPeriodBtn">📅 Daily</button>
+    <button onclick="window.setLbPeriod('weekly',this)" id="lbBtnWeekly" class="flex-1 py-2.5 rounded-2xl text-xs font-extrabold bg-secondary text-muted-foreground border border-border lbPeriodBtn">📆 Weekly</button>
+  </div>
+  <div id="lbDatePickerRow" class="flex items-center gap-2 bg-card border border-border rounded-2xl px-4 py-3">
+    <iconify-icon icon="lucide:calendar" class="text-primary shrink-0"></iconify-icon>
+    <div class="flex-1">
+      <div class="text-[10px] font-extrabold uppercase text-muted-foreground mb-1">Select Date</div>
+      <input type="date" id="lbDatePicker" class="date-input w-full" onchange="loadLeaderboard()"/>
     </div>
-
-    <div class="text-right text-[10px] text-muted-foreground font-bold" id="lbUpdatedAt"></div>
+    <button onclick="document.getElementById('lbDatePicker').value=window.todayStr();loadLeaderboard();" class="text-[10px] bg-secondary border border-border font-bold px-2 py-1 rounded-lg">Today</button>
+  </div>
+  <div class="text-right text-[10px] text-muted-foreground font-bold" id="lbUpdatedAt"></div>
 
     <div class="bg-card border border-border rounded-[2rem] p-5">
       <div class="text-center mb-5">
@@ -2584,26 +2590,38 @@ window.setDistribPeriod = (period, el) => {
 };
 
 function getDateRange(period) {
-  const today = new Date();
-  const todayStr = today.toISOString().slice(0,10);
-  if (period === 'daily') return [todayStr, todayStr];
-  const day = today.getDay() || 7;
-  const monday = new Date(today);
-  monday.setDate(today.getDate() - day + 1);
-  const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 6);
-  return [monday.toISOString().slice(0,10), sunday.toISOString().slice(0,10)];
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  if (period === 'daily') {
+    // Use date picker value if available, otherwise today
+    const pickerVal = document.getElementById('lbDatePicker')?.value;
+    const s = pickerVal || fmt(now);
+    return [s, s];
+  }
+  // Weekly: Friday to Thursday
+  // getDay(): 0=Sun,1=Mon,2=Tue,3=Wed,4=Thu,5=Fri,6=Sat
+  const day = now.getDay(); // 0-6
+  // Days since last Friday
+  const daysSinceFriday = (day + 2) % 7; // Fri=0, Sat=1, Sun=2, Mon=3, Tue=4, Wed=5, Thu=6
+  const friday = new Date(now); friday.setDate(now.getDate() - daysSinceFriday);
+  const thursday = new Date(friday); thursday.setDate(friday.getDate() + 6);
+  return [fmt(friday), fmt(thursday)];
 }
 
 function getDistribKey(period) {
   const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
   if (period === 'daily') {
-    return `daily_${now.getFullYear()}_${now.getMonth()+1}_${now.getDate()}`;
-  } else {
-    const startOfYear = new Date(now.getFullYear(), 0, 1);
-    const week = Math.ceil(((now - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
-    return `weekly_${now.getFullYear()}_W${week}`;
+    const pickerVal = document.getElementById('lbDatePicker')?.value;
+    const s = pickerVal || now.toISOString().slice(0,10);
+    return `daily_${s.replace(/-/g,'_')}`;
   }
+  // Weekly key based on Friday start
+  const day = now.getDay();
+  const daysSinceFriday = (day + 2) % 7;
+  const friday = new Date(now); friday.setDate(now.getDate() - daysSinceFriday);
+  return `weekly_fri_${friday.getFullYear()}_${pad(friday.getMonth()+1)}_${pad(friday.getDate())}`;
 }
 
 function renderDistributeList() {
@@ -2784,6 +2802,9 @@ let lbAllUsers = [];
 
 window.showDashTab = (tab) => {
   const isLb = tab === 'leaderboard';
+  // Initialize date picker to today when leaderboard opens
+const picker = document.getElementById('lbDatePicker');
+if (picker && !picker.value) picker.value = window.todayStr();
   document.getElementById('dashMainContent').classList.toggle('hidden', isLb);
   document.getElementById('dashLeaderboard').classList.toggle('hidden', !isLb);
   document.getElementById('tabBtnWd').className = `flex-1 py-2.5 rounded-2xl text-xs font-extrabold ${!isLb ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground border border-border'}`;
@@ -2796,8 +2817,11 @@ window.setLbPeriod = (period, el) => {
   document.querySelectorAll('.lbPeriodBtn').forEach(b => {
     b.className = `flex-1 py-2.5 rounded-2xl text-xs font-extrabold ${b === el ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground border border-border'} lbPeriodBtn`;
   });
+  // Show/hide date picker based on period
+  const pickerRow = document.getElementById('lbDatePickerRow');
+  if (pickerRow) pickerRow.style.display = period === 'daily' ? 'flex' : 'none';
   document.getElementById('lbPeriodLabel').innerText = (period === 'daily' ? 'Daily' : 'Weekly') + ' Top Users';
-loadLeaderboard();
+  loadLeaderboard();
 };
 
 async function loadLeaderboard() {
