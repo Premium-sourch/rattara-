@@ -671,6 +671,8 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
 
         <!-- OTP UPDATE -->
         <div class="admin-panel" id="tab-otp">
+
+          <!-- ── BULK OTP UPLOAD (with date picker) ── -->
           <div class="bg-card border rounded-2xl p-6">
             <div class="flex gap-3 mb-4">
               <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center"><iconify-icon icon="lucide:zap" class="text-purple-600 text-xl"></iconify-icon></div>
@@ -679,13 +681,26 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
                 <p class="text-[10px] text-muted-foreground">Username &nbsp; OTP count (space separated)</p>
               </div>
             </div>
+
             <div class="bg-blue-50 p-3 rounded-xl text-primary text-sm font-bold flex gap-2 items-center mb-3">
               <iconify-icon icon="lucide:info"></iconify-icon> Current rate: ৳<span id="currentRateDisplay">1</span> per OTP
             </div>
+
+            <!-- DATE PICKER ROW -->
+            <div class="bg-card border border-border rounded-2xl px-4 py-3 mb-4 flex items-center gap-3">
+              <iconify-icon icon="lucide:calendar" class="text-purple-500 shrink-0 text-lg"></iconify-icon>
+              <div class="flex-1">
+                <div class="text-[10px] font-extrabold uppercase text-muted-foreground mb-1">OTP Date <span class="text-purple-500">(used for leaderboard)</span></div>
+                <input type="date" id="bulkOtpDate" class="w-full bg-transparent outline-none text-sm font-bold text-foreground"/>
+              </div>
+              <button onclick="document.getElementById('bulkOtpDate').value=new Date().toISOString().slice(0,10)" class="text-[10px] bg-secondary border border-border font-bold px-2 py-1 rounded-lg whitespace-nowrap">Today</button>
+            </div>
+
             <div class="bg-amber-50 border border-amber-100 rounded-xl p-3 mb-4 text-sm text-amber-700 flex gap-2 items-start">
               <iconify-icon icon="lucide:lightbulb" class="mt-0.5 shrink-0"></iconify-icon>
               <span>If a username <strong>doesn't have an account yet</strong>, their OTPs will be <strong>stored as a pre-load</strong>. When they register, they'll be <strong>auto-approved</strong> and the OTPs will go straight to their account.</span>
             </div>
+
             <textarea id="bulkOtpInput" class="w-full bg-secondary rounded-2xl p-4 min-h-[120px] font-mono text-sm outline-none" placeholder="RT_Rakib 1200&#10;RT_Shakil 875&#10;RT_NewUser 500"></textarea>
             <div id="bulkPreview" class="bulk-preview mt-3"></div>
             <div class="flex gap-3 mt-4 flex-wrap">
@@ -694,21 +709,10 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
               <button onclick="document.getElementById('bulkOtpInput').value='';document.getElementById('bulkPreview').style.display='none'" class="bg-secondary border px-6 rounded-xl">Clear</button>
             </div>
           </div>
+          <!-- ── END BULK OTP UPLOAD ── -->
 
           <div class="bg-card border rounded-2xl p-6 mt-5">
-            <div class="flex gap-3 mb-4">
-              <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center"><iconify-icon icon="lucide:plus-circle" class="text-primary text-xl"></iconify-icon></div>
-              <div><h3 class="font-extrabold">Individual OTP</h3><p class="text-[10px] text-muted-foreground">Add to existing user account</p></div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <input type="text" id="singleOtpUser" placeholder="Username" class="bg-secondary rounded-xl p-3 outline-none"/>
-              <input type="number" id="singleOtpCount" placeholder="OTP count" class="bg-secondary rounded-xl p-3 outline-none"/>
-              <button onclick="window.addSingleOtp()" class="bg-primary text-white py-3 rounded-xl font-bold">Add OTP</button>
-            </div>
-          </div>
-
-          <div class="bg-card border rounded-2xl p-6 mt-5">
-            <div class="flex gap-3 mb-4">
+            <div class="flex gap-3 items-center mb-4">
               <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
                 <iconify-icon icon="lucide:badge-percent" class="text-orange-500 text-xl"></iconify-icon>
               </div>
@@ -731,9 +735,7 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
             <div id="customRateList" class="mt-4"></div>
           </div>
 
-          <!-- ═══════════════════════════════════════════════════════════
-               CAMPAIGN BONUS — NEW SECTION
-               ═══════════════════════════════════════════════════════════ -->
+          <!-- CAMPAIGN BONUS -->
           <div class="bg-card border border-emerald-200 rounded-2xl p-6 mt-5">
             <div class="flex gap-3 items-center mb-4">
               <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
@@ -755,7 +757,6 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
                 <iconify-icon icon="lucide:gift"></iconify-icon> Give Bonus
               </button>
             </div>
-            <!-- Quick amount presets -->
             <div class="flex gap-2 flex-wrap mb-2">
               <span class="text-[10px] font-bold uppercase text-muted-foreground self-center">Quick:</span>
               <button onclick="document.getElementById('bonusAmount').value=10" class="text-xs bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold px-3 py-1.5 rounded-lg hover:bg-emerald-100 transition-colors">৳10</button>
@@ -766,8 +767,8 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
             </div>
             <div id="bonusList" class="mt-4"></div>
           </div>
-          <!-- ═══════════════════════════════════════════════════════════ -->
-	  <!-- DISTRIBUTE PRIZES -->
+
+          <!-- DISTRIBUTE PRIZES -->
           <div class="bg-card border border-amber-200 rounded-2xl p-6 mt-5">
             <div class="flex gap-3 items-center mb-4">
               <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
@@ -902,95 +903,54 @@ button:disabled, button[disabled] { opacity: .55; cursor: not-allowed; pointer-e
           </div>
 
           <!-- PRIZE SETTINGS -->
-          <div class="bg-card border border-amber-200 rounded-2xl p-6 mt-5">
-            <div class="flex gap-3 items-center mb-4">
-              <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
-                <iconify-icon icon="lucide:trophy" class="text-amber-600 text-xl"></iconify-icon>
-              </div>
-              <div>
-                <h3 class="font-extrabold">Prize Settings</h3>
-                <p class="text-[10px] text-muted-foreground uppercase font-bold">Set reward amounts for top 5 winners</p>
-              </div>
-            </div>
-
-            <div class="space-y-5">
-              <!-- Daily Prizes -->
-              <div>
-                <div class="text-xs font-extrabold uppercase tracking-wider text-amber-600 mb-3 flex items-center gap-2">
-                  <iconify-icon icon="lucide:calendar-days"></iconify-icon> Daily Prizes
-                </div>
-                <div class="space-y-2" id="dailyPrizeInputs">
-                  <div class="flex items-center gap-3">
-                    <span class="text-lg w-7 text-center">🥇</span>
-                    <span class="text-xs font-bold w-16 text-muted-foreground">1st Place</span>
-                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">৳</span><input type="number" id="dailyPrize1" placeholder="0" class="w-full bg-secondary rounded-xl py-2.5 pl-7 pr-3 outline-none text-sm font-bold"/></div>
-                  </div>
-                  <div class="flex items-center gap-3">
-                    <span class="text-lg w-7 text-center">🥈</span>
-                    <span class="text-xs font-bold w-16 text-muted-foreground">2nd Place</span>
-                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">৳</span><input type="number" id="dailyPrize2" placeholder="0" class="w-full bg-secondary rounded-xl py-2.5 pl-7 pr-3 outline-none text-sm font-bold"/></div>
-                  </div>
-                  <div class="flex items-center gap-3">
-                    <span class="text-lg w-7 text-center">🥉</span>
-                    <span class="text-xs font-bold w-16 text-muted-foreground">3rd Place</span>
-                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">৳</span><input type="number" id="dailyPrize3" placeholder="0" class="w-full bg-secondary rounded-xl py-2.5 pl-7 pr-3 outline-none text-sm font-bold"/></div>
-                  </div>
-                  <div class="flex items-center gap-3">
-                    <span class="text-lg w-7 text-center">4️⃣</span>
-                    <span class="text-xs font-bold w-16 text-muted-foreground">4th Place</span>
-                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">৳</span><input type="number" id="dailyPrize4" placeholder="0" class="w-full bg-secondary rounded-xl py-2.5 pl-7 pr-3 outline-none text-sm font-bold"/></div>
-                  </div>
-                  <div class="flex items-center gap-3">
-                    <span class="text-lg w-7 text-center">5️⃣</span>
-                    <span class="text-xs font-bold w-16 text-muted-foreground">5th Place</span>
-                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">৳</span><input type="number" id="dailyPrize5" placeholder="0" class="w-full bg-secondary rounded-xl py-2.5 pl-7 pr-3 outline-none text-sm font-bold"/></div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Weekly Prizes -->
-              <div class="border-t border-border pt-4">
-                <div class="text-xs font-extrabold uppercase tracking-wider text-blue-600 mb-3 flex items-center gap-2">
-                  <iconify-icon icon="lucide:calendar-range"></iconify-icon> Weekly Prizes
-                </div>
-                <div class="space-y-2">
-                  <div class="flex items-center gap-3">
-                    <span class="text-lg w-7 text-center">🥇</span>
-                    <span class="text-xs font-bold w-16 text-muted-foreground">1st Place</span>
-                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">৳</span><input type="number" id="weeklyPrize1" placeholder="0" class="w-full bg-secondary rounded-xl py-2.5 pl-7 pr-3 outline-none text-sm font-bold"/></div>
-                  </div>
-                  <div class="flex items-center gap-3">
-                    <span class="text-lg w-7 text-center">🥈</span>
-                    <span class="text-xs font-bold w-16 text-muted-foreground">2nd Place</span>
-                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">৳</span><input type="number" id="weeklyPrize2" placeholder="0" class="w-full bg-secondary rounded-xl py-2.5 pl-7 pr-3 outline-none text-sm font-bold"/></div>
-                  </div>
-                  <div class="flex items-center gap-3">
-                    <span class="text-lg w-7 text-center">🥉</span>
-                    <span class="text-xs font-bold w-16 text-muted-foreground">3rd Place</span>
-                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">৳</span><input type="number" id="weeklyPrize3" placeholder="0" class="w-full bg-secondary rounded-xl py-2.5 pl-7 pr-3 outline-none text-sm font-bold"/></div>
-                  </div>
-                  <div class="flex items-center gap-3">
-                    <span class="text-lg w-7 text-center">4️⃣</span>
-                    <span class="text-xs font-bold w-16 text-muted-foreground">4th Place</span>
-                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">৳</span><input type="number" id="weeklyPrize4" placeholder="0" class="w-full bg-secondary rounded-xl py-2.5 pl-7 pr-3 outline-none text-sm font-bold"/></div>
-                  </div>
-                  <div class="flex items-center gap-3">
-                    <span class="text-lg w-7 text-center">5️⃣</span>
-                    <span class="text-xs font-bold w-16 text-muted-foreground">5th Place</span>
-                    <div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">৳</span><input type="number" id="weeklyPrize5" placeholder="0" class="w-full bg-secondary rounded-xl py-2.5 pl-7 pr-3 outline-none text-sm font-bold"/></div>
-                  </div>
-                </div>
-              </div>
-
-              <button onclick="window.savePrizeSettings()" class="w-full bg-amber-500 text-white font-bold py-3 rounded-2xl flex gap-2 items-center justify-center hover:bg-amber-600 transition-colors">
-                <iconify-icon icon="lucide:trophy"></iconify-icon> Save Prize Settings
-              </button>
-            </div>
-          </div>
-        </div>
-
+         <!-- PRIZE SETTINGS -->
+<div class="bg-card border border-amber-200 rounded-2xl p-6 mt-5">
+  <div class="flex gap-3 items-center mb-4">
+    <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+      <iconify-icon icon="lucide:trophy" class="text-amber-600 text-xl"></iconify-icon>
+    </div>
+    <div>
+      <h3 class="font-extrabold">Prize Settings</h3>
+      <p class="text-[10px] text-muted-foreground uppercase font-bold">Daily: OTP criteria tiers · Weekly: rank prizes + criteria tiers</p>
+    </div>
+  </div>
+  <div class="space-y-6">
+    <div>
+      <div class="text-xs font-extrabold uppercase tracking-wider text-amber-600 mb-1 flex items-center gap-2">
+        <iconify-icon icon="lucide:calendar-days"></iconify-icon> Daily — Criteria Tiers
+      </div>
+      <p class="text-[10px] text-muted-foreground mb-3">Users who reach the OTP threshold earn that prize (highest tier only).</p>
+      <div id="dailyCriteriaList" class="space-y-2 mb-3"></div>
+      <button onclick="window.addCriteria('daily')" class="text-xs bg-amber-50 border border-amber-200 text-amber-700 font-bold px-3 py-2 rounded-xl flex items-center gap-2 hover:bg-amber-100 transition-colors">
+        <iconify-icon icon="lucide:plus"></iconify-icon> Add Daily Tier
+      </button>
+    </div>
+    <div class="border-t border-border pt-5">
+      <div class="text-xs font-extrabold uppercase tracking-wider text-blue-600 mb-1 flex items-center gap-2">
+        <iconify-icon icon="lucide:calendar-range"></iconify-icon> Weekly — Rank Prizes
+      </div>
+      <p class="text-[10px] text-muted-foreground mb-3">Top 5 users by OTP count get these prizes.</p>
+      <div class="space-y-2">
+        <div class="flex items-center gap-3"><span class="text-lg w-7 text-center">🥇</span><span class="text-xs font-bold w-16 text-muted-foreground">1st Place</span><div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">৳</span><input type="number" id="weeklyPrize1" placeholder="0" class="w-full bg-secondary rounded-xl py-2.5 pl-7 pr-3 outline-none text-sm font-bold"/></div></div>
+        <div class="flex items-center gap-3"><span class="text-lg w-7 text-center">🥈</span><span class="text-xs font-bold w-16 text-muted-foreground">2nd Place</span><div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">৳</span><input type="number" id="weeklyPrize2" placeholder="0" class="w-full bg-secondary rounded-xl py-2.5 pl-7 pr-3 outline-none text-sm font-bold"/></div></div>
+        <div class="flex items-center gap-3"><span class="text-lg w-7 text-center">🥉</span><span class="text-xs font-bold w-16 text-muted-foreground">3rd Place</span><div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">৳</span><input type="number" id="weeklyPrize3" placeholder="0" class="w-full bg-secondary rounded-xl py-2.5 pl-7 pr-3 outline-none text-sm font-bold"/></div></div>
+        <div class="flex items-center gap-3"><span class="text-lg w-7 text-center">4️⃣</span><span class="text-xs font-bold w-16 text-muted-foreground">4th Place</span><div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">৳</span><input type="number" id="weeklyPrize4" placeholder="0" class="w-full bg-secondary rounded-xl py-2.5 pl-7 pr-3 outline-none text-sm font-bold"/></div></div>
+        <div class="flex items-center gap-3"><span class="text-lg w-7 text-center">5️⃣</span><span class="text-xs font-bold w-16 text-muted-foreground">5th Place</span><div class="relative flex-1"><span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">৳</span><input type="number" id="weeklyPrize5" placeholder="0" class="w-full bg-secondary rounded-xl py-2.5 pl-7 pr-3 outline-none text-sm font-bold"/></div></div>
       </div>
     </div>
+    <div class="border-t border-border pt-5">
+      <div class="text-xs font-extrabold uppercase tracking-wider text-blue-600 mb-1 flex items-center gap-2">
+        <iconify-icon icon="lucide:layers"></iconify-icon> Weekly — Criteria Tiers (optional)
+      </div>
+      <p class="text-[10px] text-muted-foreground mb-3">Any user hitting a threshold earns that prize regardless of rank.</p>
+      <div id="weeklyCriteriaList" class="space-y-2 mb-3"></div>
+      <button onclick="window.addCriteria('weekly')" class="text-xs bg-blue-50 border border-blue-200 text-blue-700 font-bold px-3 py-2 rounded-xl flex items-center gap-2 hover:bg-blue-100 transition-colors">
+        <iconify-icon icon="lucide:plus"></iconify-icon> Add Weekly Tier
+      </button>
+    </div>
+    <button onclick="window.savePrizeSettings()" class="w-full bg-amber-500 text-white font-bold py-3 rounded-2xl flex gap-2 items-center justify-center hover:bg-amber-600 transition-colors">
+      <iconify-icon icon="lucide:trophy"></iconify-icon> Save Prize Settings
+    </button>
   </div>
 </div>
 
@@ -1251,6 +1211,9 @@ async function loadSettings() {
     document.getElementById('setMethodNagad').checked  = activeMethods.includes('Nagad');
     document.getElementById('setMethodBinance').checked = activeMethods.includes('Binance');
   } catch (e) { console.error('loadSettings:', e); }
+  // Set bulk OTP date picker to today by default
+  const bulkDateEl = document.getElementById('bulkOtpDate');
+  if (bulkDateEl && !bulkDateEl.value) bulkDateEl.value = new Date().toISOString().slice(0, 10);
   renderMethodButtons();
   await loadPrizeSettings();
   renderDistributeList();
@@ -1713,13 +1676,14 @@ window.rejectRegistration = async (regId, username) => {
 };
 
 // ─── Dashboard stats ───────────────────────────────────────────────────────────
-function getUserRate(user) {
-  return (user && user.customRate && user.customRate > 0) ? user.customRate : (settings.otpRate || 1);
+function getUserRate(user, freshRate) {
+  if (user && user.customRate && user.customRate > 0) return user.customRate;
+  return freshRate || settings.otpRate || 1;
 }
 
 function calcAvailable(user) {
   const totalOtp = user.totalOtp || 0;
-  const rate = getUserRate(user);
+  const rate = getUserRate(user, settings.otpRate);
   const otpBalance = totalOtp * rate;
   const bonus = user.bonusBalance || 0;
   return Math.max(0, otpBalance + bonus - (user.totalWithdrawn || 0) - (user.totalPending || 0));
@@ -1728,7 +1692,7 @@ function calcAvailable(user) {
 function updateDashStats() {
   if (!currentUser) return;
   const totalOtp = currentUser.totalOtp || 0;
-  const rate = getUserRate(currentUser);
+  const rate = getUserRate(currentUser, settings.otpRate);
   const otpBalance = totalOtp * rate;
   const bonus = currentUser.bonusBalance || 0;
   document.getElementById('dashTotalOtp').innerText = totalOtp;
@@ -1737,7 +1701,6 @@ function updateDashStats() {
   document.getElementById('dashBalance').innerText = calcAvailable(currentUser);
   document.getElementById('dashBalanceMin').innerText = `Min withdraw ৳${settings.minWithdraw}`;
 
-  // Show bonus banner if user has bonus
   const bonusBanner = document.getElementById('bonusBanner');
   const bonusBannerAmount = document.getElementById('bonusBannerAmount');
   if (bonus > 0) {
@@ -1815,8 +1778,8 @@ window.submitWithdraw = async () => {
     if (!/^01[3-9]\d{8}$/.test(number)) { err.innerText = 'Valid BD number required (01X-XXXXXXXX)'; err.style.display = 'block'; return; }
   }
   if (isNaN(amount) || amount <= 0) { err.innerText = 'Please enter a withdrawal amount'; err.style.display = 'block'; return; }
-	if (amount % 10 !== 0) { err.innerText = 'Amount must end in 0 (e.g. 100, 110, 150, 200, 500...)'; err.style.display = 'block'; return; }
-	if (amount < settings.minWithdraw) { err.innerText = `Minimum withdrawal is ৳${settings.minWithdraw}`; err.style.display = 'block'; return; }
+  if (amount % 10 !== 0) { err.innerText = 'Amount must end in 0 (e.g. 100, 110, 150, 200, 500...)'; err.style.display = 'block'; return; }
+  if (amount < settings.minWithdraw) { err.innerText = `Minimum withdrawal is ৳${settings.minWithdraw}`; err.style.display = 'block'; return; }
 
   setLoading('wdBtn', true);
   try {
@@ -1826,7 +1789,7 @@ window.submitWithdraw = async () => {
       const snap = await tx.get(userRef);
       if (!snap.exists()) throw new Error('User not found');
       const d = snap.data();
-      const rate = getUserRate(d);
+      const rate = getUserRate(d, settings.otpRate);
       const bonus = d.bonusBalance || 0;
       const freshAvailable = Math.max(0, (d.totalOtp||0) * rate + bonus - (d.totalWithdrawn||0) - (d.totalPending||0));
       if (amount > freshAvailable) throw new Error(`Insufficient balance. Available: ৳${freshAvailable}`);
@@ -2107,8 +2070,6 @@ window.giveBonus = async () => {
 
   try {
     await updateDoc(doc(db, 'users', found.id), { bonusBalance: newBonus });
-
-    // Also log this bonus as a withdrawal record for audit trail
     await addDoc(collection(db, 'bonusHistory'), {
       userId: found.id,
       username: found.username || found.id,
@@ -2118,7 +2079,6 @@ window.giveBonus = async () => {
       awardedAt: serverTimestamp(),
       note: 'Campaign bonus'
     });
-
     window.showToast(`🎁 ৳${amount} bonus given to ${found.username || found.id}!`, 'success');
     document.getElementById('bonusUser').value   = '';
     document.getElementById('bonusAmount').value = '';
@@ -2279,10 +2239,11 @@ window.parseBulkData = (raw) => {
 window.previewBulkOtp = () => {
   const raw = document.getElementById('bulkOtpInput').value;
   const previewDiv = document.getElementById('bulkPreview');
+  const selectedDate = document.getElementById('bulkOtpDate').value || new Date().toISOString().slice(0, 10);
   const lines = window.parseBulkData(raw);
   if (!lines.length) { previewDiv.style.display = 'none'; return; }
   previewDiv.style.display = 'block';
-  previewDiv.innerHTML = `<strong class="block mb-2">📋 ${lines.length} entries found</strong>` +
+  previewDiv.innerHTML = `<strong class="block mb-1">📋 ${lines.length} entries — date: ${selectedDate}</strong>` +
     lines.map(({ username, count }) => {
       const found = allUsers.find(u => u.id===username.toLowerCase() || (u.username||'').toLowerCase()===username.toLowerCase());
       const preloaded = allPreloads.find(p => p.id === username.toLowerCase());
@@ -2298,10 +2259,15 @@ window.previewBulkOtp = () => {
 
 window.applyBulkOtp = async () => {
   const raw = document.getElementById('bulkOtpInput').value;
+  // ── Read the chosen date (fall back to today) ──
+  const selectedDate = document.getElementById('bulkOtpDate').value || new Date().toISOString().slice(0, 10);
+
   const lines = window.parseBulkData(raw);
   if (!lines.length) { window.showToast('No valid data found', 'error'); return; }
+
   const applyBtn = document.querySelector('#tab-otp .bg-slate-900');
   if (applyBtn) applyBtn.disabled = true;
+
   let updatedUsers = 0, preloadedNew = 0, preloadedAdded = 0;
   const BATCH_SIZE = 499;
   let batch = writeBatch(db);
@@ -2309,6 +2275,7 @@ window.applyBulkOtp = async () => {
   const flushBatch = async () => {
     if (batchCount > 0) { await batch.commit(); batch = writeBatch(db); batchCount = 0; }
   };
+
   for (const { username, count } of lines) {
     const found = allUsers.find(u => u.id===username.toLowerCase() || (u.username||'').toLowerCase()===username.toLowerCase());
     if (found) {
@@ -2330,21 +2297,24 @@ window.applyBulkOtp = async () => {
   }
   await flushBatch();
   if (applyBtn) applyBtn.disabled = false;
-  // Write otpLogs separately after batch — non-blocking
-  const today = new Date().toISOString().slice(0,10);
+
+  // ── Write otpLogs with the chosen date ──
   for (const { username, count } of lines) {
     const found = allUsers.find(u => u.id===username.toLowerCase() || (u.username||'').toLowerCase()===username.toLowerCase());
     if (found) {
       addDoc(collection(db, 'otpLogs'), {
         userId: found.id,
-        username: found.username||found.id,
+        username: found.username || found.id,
         count,
-        date: today,
+        date: selectedDate,       // ← uses picker value instead of always today
         addedAt: serverTimestamp()
       }).catch(e => console.warn('otpLog write failed for', found.id, e));
     }
   }
-  const msg = [`✅ ${updatedUsers} user${updatedUsers!==1?'s':''} updated`];
+
+  const msg = [
+    `✅ ${updatedUsers} user${updatedUsers!==1?'s':''} updated (date: ${selectedDate})`
+  ];
   if (preloadedNew) msg.push(`⚡ ${preloadedNew} new pre-loaded`);
   if (preloadedAdded) msg.push(`+${preloadedAdded} pre-load updated`);
   window.showToast(msg.join(' · '), 'success');
@@ -2366,7 +2336,7 @@ window.addManualWithdrawal = async () => {
     const uSnap = await getDoc(doc(db, 'users', found.id));
     if (!uSnap.exists()) { window.showToast('User not found in DB', 'error'); return; }
     const d = uSnap.data();
-    const rate = getUserRate(found);
+    const rate = getUserRate(found, settings.otpRate);
     const bonus = d.bonusBalance || 0;
     const available = Math.max(0, (d.totalOtp||0) * rate + bonus - (d.totalWithdrawn||0) - (d.totalPending||0));
     if (amount > available) {
@@ -2411,21 +2381,6 @@ window.removeCustomRate = async (userId, username) => {
     await updateDoc(doc(db, 'users', userId), { customRate: null });
     window.showToast(`Custom rate removed for ${username}`, 'info');
   } catch (e) { window.showToast('Error removing custom rate', 'error'); }
-};
-
-window.addSingleOtp = async () => {
-  const username = document.getElementById('singleOtpUser').value.trim();
-  const cnt = parseInt(document.getElementById('singleOtpCount').value);
-  if (!username || isNaN(cnt) || cnt <= 0) { window.showToast('Enter valid username and count', 'error'); return; }
-  if (cnt > 100000) { window.showToast('Count exceeds 100,000 safety cap', 'error'); return; }
-  const found = allUsers.find(u => u.id===username.toLowerCase() || (u.username||'').toLowerCase()===username.toLowerCase());
-  if (!found) { window.showToast('User not found. Use bulk OTP to pre-load for unregistered users.', 'error'); return; }
-  await updateDoc(doc(db, 'users', found.id), { totalOtp: (found.totalOtp||0) + cnt });
-  const today = new Date().toISOString().slice(0,10);
-  await addDoc(collection(db, 'otpLogs'), { userId: found.id, username: found.username||found.id, count: cnt, date: today, addedAt: serverTimestamp() });
-  window.showToast(`${found.username}: +${cnt} OTP added`, 'success');
-  document.getElementById('singleOtpUser').value = '';
-  document.getElementById('singleOtpCount').value = '';
 };
 
 function renderPreloadedOtpList() {
@@ -2536,49 +2491,103 @@ window.addEventListener('load', async () => {
     }
   }, 800);
 });
+
 // ─── Prize Settings ────────────────────────────────────────────────────────────
 let prizeSettings = {
-  daily:  [0, 0, 0, 0, 0],
-  weekly: [0, 0, 0, 0, 0]
+  dailyCriteria:  [],
+  weekly:         [0,0,0,0,0],
+  weeklyCriteria: []
 };
 let distribPeriod = 'daily';
 let prizeDistribHistory = {};
+
+function getEligibleTier(otpCount, criteriaArr) {
+  const sorted = [...(criteriaArr||[])].filter(t => t.minOtp > 0 && t.prize > 0).sort((a,b) => b.minOtp - a.minOtp);
+  return sorted.find(t => otpCount >= t.minOtp) || null;
+}
+
+function renderCriteriaInputs() {
+  ['daily','weekly'].forEach(period => {
+    const container = document.getElementById(period + 'CriteriaList');
+    if (!container) return;
+    const tiers = prizeSettings[period + 'Criteria'] || [];
+    if (!tiers.length) {
+      container.innerHTML = `<div class="text-xs text-muted-foreground py-2 italic">No tiers yet. Click "Add" below.</div>`;
+      return;
+    }
+    container.innerHTML = tiers.map((t, i) => `
+      <div class="flex items-center gap-2 bg-secondary rounded-xl px-3 py-2">
+        <iconify-icon icon="lucide:zap" class="text-amber-500 shrink-0 text-sm"></iconify-icon>
+        <div class="flex-1 flex items-center gap-2 flex-wrap">
+          <div class="flex items-center gap-1">
+            <span class="text-[10px] font-bold text-muted-foreground">Min OTPs</span>
+            <input type="number" min="1" value="${t.minOtp||''}" placeholder="e.g. 500"
+              onchange="window.updateCriteria('${period}',${i},'minOtp',this.value)"
+              class="w-20 bg-white border border-border rounded-lg py-1 px-2 text-xs font-bold outline-none"/>
+          </div>
+          <span class="text-muted-foreground text-xs font-bold">→ Prize ৳</span>
+          <input type="number" min="1" value="${t.prize||''}" placeholder="e.g. 50"
+            onchange="window.updateCriteria('${period}',${i},'prize',this.value)"
+            class="w-20 bg-white border border-border rounded-lg py-1 px-2 text-xs font-bold outline-none"/>
+        </div>
+        <button onclick="window.removeCriteria('${period}',${i})" class="text-red-400 hover:text-red-600 transition-colors shrink-0 p-1">
+          <iconify-icon icon="lucide:trash-2" class="text-sm"></iconify-icon>
+        </button>
+      </div>`).join('');
+  });
+}
+
+window.addCriteria = (period) => {
+  prizeSettings[period + 'Criteria'].push({ minOtp: 0, prize: 0 });
+  renderCriteriaInputs();
+};
+window.removeCriteria = (period, idx) => {
+  prizeSettings[period + 'Criteria'].splice(idx, 1);
+  renderCriteriaInputs();
+};
+window.updateCriteria = (period, idx, field, val) => {
+  prizeSettings[period + 'Criteria'][idx][field] = parseFloat(val) || 0;
+};
 
 async function loadPrizeSettings() {
   try {
     const snap = await getDoc(doc(db, 'config', 'prizes'));
     if (snap.exists()) {
       const d = snap.data();
-      prizeSettings.daily  = d.daily  || [0,0,0,0,0];
-      prizeSettings.weekly = d.weekly || [0,0,0,0,0];
-      prizeDistribHistory  = d.history || {};
+      prizeSettings.dailyCriteria  = d.dailyCriteria  || [];
+      prizeSettings.weekly         = d.weekly         || [0,0,0,0,0];
+      prizeSettings.weeklyCriteria = d.weeklyCriteria || [];
+      prizeDistribHistory          = d.history        || {};
     }
     [1,2,3,4,5].forEach(i => {
-      const dEl = document.getElementById('dailyPrize'+i);
-      const wEl = document.getElementById('weeklyPrize'+i);
-      if (dEl) dEl.value = prizeSettings.daily[i-1]  || '';
-      if (wEl) wEl.value = prizeSettings.weekly[i-1] || '';
+      const el = document.getElementById('weeklyPrize'+i);
+      if (el) el.value = prizeSettings.weekly[i-1] || '';
     });
   } catch(e) { console.error('loadPrizeSettings:', e); }
+  renderCriteriaInputs();
 }
 
 window.savePrizeSettings = async () => {
-  prizeSettings.daily  = [1,2,3,4,5].map(i => parseFloat(document.getElementById('dailyPrize'+i)?.value)  || 0);
   prizeSettings.weekly = [1,2,3,4,5].map(i => parseFloat(document.getElementById('weeklyPrize'+i)?.value) || 0);
+  ['daily','weekly'].forEach(p => {
+    prizeSettings[p+'Criteria'] = (prizeSettings[p+'Criteria']||[])
+      .filter(t => t.minOtp > 0 && t.prize > 0)
+      .sort((a,b) => a.minOtp - b.minOtp);
+  });
   try {
     const snap = await getDoc(doc(db, 'config', 'prizes'));
     const existing = snap.exists() ? snap.data() : {};
     await setDoc(doc(db, 'config', 'prizes'), {
       ...existing,
-      daily:  prizeSettings.daily,
-      weekly: prizeSettings.weekly,
+      dailyCriteria:  prizeSettings.dailyCriteria,
+      weekly:         prizeSettings.weekly,
+      weeklyCriteria: prizeSettings.weeklyCriteria,
       updatedAt: serverTimestamp()
     });
     window.showToast('🏆 Prize settings saved!', 'success');
+    renderCriteriaInputs();
     renderDistributeList();
-  } catch(e) {
-    window.showToast('Error saving prize settings', 'error');
-  }
+  } catch(e) { window.showToast('Error saving prize settings', 'error'); }
 };
 
 // ─── Distribute prizes ─────────────────────────────────────────────────────────
@@ -2599,7 +2608,6 @@ function getDateRange(period) {
     const s = pickerVal || fmt(now);
     return [s, s];
   }
-  // Days since last Friday (Fri=0, Sat=1, Sun=2, Mon=3, Tue=4, Wed=5, Thu=6)
   const day = now.getDay();
   const daysSinceFriday = (day + 2) % 7;
   const thisFriday = new Date(now); thisFriday.setDate(now.getDate() - daysSinceFriday);
@@ -2637,13 +2645,11 @@ function renderDistributeList() {
   const container = document.getElementById('distributeList');
   if (!container) return;
   const prizes = prizeSettings[distribPeriod] || [0,0,0,0,0];
-  const rate = settings.otpRate || 1;
+  // Build period OTP totals from lbAllUsers if available, else fall back to allUsers totalOtp
+  const periodTotals = {};
+  lbAllUsers.forEach(u => { periodTotals[u.id] = u.otp; });
   const sorted = [...allUsers]
-    .map(u => ({
-      ...u,
-      displayName: u.username || u.id,
-      otp: u.totalOtp || 0
-    }))
+    .map(u => ({ ...u, displayName: u.username || u.id, otp: periodTotals[u.id] ?? (u.totalOtp || 0) }))
     .filter(u => u.otp > 0)
     .sort((a, b) => b.otp - a.otp)
     .slice(0, 5);
@@ -2677,9 +2683,7 @@ function renderDistributeList() {
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-        ${hasPrize
-          ? `<span style="font-size:11px;font-weight:800;color:${rankColors[i].text};">৳${prize}</span>`
-          : `<span style="font-size:10px;color:#94A3B8;">No prize set</span>`}
+        ${hasPrize ? `<span style="font-size:11px;font-weight:800;color:${rankColors[i].text};">৳${prize}</span>` : `<span style="font-size:10px;color:#94A3B8;">No prize set</span>`}
         ${alreadyGiven
           ? `<span class="prize-tag" style="background:${rankColors[i].border};color:${rankColors[i].text};">✅ Given</span>`
           : hasPrize
@@ -2700,32 +2704,23 @@ window.giveSinglePrize = async (btn) => {
   const rank     = btn.dataset.rank;
 
   if (!confirm(`Give ৳${prize} prize to "${username}" (Rank #${rank})?\n\nThis will be added as a campaign bonus to their balance.`)) return;
-
   btn.disabled = true;
   try {
     const found = allUsers.find(u => u.id === userId);
     if (!found) { window.showToast('User not found', 'error'); btn.disabled = false; return; }
-
     const currentBonus = found.bonusBalance || 0;
     const newBonus = currentBonus + prize;
     await updateDoc(doc(db, 'users', userId), { bonusBalance: newBonus });
-
     await addDoc(collection(db, 'bonusHistory'), {
       userId, username: found.username || found.id,
       amount: prize, previousBonus: currentBonus, newBonus,
       awardedAt: serverTimestamp(),
       note: `Prize — Rank #${rank} (${distribPeriod})`
     });
-
     prizeDistribHistory[histKey] = { username, prize, givenAt: new Date().toISOString() };
     const snap = await getDoc(doc(db, 'config', 'prizes'));
     const existing = snap.exists() ? snap.data() : {};
-    await setDoc(doc(db, 'config', 'prizes'), {
-      ...existing,
-      history: prizeDistribHistory,
-      updatedAt: serverTimestamp()
-    });
-
+    await setDoc(doc(db, 'config', 'prizes'), { ...existing, history: prizeDistribHistory, updatedAt: serverTimestamp() });
     window.showToast(`🏆 ৳${prize} prize given to ${username}!`, 'success');
     renderDistributeList();
   } catch(e) {
@@ -2739,28 +2734,24 @@ window.distributeAllPrizes = async () => {
   const prizes = prizeSettings[distribPeriod] || [0,0,0,0,0];
   const hasPrizes = prizes.some(p => p > 0);
   if (!hasPrizes) { window.showToast('No prize amounts set for this period', 'error'); return; }
-
   const distribKey = getDistribKey(distribPeriod);
+  const periodTotals = {};
+  lbAllUsers.forEach(u => { periodTotals[u.id] = u.otp; });
   const sorted = [...allUsers]
-    .map(u => ({ ...u, otp: u.totalOtp || 0 }))
+    .map(u => ({ ...u, displayName: u.username || u.id, otp: periodTotals[u.id] ?? (u.totalOtp || 0) }))
     .filter(u => u.otp > 0)
     .sort((a, b) => b.otp - a.otp)
     .slice(0, 5);
-
   const toGive = sorted.filter((u, i) => {
     const histKey = `${distribKey}_rank${i+1}`;
     return prizes[i] > 0 && !prizeDistribHistory[histKey];
   });
-
   if (!toGive.length) { window.showToast('All prizes already distributed for this period!', 'info'); return; }
-
   const names = toGive.map((u,i) => {
     const rank = sorted.indexOf(u) + 1;
     return `#${rank} ${u.username||u.id} → ৳${prizes[rank-1]}`;
   }).join('\n');
-
   if (!confirm(`Distribute prizes to ${toGive.length} winner(s)?\n\n${names}`)) return;
-
   let successCount = 0;
   for (let i = 0; i < sorted.length; i++) {
     const u = sorted[i];
@@ -2781,13 +2772,9 @@ window.distributeAllPrizes = async () => {
       successCount++;
     } catch(e) { console.error('distributeAllPrizes error for', u.id, e); }
   }
-
   const snap = await getDoc(doc(db, 'config', 'prizes'));
   const existing = snap.exists() ? snap.data() : {};
-  await setDoc(doc(db, 'config', 'prizes'), {
-    ...existing, history: prizeDistribHistory, updatedAt: serverTimestamp()
-  });
-
+  await setDoc(doc(db, 'config', 'prizes'), { ...existing, history: prizeDistribHistory, updatedAt: serverTimestamp() });
   window.showToast(`🏆 ${successCount} prize(s) distributed successfully!`, 'success');
   renderDistributeList();
 };
@@ -2798,9 +2785,10 @@ async function loadPrizeSettingsForUser() {
     const snap = await getDoc(doc(db, 'config', 'prizes'));
     if (snap.exists()) {
       const d = snap.data();
-      prizeSettings.daily  = d.daily  || [0,0,0,0,0];
-      prizeSettings.weekly = d.weekly || [0,0,0,0,0];
-      prizeDistribHistory  = d.history || {};
+      prizeSettings.dailyCriteria  = d.dailyCriteria  || [];
+      prizeSettings.weekly         = d.weekly         || [0,0,0,0,0];
+      prizeSettings.weeklyCriteria = d.weeklyCriteria || [];
+      prizeDistribHistory          = d.history        || {};
     }
   } catch(e) {}
 }
@@ -2814,14 +2802,17 @@ let lbAllUsers = [];
 
 window.showDashTab = (tab) => {
   const isLb = tab === 'leaderboard';
-  // Initialize date picker to today when leaderboard opens
-const picker = document.getElementById('lbDatePicker');
-if (picker && !picker.value) picker.value = window.todayStr();
+  const picker = document.getElementById('lbDatePicker');
+  if (picker && !picker.value) picker.value = window.todayStr();
   document.getElementById('dashMainContent').classList.toggle('hidden', isLb);
   document.getElementById('dashLeaderboard').classList.toggle('hidden', !isLb);
   document.getElementById('tabBtnWd').className = `flex-1 py-2.5 rounded-2xl text-xs font-extrabold ${!isLb ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground border border-border'}`;
   document.getElementById('tabBtnLb').className = `flex-1 py-2.5 rounded-2xl text-xs font-extrabold ${isLb ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground border border-border'}`;
-  if (isLb) loadLeaderboard();
+  if (isLb) {
+    const pickerRow = document.getElementById('lbDatePickerRow');
+    if (pickerRow) pickerRow.style.display = lbPeriod === 'daily' ? 'flex' : 'none';
+    loadLeaderboard();
+  }
 };
 
 window.setLbPeriod = (period, el) => {
@@ -2829,10 +2820,8 @@ window.setLbPeriod = (period, el) => {
   document.querySelectorAll('.lbPeriodBtn').forEach(b => {
     b.className = `flex-1 py-2.5 rounded-2xl text-xs font-extrabold ${b === el ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground border border-border'} lbPeriodBtn`;
   });
-  // Show date picker only for daily
   const pickerRow = document.getElementById('lbDatePickerRow');
   if (pickerRow) pickerRow.style.display = period === 'daily' ? 'flex' : 'none';
-  // Update label with date range for weekly periods
   const labelEl = document.getElementById('lbPeriodLabel');
   if (period === 'daily') {
     labelEl.innerHTML = 'Daily Top Users';
@@ -2870,15 +2859,13 @@ window.loadLeaderboard = async function() {
 
 function renderLeaderboard() {
   const rate = settings.otpRate || 1;
-  const prizes = prizeSettings[lbPeriod === 'lastweek' ? 'weekly' : lbPeriod] || [0,0,0,0,0];
   const distribKey = getDistribKey(lbPeriod);
+  const prizes = (lbPeriod === 'weekly' || lbPeriod === 'lastweek')
+    ? (prizeSettings.weekly || [0,0,0,0,0])
+    : [];
 
   const sorted = [...lbAllUsers]
-    .map(u => ({
-      ...u,
-      displayName: u.username || u.id,
-      value: u.otp * (settings.otpRate || 1)
-    }))
+    .map(u => ({ ...u, displayName: u.username || u.id, value: u.otp * (settings.otpRate || 1) }))
     .filter(u => u.otp > 0)
     .sort((a, b) => b.otp - a.otp);
 
@@ -2890,54 +2877,100 @@ function renderLeaderboard() {
     return;
   }
 
-  // ── Prize board ──
-  const hasPrizes = prizes.some(p => p > 0);
   const prizeBoard = document.getElementById('lbPrizeBoard');
-  const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
-  const prizeColors = [
-    { bg:'#FEF9C3', border:'#FDE047', text:'#854D0E' },
-    { bg:'#F1F5F9', border:'#CBD5E1', text:'#475569' },
-    { bg:'#FFEDD5', border:'#FDBA74', text:'#9A3412' },
-    { bg:'#F0FDF4', border:'#BBF7D0', text:'#166534' },
-    { bg:'#EFF6FF', border:'#BFDBFE', text:'#1E40AF' }
-  ];
+const isWeekly = lbPeriod === 'weekly' || lbPeriod === 'lastweek';
+const distribKeyLb = getDistribKey(lbPeriod);
 
-  if (hasPrizes) {
+if (isWeekly) {
+  const weeklyRank = prizeSettings.weekly || [0,0,0,0,0];
+  const weeklyCrit = [...(prizeSettings.weeklyCriteria||[])].sort((a,b)=>a.minOtp-b.minOtp);
+  const hasRank = weeklyRank.some(p=>p>0);
+  const hasCrit = weeklyCrit.length > 0;
+  if (!hasRank && !hasCrit) { prizeBoard.innerHTML = ''; }
+  else {
+    const myOtp = currentUser ? (lbAllUsers.find(u=>u.id===currentUser.id)?.otp||0) : 0;
+    const rankMedals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+    const rankRows = hasRank ? sorted.slice(0,5).map((u,i) => {
+      const p = weeklyRank[i]||0; if (!p) return '';
+      const histKey = `${distribKeyLb}_rank${i+1}`;
+      const given = prizeDistribHistory[histKey];
+      const isMe = currentUser && u.id === currentUser.id;
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-radius:13px;background:#FEF9C3;border:1.5px solid #FDE047;margin-bottom:5px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:15px;">${rankMedals[i]}</span>
+          <span style="font-size:11px;font-weight:800;color:#854D0E;">${escHtml(u.displayName)}</span>
+          ${isMe?`<span style="font-size:9px;font-weight:800;color:#2563EB;background:#DBEAFE;padding:2px 6px;border-radius:20px;">You!</span>`:''}
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;">
+          <span style="font-size:12px;font-weight:800;color:#854D0E;">৳${p}</span>
+          ${given?`<span style="font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;background:#FDE047;color:#854D0E;">✅ Awarded</span>`:''}
+        </div>
+      </div>`;
+    }).filter(Boolean).join('') : '';
+    const critRows = hasCrit ? weeklyCrit.map(t => {
+      const qualifies = myOtp >= t.minOtp;
+      const histKey = `${distribKeyLb}_wcriteria_${currentUser?.id}`;
+      const given = currentUser && prizeDistribHistory[histKey];
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-radius:13px;background:${qualifies?'#EFF6FF':'#F8FAFC'};border:1.5px solid ${qualifies?'#BFDBFE':'#E2E8F0'};margin-bottom:5px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:14px;">${qualifies?'✅':'🎯'}</span>
+          <span style="font-size:11px;font-weight:800;color:${qualifies?'#1D4ED8':'#475569'};">≥ ${t.minOtp.toLocaleString()} OTPs</span>
+          ${qualifies&&currentUser?`<span style="font-size:9px;font-weight:800;color:#059669;background:#D1FAE5;padding:2px 6px;border-radius:20px;">You qualify!</span>`:''}
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;">
+          <span style="font-size:12px;font-weight:800;color:${qualifies?'#1D4ED8':'#475569'};">৳${t.prize}</span>
+          ${given?`<span style="font-size:9px;padding:2px 7px;border-radius:20px;background:#D1FAE5;color:#065F46;font-weight:800;">✅ Awarded</span>`:''}
+        </div>
+      </div>`;
+    }).join('') : '';
     prizeBoard.innerHTML = `
-      <div class="bg-card border border-amber-200 rounded-[2rem] p-5">
+      <div class="bg-card border border-amber-200 rounded-[2rem] p-5 mb-4">
         <div class="flex items-center gap-2 mb-4">
           <span style="font-size:18px;">🏆</span>
           <div>
-            <div class="text-xs font-extrabold uppercase tracking-wider text-amber-600">${lbPeriod === 'daily' ? 'Daily' : 'Weekly'} Prize Pool</div>
-            <div class="text-[10px] text-muted-foreground">Prizes for top performers</div>
+            <div class="text-xs font-extrabold uppercase tracking-wider text-amber-600">Weekly Prize Pool</div>
+            <div class="text-[10px] text-muted-foreground">Rank prizes + criteria rewards</div>
           </div>
         </div>
-        <div class="space-y-2">
-          ${prizes.map((prize, i) => {
-            if (!prize) return '';
-            const histKey = `${distribKey}_rank${i+1}`;
-            const given = prizeDistribHistory[histKey];
-            const winner = sorted[i];
-            const isMe = winner && currentUser && winner.id === currentUser.id;
-            return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:14px;background:${prizeColors[i].bg};border:1.5px solid ${prizeColors[i].border};">
-              <div style="display:flex;align-items:center;gap:8px;">
-                <span style="font-size:16px;">${medals[i]}</span>
-                <span style="font-size:12px;font-weight:800;color:${prizeColors[i].text};">${i+1}${i===0?'st':i===1?'nd':i===2?'rd':'th'} Place</span>
-                ${isMe ? `<span style="font-size:9px;font-weight:800;color:#2563EB;background:#DBEAFE;padding:2px 6px;border-radius:20px;">You!</span>` : ''}
-              </div>
-              <div style="display:flex;align-items:center;gap:6px;">
-                <span style="font-size:13px;font-weight:800;color:${prizeColors[i].text};">৳${prize}</span>
-                ${given ? `<span style="font-size:9px;font-weight:800;padding:2px 8px;border-radius:20px;background:${prizeColors[i].border};color:${prizeColors[i].text};">✅ Awarded</span>` : ''}
-              </div>
-            </div>`;
-          }).filter(Boolean).join('')}
+        ${hasRank?`<div class="text-[10px] font-extrabold uppercase text-amber-600 mb-2 tracking-wider">🏅 Rank Prizes</div>${rankRows}`:''}
+        ${hasCrit?`<div class="text-[10px] font-extrabold uppercase text-blue-600 mb-2 mt-3 tracking-wider">⚡ Criteria Prizes</div>${critRows}`:''}
+      </div>`;
+  }
+} else {
+  const dailyCrit = [...(prizeSettings.dailyCriteria||[])].sort((a,b)=>a.minOtp-b.minOtp);
+  if (!dailyCrit.length) { prizeBoard.innerHTML = ''; }
+  else {
+    const myOtp = currentUser ? (lbAllUsers.find(u=>u.id===currentUser.id)?.otp||0) : 0;
+    const critRows = dailyCrit.map(t => {
+      const qualifies = myOtp >= t.minOtp;
+      const histKey = `${distribKeyLb}_criteria_${currentUser?.id}`;
+      const given = currentUser && prizeDistribHistory[histKey];
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-radius:13px;background:${qualifies?'#ECFDF5':'#F8FAFC'};border:1.5px solid ${qualifies?'#6EE7B7':'#E2E8F0'};margin-bottom:5px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:14px;">${qualifies?'✅':'🎯'}</span>
+          <span style="font-size:11px;font-weight:800;color:${qualifies?'#059669':'#475569'};">≥ ${t.minOtp.toLocaleString()} OTPs</span>
+          ${qualifies&&currentUser?`<span style="font-size:9px;font-weight:800;color:#059669;background:#D1FAE5;padding:2px 6px;border-radius:20px;">You qualify!</span>`:''}
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;">
+          <span style="font-size:12px;font-weight:800;color:${qualifies?'#059669':'#475569'};">৳${t.prize}</span>
+          ${given?`<span style="font-size:9px;padding:2px 7px;border-radius:20px;background:#D1FAE5;color:#065F46;font-weight:800;">✅ Awarded</span>`:''}
         </div>
       </div>`;
-  } else {
-    prizeBoard.innerHTML = '';
+    }).join('');
+    prizeBoard.innerHTML = `
+      <div class="bg-card border border-emerald-200 rounded-[2rem] p-5 mb-4">
+        <div class="flex items-center gap-2 mb-4">
+          <span style="font-size:18px;">🎯</span>
+          <div>
+            <div class="text-xs font-extrabold uppercase tracking-wider text-emerald-600">Daily Prize Criteria</div>
+            <div class="text-[10px] text-muted-foreground">Reach the target OTPs to earn a prize</div>
+          </div>
+        </div>
+        ${critRows}
+      </div>`;
   }
+}
 
-  // ── Podium top 3 ──
   const top3 = [sorted[1], sorted[0], sorted[2]].filter(Boolean);
   const podiumHeights = ['80px','110px','60px'];
   const podiumMedals = ['🥈','🥇','🥉'];
@@ -2967,7 +3000,6 @@ function renderLeaderboard() {
     </div>`;
   }).join('');
 
-  // ── Rank 4–10 list ──
   const rest = sorted.slice(3, 10);
   document.getElementById('lbRankList').innerHTML = rest.length
     ? rest.map((u, i) => {
@@ -2992,7 +3024,6 @@ function renderLeaderboard() {
       }).join('')
     : '';
 
-  // ── My rank card ──
   const myIdx = currentUser ? sorted.findIndex(u => u.id === currentUser.id) : -1;
   const myRankCard = document.getElementById('lbMyRank');
   if (myIdx !== -1) {
